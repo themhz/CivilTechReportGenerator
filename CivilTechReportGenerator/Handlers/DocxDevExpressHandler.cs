@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using DevExpress.XtraRichEdit;
 using DevExpress.XtraRichEdit.API.Native;
 using System.Drawing;
+using CivilTechReportGenerator.Types;
 
 namespace CivilTechReportGenerator {
     class DocxDevExpressHandler {
@@ -16,7 +17,7 @@ namespace CivilTechReportGenerator {
         public Document doc;
         public CharacterProperties cp;
         public ParagraphProperties pp;
-        public Dictionary<string, string> fieldItems;
+        public Dictionary<string, string> fieldItems;        
 
         public DocxDevExpressHandler(String _template, String _filePath) {
             this.template = _template;
@@ -29,6 +30,33 @@ namespace CivilTechReportGenerator {
             this.fieldItems = items;
         }
 
+
+        
+        //Populates Tables based on table key. It uses a custom type like List<TableData> to populate the table tha corresponds to the particular table key
+        public void populateTable(List<TableData> tableItems) {
+            var document = this.srv.Document;
+            document.BeginUpdate();
+            
+            foreach(TableData td in tableItems) {
+                //var table = document.Tables[int.Parse(td.TableKey)];
+
+                document.Tables[int.Parse(td.TableKey)].BeginUpdate();
+                foreach (List<string> row in td.Rows) {
+                    for(int i=0; i < row.Count; i++) {
+
+                        document.InsertSingleLineText(document.Tables[int.Parse(td.TableKey)][0, i].Range.Start, row[i]);
+                    }
+
+                }
+                document.Tables[int.Parse(td.TableKey)].EndUpdate();
+            }
+
+            
+            document.EndUpdate();
+            document.SaveDocument(this.filePath, DocumentFormat.OpenXml);
+
+
+        }
         public void startEditTableTest() {
             this.srv.Document.BeginUpdate();
             var document = this.srv.Document;
@@ -44,11 +72,12 @@ namespace CivilTechReportGenerator {
             //MessageBox.Show(document.Tables.Count.ToString());
         }
 
+        //
         public void startReplaceKeysInDoc() {                      
             this.srv.Document.BeginUpdate();
             foreach (KeyValuePair<string, string> fieldItem in this.fieldItems) {                
                 System.Text.RegularExpressions.Regex myRegEx = new System.Text.RegularExpressions.Regex(fieldItem.Key);
-                int count = this.srv.Document.ReplaceAll(myRegEx, fieldItem.Value);
+                this.srv.Document.ReplaceAll(myRegEx, fieldItem.Value);
             }
             this.srv.Document.EndUpdate();
             this.srv.SaveDocument(this.filePath, DocumentFormat.OpenXml);

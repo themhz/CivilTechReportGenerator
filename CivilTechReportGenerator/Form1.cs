@@ -12,7 +12,8 @@ using System.Xml;
 
 using DevExpress.Spreadsheet;
 using System.IO;
-
+using CivilTechReportGenerator.Types;
+using CivilTechReportGenerator.Handlers;
 
 namespace CivilTechReportGenerator
 {
@@ -26,9 +27,42 @@ namespace CivilTechReportGenerator
         private void barButtonItem2_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
 
-            testDevExpressReplaceKeys();
+            createTable();
         }
 
+        private void createTable() {
+            String template = "c://Users//themis//Documents/test3.docx";
+            TableHandler tw = new TableHandler();
+            tw.loadTemplate(template);
+            tw.createTable(2, 2);
+            MessageBox.Show("Tables :" + tw.countTables().ToString());
+        }
+
+        private void countTables() {
+            String template = "c://Users//themis//Documents/test3.docx";
+            TableHandler tw = new TableHandler();
+            tw.loadTemplate(template);
+            MessageBox.Show(tw.countTables().ToString());
+        }
+
+        private void testPopulateTable() {
+            String template = "c://Users//themis//Documents/ΠαράρτημαVI_Template.docx";
+            String generatedfile = "c://Users//themis//Documents/ΠαράρτημαVI_Template2.docx";
+            DocxDevExpressHandler dh = new DocxDevExpressHandler(template, generatedfile);
+
+            TableData td = new TableData();
+            td.TableKey = "2";
+            List<string> row1 = new List<string> { "col1", "col2", "col3", "col4", "col5", "col6", "col7", "col8", "col9", "col10" };
+            List<string> row2 = new List<string> { "col1", "col2", "col3", "col4", "col5", "col6", "col7", "col8", "col9", "col10"};
+            td.Rows.Add(row1);
+            td.Rows.Add(row2);
+            List<TableData> tds = new List<TableData>();
+            tds.Add(td);
+
+            dh.loadTemplate();
+            dh.populateTable(tds);
+
+        }
 
         private void testDevExpressReplaceKeys()
         {        
@@ -83,5 +117,6 @@ namespace CivilTechReportGenerator
             XmlHandler xh = new XmlHandler(path);
             String xml = xh.getXml();
         }
+      
     }
 }
