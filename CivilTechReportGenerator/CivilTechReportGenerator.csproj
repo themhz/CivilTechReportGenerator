@@ -102,13 +102,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Abstracts\CivilDocumentX.cs" />
-    <Compile Include="Handlers\DocxDevExpressHandler.cs" />
+    <Compile Include="Factories\DocumentFactory.cs" />
+    <Compile Include="Handlers\SectionHandler.cs" />
+    <Compile Include="Interfaces\IDocumentItem.cs" />
+    <Compile Include="tests\DocxDevExpressHandler.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Handlers\ParagraphHandler.cs" />
     <Compile Include="Handlers\TableHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -14,6 +14,7 @@ using DevExpress.Spreadsheet;
 using System.IO;
 using CivilTechReportGenerator.Types;
 using CivilTechReportGenerator.Handlers;
+using DevExpress.XtraRichEdit;
 
 namespace CivilTechReportGenerator
 {
@@ -23,45 +24,90 @@ namespace CivilTechReportGenerator
         {
             InitializeComponent();
         }
-
+        int a = 0;
         private void barButtonItem2_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
 
-            createTable();
+            RichEditDocumentServer wordProcessor = new RichEditDocumentServer();
+            using (wordProcessor) {
+                testPopulateTable(wordProcessor);
+                
+            }
+            
         }
 
-        private void createTable() {
-            String template = "c://Users//themis//Documents/test3.docx";
-            TableHandler tw = new TableHandler();
-            tw.loadTemplate(template);
-            tw.createTable(2, 2);
-            MessageBox.Show("Tables :" + tw.countTables().ToString());
-        }
-
-        private void countTables() {
-            String template = "c://Users//themis//Documents/test3.docx";
-            TableHandler tw = new TableHandler();
-            tw.loadTemplate(template);
-            MessageBox.Show(tw.countTables().ToString());
-        }
-
-        private void testPopulateTable() {
+        private void checkTable(RichEditDocumentServer wordProcessor) {
             String template = "c://Users//themis//Documents/ΠαράρτημαVI_Template.docx";
             String generatedfile = "c://Users//themis//Documents/ΠαράρτημαVI_Template2.docx";
-            DocxDevExpressHandler dh = new DocxDevExpressHandler(template, generatedfile);
+
+            TableHandler th = new TableHandler(wordProcessor);
+            th.loadTemplate(template);
+            
+            th.checkTable();
+        }
+
+        private void testPopulateTable(RichEditDocumentServer wordProcessor) {
+            String template = "c://Users//themis//Documents/ΠαράρτημαVI_Template.docx";
+            String generatedfile = "c://Users//themis//Documents/ΠαράρτημαVI_Template2.docx";
+
+            TableHandler th = new TableHandler(wordProcessor);
+            th.loadTemplate(template);
+
 
             TableData td = new TableData();
             td.TableKey = "2";
-            List<string> row1 = new List<string> { "col1", "col2", "col3", "col4", "col5", "col6", "col7", "col8", "col9", "col10" };
-            List<string> row2 = new List<string> { "col1", "col2", "col3", "col4", "col5", "col6", "col7", "col8", "col9", "col10"};
+            List<string> row1 = new List<string> { "col1", "col2", "col3", "col4", "col5", "col6", "col7", "col8", "col9", "col10", "col11" };
+            List<string> row2 = new List<string> { "col1", "col2", "col3", "col4", "col5", "col6", "col7", "col8", "col9", "col10", "col11" };
+            List<string> row3 = new List<string> { "col1", "col2", "col3", "col4", "col5", "col6", "col7", "col8", "col9", "col10", "col11" };
+            List<string> row4 = new List<string> { "col1", "col2", "col3", "col4", "col5", "col6", "col7", "col8", "col9", "col10", "col11" };
             td.Rows.Add(row1);
             td.Rows.Add(row2);
+            td.Rows.Add(row3);
+            td.Rows.Add(row4);
             List<TableData> tds = new List<TableData>();
             tds.Add(td);
 
-            dh.loadTemplate();
-            dh.populateTable(tds);
+            th.loadTemplate(template);
+            th.beginUpdate();
+            th.populateTable(tds);
+            th.saveDocument(generatedfile);
 
+        }
+
+        private void createSection(RichEditDocumentServer wordProcessor) {
+            String template = "c://Users//themis//Documents/test3.docx";
+            SectionHandler sh = new SectionHandler(wordProcessor);
+            sh.loadTemplate(template);
+            sh.create();
+
+        }
+        private void createParagraph(RichEditDocumentServer wordProcessor) {
+            String template = "c://Users//themis//Documents/test3.docx";
+            ParagraphHandler ph = new ParagraphHandler(wordProcessor);
+            ph.text = "dasdsadsa";
+            ph.x = 0;
+            ph.y = 1;
+            
+            ph.loadTemplate(template);
+
+            ph.create();
+            
+       }
+        private void createTable(RichEditDocumentServer wordProcessor) {
+            String template = "c://Users//themis//Documents/test3.docx";
+            TableHandler tw = new TableHandler(wordProcessor);
+            tw.loadTemplate(template);
+            
+            tw.create();            
+            MessageBox.Show("Tables :" + tw.countTables().ToString() + " at position "+ a);
+            a = a + 20;
+        }
+
+        private void countTables(RichEditDocumentServer wordProcessor) {
+            String template = "c://Users//themis//Documents/test3.docx";
+            TableHandler tw = new TableHandler(wordProcessor);
+            tw.loadTemplate(template);
+            MessageBox.Show(tw.countTables().ToString());
         }
 
         private void testDevExpressReplaceKeys()

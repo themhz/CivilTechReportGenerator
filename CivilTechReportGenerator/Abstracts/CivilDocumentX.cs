@@ -7,10 +7,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using CivilTechReportGenerator.Interfaces;
 
 namespace CivilTechReportGenerator {
-    abstract class CivilDocumentX {
+    abstract class CivilDocumentX :IDocumentItem  {
+
+        public int x, y, pos = 0;
 
         public RichEditDocumentServer srv;        
         
@@ -26,19 +28,26 @@ namespace CivilTechReportGenerator {
 
 
         public void loadTemplate(String template) {
-            //using (this.srv) {
-                this.srv.LoadDocument(template);
-                this.document = this.srv.Document;                
-            //}
-
+           
+            this.srv.LoadDocument(template);
+            this.document = this.srv.Document;
             this.templatePath = template;
 
         }
 
         public void saveDocument() {
+            this.document.EndUpdate();
             this.srv.SaveDocument(this.templatePath, DocumentFormat.OpenXml);
-
         }
+
+        public void saveDocument(String generatedfile) {
+            this.srv.SaveDocument(generatedfile, DocumentFormat.OpenXml);
+        }
+
+        public void beginUpdate() {
+            this.document.BeginUpdate();
+        }
+        
 
     }
 }
