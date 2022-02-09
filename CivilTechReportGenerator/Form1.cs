@@ -15,6 +15,7 @@ using System.IO;
 using CivilTechReportGenerator.Types;
 using CivilTechReportGenerator.Handlers;
 using DevExpress.XtraRichEdit;
+using CivilTechReportGenerator.tests;
 
 namespace CivilTechReportGenerator
 {
@@ -30,20 +31,48 @@ namespace CivilTechReportGenerator
 
             RichEditDocumentServer wordProcessor = new RichEditDocumentServer();
             using (wordProcessor) {
-                testPopulateTable(wordProcessor);
-                
+                parseDocument();
+
+
             }
             
         }
+        public void testCopyRow(RichEditDocumentServer wordProcessor) {
+            String template = "c://Users//themis//Documents/Test-2.docx";
+            String generatedfile = "c://Users//themis//Documents/Test-2_copy.docx";
 
-        private void checkTable(RichEditDocumentServer wordProcessor) {
+            TableHandler th = new TableHandler(wordProcessor);
+            th.loadTemplate(template);
+            th.copyRow(1, 1, 3, generatedfile);
+            th.copyRow(1, 1, 4, generatedfile);
+
+
+        }
+
+
+        public void testCopyElement(RichEditDocumentServer wordProcessor) {
+            String template = "c://Users//themis//Documents/Test-2.docx";
+            String generatedfile = "c://Users//themis//Documents/Test-2_copy.docx";
+
+            TableHandler th = new TableHandler(wordProcessor);
+            th.loadTemplate(template);
+            th.copy(0, 14, generatedfile);
+
+        }
+
+        private void parseDocument() {
+            parseDocument pd = new parseDocument();
+            pd.OpenDocument("c://Users//themis//Documents/test1.docx");
+        }
+
+        private void countTables(RichEditDocumentServer wordProcessor) {
             String template = "c://Users//themis//Documents/ΠαράρτημαVI_Template.docx";
             String generatedfile = "c://Users//themis//Documents/ΠαράρτημαVI_Template2.docx";
 
             TableHandler th = new TableHandler(wordProcessor);
             th.loadTemplate(template);
             
-            th.checkTable();
+            th.countTables();
         }
 
         private void testPopulateTable(RichEditDocumentServer wordProcessor) {
@@ -101,14 +130,7 @@ namespace CivilTechReportGenerator
             tw.create();            
             MessageBox.Show("Tables :" + tw.countTables().ToString() + " at position "+ a);
             a = a + 20;
-        }
-
-        private void countTables(RichEditDocumentServer wordProcessor) {
-            String template = "c://Users//themis//Documents/test3.docx";
-            TableHandler tw = new TableHandler(wordProcessor);
-            tw.loadTemplate(template);
-            MessageBox.Show(tw.countTables().ToString());
-        }
+        }       
 
         private void testDevExpressReplaceKeys()
         {        

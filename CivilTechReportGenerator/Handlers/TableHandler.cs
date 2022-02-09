@@ -31,14 +31,44 @@ namespace CivilTechReportGenerator.Handlers {
 
         //Creates a table in the document
         public override void create() {
-                                   
-           //Create a new table and specify its layout type
-           DocumentPosition position = base.document.CreatePosition(this.pos);              
-           Table table = document.Tables.Create(position, x, y);                
-           base.saveDocument();           
+
+            //Create a new table and specify its layout type
+            DocumentPosition position = base.document.CreatePosition(this.pos);
+            Table table = document.Tables.Create(position, x, y);
+            base.saveDocument();
+
         }
 
-     
+        //Copies table in a specific position
+        //as suggestion https://supportcenter.devexpress.com/ticket/details/t293243/copy-paste-paragraph-or-table
+        public void copy(int tableIndex, int posTarget, String generatedfile) {
+
+            DocumentRange myRange = document.Tables[tableIndex].Range;
+            DocumentPosition dpos = document.CreatePosition(posTarget);
+            document.InsertText(dpos, " ");            
+            base.document.InsertDocumentContent(dpos, base.document.Tables[pos].Range);
+            base.saveDocument(generatedfile);
+        }
+
+        public void copyRow(int tableIndex, int rowIndex, int newRowIndex, String generatedfile) {
+            Table table = document.Tables[tableIndex];
+            table.BeginUpdate();
+            table.Rows.InsertBefore(newRowIndex);
+
+            //table.Rows.InsertAfter(newRowIndex);
+         
+
+            for (int i = 0; i < table.Rows[1].Cells.Count; i++) {
+                String text = document.GetText(table.Rows[rowIndex].Cells[i].Range);
+                document.InsertText(table.Rows[newRowIndex + 1].Cells[i].Range.Start, text);                
+            }
+
+            //table.Rows[1].Cells.Append();
+            table.EndUpdate();
+
+            base.saveDocument(generatedfile);
+        }
+
 
         // gets table items type TableData. Check folder Types for see the structurwe of TableData
         //You also need to pass the target file which will be the generatedfile. It is a string with the path of the file that will be
