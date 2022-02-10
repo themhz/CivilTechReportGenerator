@@ -8,5 +8,6 @@ namespace CivilTechReportGenerator.Interfaces {
     abstract class IDocumentItem {
 
         public abstract void create();
+        public abstract int count();
     }
 }

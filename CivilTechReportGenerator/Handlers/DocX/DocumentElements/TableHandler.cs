@@ -18,16 +18,14 @@ namespace CivilTechReportGenerator.Handlers {
         }
 
         //Counts how many tables are in the document
-        public int countTables() {            
-            return base.document.Tables.Count;            
-                
+        public override int count() {
+            return base.document.Tables.Count;
         }
 
         //Simply counts the rows of a table, just give the index of the table
         public void countTableRows(int index) {
             MessageBox.Show(base.document.Tables[index].Rows.Count.ToString());
         }
-
 
         //Creates a table in the document
         public override void create() {
@@ -50,6 +48,12 @@ namespace CivilTechReportGenerator.Handlers {
             base.saveDocument(generatedfile);
         }
 
+        public void delete(int index, String generatedfile) {
+
+            base.document.Delete(base.document.Tables[index].Range);
+            base.saveDocument(generatedfile);
+        }
+
         public void copyRow(int tableIndex, int rowIndex, int newRowIndex, String generatedfile) {
             Table table = document.Tables[tableIndex];
             table.BeginUpdate();
@@ -68,6 +72,8 @@ namespace CivilTechReportGenerator.Handlers {
 
             base.saveDocument(generatedfile);
         }
+
+
 
 
         // gets table items type TableData. Check folder Types for see the structurwe of TableData

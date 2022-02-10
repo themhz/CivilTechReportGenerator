@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace CivilTechReportGenerator.tests {
     class parseDocument {
-
+       
         public void OpenDocument(string fileName) {
             if (System.IO.File.Exists(fileName)) {
                 using (DevExpress.XtraRichEdit.RichEditDocumentServer srv = new DevExpress.XtraRichEdit.RichEditDocumentServer()) {

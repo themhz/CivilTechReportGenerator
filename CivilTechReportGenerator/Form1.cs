@@ -1,4 +1,8 @@
-﻿using System;
+﻿using CivilTechReportGenerator.Handlers;
+using CivilTechReportGenerator.tests;
+using CivilTechReportGenerator.Types;
+using DevExpress.XtraRichEdit;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,36 +11,59 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml;
 
-
-using DevExpress.Spreadsheet;
-using System.IO;
-using CivilTechReportGenerator.Types;
-using CivilTechReportGenerator.Handlers;
-using DevExpress.XtraRichEdit;
-using CivilTechReportGenerator.tests;
-
-namespace CivilTechReportGenerator
-{
-    public partial class Form1 : Form
-    {
-        public Form1()
-        {
+namespace CivilTechReportGenerator {
+    public partial class Form1 : Form {
+        public Form1() {
             InitializeComponent();
         }
         int a = 0;
-        private void barButtonItem2_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
-        {
-
+        private void button1_Click(object sender, EventArgs e) {
             RichEditDocumentServer wordProcessor = new RichEditDocumentServer();
             using (wordProcessor) {
-                parseDocument();
+                deleteElement(wordProcessor);
+              
+            }
+        }
 
+        public void deleteElement(RichEditDocumentServer wordProcessor) {
+            String template = "c://Users//themis//Documents/Test.docx";
+            String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
 
+            TableHandler th = new TableHandler(wordProcessor);
+            th.loadTemplate(template);
+            th.delete(1, generatedfile);
+
+        }
+
+        public void scanDocumentV2(RichEditDocumentServer wordProcessor) {
+            String template = "c://Users//themis//Documents/Test.docx";
+            String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
+
+            DocumentHandler dh = new DocumentHandler(wordProcessor);
+            dh.loadTemplate(template);
+
+            List<String[]> countElements = dh.countElements();
+
+            foreach(var element in countElements) {
+                MessageBox.Show(element[0] + element[1]);
             }
             
+
+
         }
+
+        public void scanDocument(RichEditDocumentServer wordProcessor) {
+            String template = "c://Users//themis//Documents/Test.docx";
+            String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
+
+            DocumentHandler dh = new DocumentHandler(wordProcessor);
+            dh.loadTemplate(template);
+            
+            String text = dh.scanDocument();
+            memoEdit1.Text = text;            
+        }
+
         public void testCopyRow(RichEditDocumentServer wordProcessor) {
             String template = "c://Users//themis//Documents/Test-2.docx";
             String generatedfile = "c://Users//themis//Documents/Test-2_copy.docx";
@@ -62,7 +89,7 @@ namespace CivilTechReportGenerator
 
         private void parseDocument() {
             parseDocument pd = new parseDocument();
-            pd.OpenDocument("c://Users//themis//Documents/test1.docx");
+            pd.OpenDocument("c://Users//themis//Documents/Test.docx");
         }
 
         private void countTables(RichEditDocumentServer wordProcessor) {
@@ -71,8 +98,8 @@ namespace CivilTechReportGenerator
 
             TableHandler th = new TableHandler(wordProcessor);
             th.loadTemplate(template);
-            
-            th.countTables();
+
+            th.count();
         }
 
         private void testPopulateTable(RichEditDocumentServer wordProcessor) {
@@ -116,26 +143,25 @@ namespace CivilTechReportGenerator
             ph.text = "dasdsadsa";
             ph.x = 0;
             ph.y = 1;
-            
+
             ph.loadTemplate(template);
 
             ph.create();
-            
-       }
+
+        }
         private void createTable(RichEditDocumentServer wordProcessor) {
             String template = "c://Users//themis//Documents/test3.docx";
             TableHandler tw = new TableHandler(wordProcessor);
             tw.loadTemplate(template);
-            
-            tw.create();            
-            MessageBox.Show("Tables :" + tw.countTables().ToString() + " at position "+ a);
-            a = a + 20;
-        }       
 
-        private void testDevExpressReplaceKeys()
-        {        
+            tw.create();
+            MessageBox.Show("Tables :" + tw.count().ToString() + " at position " + a);
+            a = a + 20;
+        }
+
+        private void testDevExpressReplaceKeys() {
             String template = "c://Users//themis//Documents/ΠαράρτημαVI_Template.docx";
-            String generatedfile = "c://Users//themis//Documents/ΠαράρτημαVI_Template2.docx";            
+            String generatedfile = "c://Users//themis//Documents/ΠαράρτημαVI_Template2.docx";
             DocxDevExpressHandler dh = new DocxDevExpressHandler(template, generatedfile);
             Dictionary<string, string> fieldItems = new Dictionary<string, string>();
             fieldItems.Add("#ΠΑΡΑΣΤΑΤΙΚΑ#", "test1");
@@ -152,20 +178,18 @@ namespace CivilTechReportGenerator
             dh.loadTemplate();
             dh.startReplaceKeysInDoc();
         }
-        private void testDevExpressLoadWord()
-        {
+        private void testDevExpressLoadWord() {
             String file = "c://Users//themis//Documents/Test.docx";
             DocxDevExpressHandler dh = new DocxDevExpressHandler(file, file);
             dh.loadDocument();
             dh.startEditTableTest();
         }
-        private void testDevExpressWord()
-        {
+        private void testDevExpressWord() {
             String file = "c://Users//themis//Documents/Test.docx";
             DocxDevExpressHandler dh = new DocxDevExpressHandler(file, file);
             dh.setCharacterPropertiesInDocument();
             dh.setParagraphPropertiesInDocument();
-            dh.insertSection();            
+            dh.insertSection();
             dh.appendText("hello world");
             dh.insertSection();
             dh.appendText("hello world2");
@@ -175,8 +199,7 @@ namespace CivilTechReportGenerator
             //dh.showDocument();
         }
 
-        private void testXml()
-        {
+        private void testXml() {
             //d:\ProjNet2022\applications\Building.Project\Building.UI\data.el\databases\building\
 
 
@@ -185,6 +208,5 @@ namespace CivilTechReportGenerator
             XmlHandler xh = new XmlHandler(path);
             String xml = xh.getXml();
         }
-      
     }
 }

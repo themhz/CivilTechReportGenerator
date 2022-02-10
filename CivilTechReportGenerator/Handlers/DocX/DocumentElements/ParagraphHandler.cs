@@ -44,6 +44,17 @@ namespace CivilTechReportGenerator.Handlers {
             base.saveDocument();
             
         }
-        
+
+        public void delete(int index, String generatedfile) {
+
+            base.document.Delete(base.document.Paragraphs[index].Range);
+            base.saveDocument(generatedfile);
+        }
+
+
+        public override int count() {
+            return base.document.Paragraphs.Count;
+        }
+
     }
 }

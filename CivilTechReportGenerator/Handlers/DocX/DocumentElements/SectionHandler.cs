@@ -45,5 +45,16 @@ namespace CivilTechReportGenerator.Handlers {
             base.saveDocument();
 
         }
+
+
+        public void delete(int index, String generatedfile) {
+
+            base.document.Delete(base.document.Sections[index].Range);
+            base.saveDocument(generatedfile);
+        }
+
+        public override int count() {
+            return base.document.Sections.Count;
+        }
     }
 }
