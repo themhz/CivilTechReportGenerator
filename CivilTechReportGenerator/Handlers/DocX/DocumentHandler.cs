@@ -71,5 +71,6 @@ namespace CivilTechReportGenerator.Handlers {
             return elementCounter;
         }
         
+        
     }
 }

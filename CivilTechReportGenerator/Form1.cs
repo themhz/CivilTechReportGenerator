@@ -20,17 +20,26 @@ namespace CivilTechReportGenerator {
         int a = 0;
         private void button1_Click(object sender, EventArgs e) {
             RichEditDocumentServer wordProcessor = new RichEditDocumentServer();
-            using (wordProcessor) {
-                deleteElement(wordProcessor);
-              
+            using (wordProcessor) {                
+                testReplace(wordProcessor);              
             }
+        }
+
+        public void testReplace(RichEditDocumentServer wordProcessor) {
+            String template = "c://Users//themis//Documents/Test.docx";
+            String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
+            TableHandler th = new TableHandler(wordProcessor);
+            th.loadTemplate(template);
+
+            th.replace(generatedfile,1);
         }
 
         public void deleteElement(RichEditDocumentServer wordProcessor) {
             String template = "c://Users//themis//Documents/Test.docx";
             String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
 
-            TableHandler th = new TableHandler(wordProcessor);
+            TableHandler th = new TableHandler(wordProcessor);           
+            
             th.loadTemplate(template);
             th.delete(1, generatedfile);
 

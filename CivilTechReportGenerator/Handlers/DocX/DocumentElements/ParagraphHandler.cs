@@ -45,6 +45,17 @@ namespace CivilTechReportGenerator.Handlers {
             
         }
 
+        public void replace(String generatedfile, int pos) {
+
+            System.Text.RegularExpressions.Regex myRegEx = new System.Text.RegularExpressions.Regex("{{PARAGRAPH}}");
+            DocumentRange dr = this.srv.Document.FindAll(myRegEx).First();
+            DocumentPosition dpos = document.CreatePosition(dr.Start.ToInt());
+            document.InsertText(dpos, " ");
+            base.document.InsertDocumentContent(dpos, base.document.Sections[pos].Range);
+            base.document.Delete(dr);
+            base.saveDocument(generatedfile);
+        }
+
         public void delete(int index, String generatedfile) {
 
             base.document.Delete(base.document.Paragraphs[index].Range);

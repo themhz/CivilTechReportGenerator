@@ -13,6 +13,7 @@ using CivilTechReportGenerator.Types;
 namespace CivilTechReportGenerator.Handlers {
     class TableHandler: CivilDocumentX {
         
+
         public TableHandler(RichEditDocumentServer wordProcessor) : base() {
             base.srv = wordProcessor;
         }
@@ -38,7 +39,7 @@ namespace CivilTechReportGenerator.Handlers {
         }
 
         //Copies table in a specific position
-        //as suggestion https://supportcenter.devexpress.com/ticket/details/t293243/copy-paste-paragraph-or-table
+        //as suggested https://supportcenter.devexpress.com/ticket/details/t293243/copy-paste-paragraph-or-table
         public void copy(int tableIndex, int posTarget, String generatedfile) {
 
             DocumentRange myRange = document.Tables[tableIndex].Range;
@@ -74,8 +75,6 @@ namespace CivilTechReportGenerator.Handlers {
         }
 
 
-
-
         // gets table items type TableData. Check folder Types for see the structurwe of TableData
         //You also need to pass the target file which will be the generatedfile. It is a string with the path of the file that will be
         //generated
@@ -98,6 +97,17 @@ namespace CivilTechReportGenerator.Handlers {
             }
             
         }
-      
+
+        public void replace(String generatedfile, int pos) {
+
+            System.Text.RegularExpressions.Regex myRegEx = new System.Text.RegularExpressions.Regex("{{TABLE1}}");
+            DocumentRange dr = this.srv.Document.FindAll(myRegEx).First();                                        
+            DocumentPosition dpos = document.CreatePosition(dr.Start.ToInt());
+            document.InsertText(dpos, " ");
+            base.document.InsertDocumentContent(dpos, base.document.Tables[pos].Range);
+            base.document.Delete(dr);
+            base.saveDocument(generatedfile);
+        }
+
     }
 }

@@ -53,6 +53,17 @@ namespace CivilTechReportGenerator.Handlers {
             base.saveDocument(generatedfile);
         }
 
+        public void replace(String generatedfile, int pos) {
+
+            System.Text.RegularExpressions.Regex myRegEx = new System.Text.RegularExpressions.Regex("{{SECTION}}");
+            DocumentRange dr = this.srv.Document.FindAll(myRegEx).First();
+            DocumentPosition dpos = document.CreatePosition(dr.Start.ToInt());
+            document.InsertText(dpos, " ");
+            base.document.InsertDocumentContent(dpos, base.document.Sections[pos].Range);
+            base.document.Delete(dr);
+            base.saveDocument(generatedfile);
+        }
+
         public override int count() {
             return base.document.Sections.Count;
         }

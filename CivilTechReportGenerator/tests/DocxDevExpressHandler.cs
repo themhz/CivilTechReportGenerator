@@ -77,7 +77,7 @@ namespace CivilTechReportGenerator {
             this.srv.Document.BeginUpdate();
             foreach (KeyValuePair<string, string> fieldItem in this.fieldItems) {                
                 System.Text.RegularExpressions.Regex myRegEx = new System.Text.RegularExpressions.Regex(fieldItem.Key);
-                this.srv.Document.ReplaceAll(myRegEx, fieldItem.Value);
+                this.srv.Document.ReplaceAll(myRegEx, fieldItem.Value);                
             }
             this.srv.Document.EndUpdate();
             this.srv.SaveDocument(this.filePath, DocumentFormat.OpenXml);
