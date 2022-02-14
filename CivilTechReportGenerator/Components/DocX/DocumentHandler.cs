@@ -12,8 +12,8 @@ using CivilTechReportGenerator.Interfaces;
 using CivilTechReportGenerator.Types;
 
 namespace CivilTechReportGenerator.Handlers {
-    class DocumentHandler : DocumentX {
-        
+    class DocumentHandler : DocumentX, IDocumentHandler {
+
         public String text;
 
         //private ListItem listItem;
@@ -65,8 +65,8 @@ namespace CivilTechReportGenerator.Handlers {
             return item;
         }
 
-        public DocumentHandler(RichEditDocumentServer wordProcessor) : base(wordProcessor) {    
-            
+        public DocumentHandler(RichEditDocumentServer wordProcessor) : base(wordProcessor) {
+
         }
 
         public override int count() {
@@ -76,27 +76,27 @@ namespace CivilTechReportGenerator.Handlers {
         public String scanDocument() {
             Document document = base.srv.Document;
             DocumentIterator iterator = new DocumentIterator(document, true);
-            MyVisitor visitor = new MyVisitor();            
+            MyVisitor visitor = new MyVisitor();
 
             while (iterator.MoveNext()) {
-                String test = iterator.Current.Type.ToString();                                              
+                String test = iterator.Current.Type.ToString();
                 if (test.Equals("Text"))
                     visitor.Buffer.Append(test + "=");
                 else
                     visitor.Buffer.AppendLine(test);
 
                 iterator.Current.Accept(visitor);
-                
 
 
 
-            }                                    
+
+            }
 
             return visitor.Text;
         }
 
 
-        public override void create() {                     
+        public override void create() {
 
         }
 
@@ -119,7 +119,7 @@ namespace CivilTechReportGenerator.Handlers {
             //elementCounter.Add(new String[] { "List:", lh.count().ToString() });
             return elementCounter;
         }
-        
+
 
         public void deleteElement(DocumentXItem item, int index) {
             item.delete(index);

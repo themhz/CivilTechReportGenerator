@@ -12,16 +12,16 @@ using CivilTechReportGenerator.Interfaces;
 using System.Text.RegularExpressions;
 
 namespace CivilTechReportGenerator.Handlers {
-    class ParagraphItem : DocumentXItem {
-        
+    class ParagraphItem : DocumentXItem, IParagraphItem {
+
 
         public String text;
         public RichEditDocumentServer srv;
         public ParagraphItem(RichEditDocumentServer srv) : base(srv) {
             this.srv = srv;
-        }        
+        }
         public override void create() {
-           
+
             Document document = base.srv.Document;
             // Start the document update:
             document.BeginUpdate();
@@ -42,13 +42,13 @@ namespace CivilTechReportGenerator.Handlers {
             DocumentPosition dpos = this.srv.Document.CreatePosition(dr.Start.ToInt());
             this.srv.Document.InsertText(dpos, " ");
             this.srv.Document.InsertDocumentContent(dpos, this.srv.Document.Sections[pos].Range);
-            this.srv.Document.Delete(dr);            
+            this.srv.Document.Delete(dr);
         }
         public Table findParagraph(int pos) {
             return this.srv.Document.Tables[pos];
         }
         public override void delete(int index) {
-            this.srv.Document.Delete(this.srv.Document.Paragraphs[index].Range);            
+            this.srv.Document.Delete(this.srv.Document.Paragraphs[index].Range);
         }
         public override int count() {
             return this.srv.Document.Paragraphs.Count;

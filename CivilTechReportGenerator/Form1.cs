@@ -23,7 +23,7 @@ namespace CivilTechReportGenerator {
         private void button1_Click(object sender, EventArgs e) {
             RichEditDocumentServer wordProcessor = new RichEditDocumentServer();
             using (wordProcessor) {
-                test_countTables(wordProcessor);              
+                test_populateTable(wordProcessor);              
             }
         }
 
@@ -75,11 +75,41 @@ namespace CivilTechReportGenerator {
             String template = "c://Users//themis//Documents/Test.docx";
             String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
             DocumentHandler dh = new DocumentHandler(wordProcessor);
+            dh.loadTemplate(generatedfile);
+            int i = dh.setDocumentItem(new TableItem(wordProcessor)).getDocumentItem().count();            
+            MessageBox.Show(i.ToString());
+            
+        }
+        private void test_populateTable(RichEditDocumentServer wordProcessor) {
+            String template = "c://Users//themis//Documents/Test.docx";
+            String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
+            DocumentHandler dh = new DocumentHandler(wordProcessor);
+            
+            dh.setDocumentItem(new TableItem(wordProcessor));
+            dh.loadTemplate(template);
 
             //TableItem th = new TableItem(wordProcessor);
             //th.loadTemplate(template);
 
-            //th.count();
+
+            TableData td = new TableData();
+            td.TableKey = "2";
+            List<string> row1 = new List<string> { "col1", "col2", "col3", "col4", "col5", "col6", "col7", "col8", "col9", "col10", "col11" };
+            List<string> row2 = new List<string> { "col1", "col2", "col3", "col4", "col5", "col6", "col7", "col8", "col9", "col10", "col11" };
+            List<string> row3 = new List<string> { "col1", "col2", "col3", "col4", "col5", "col6", "col7", "col8", "col9", "col10", "col11" };
+            List<string> row4 = new List<string> { "col1", "col2", "col3", "col4", "col5", "col6", "col7", "col8", "col9", "col10", "col11" };
+            td.Rows.Add(row1);
+            td.Rows.Add(row2);
+            td.Rows.Add(row3);
+            td.Rows.Add(row4);
+            List<TableData> tds = new List<TableData>();
+            tds.Add(td);
+
+
+            //dh.getDocumentItem().beginUpdate();
+            //th.populateTable(tds);
+            //th.saveDocument(generatedfile);
+
         }
 
 
@@ -123,33 +153,7 @@ namespace CivilTechReportGenerator {
             pd.OpenDocument("c://Users//themis//Documents/Test.docx");
         }
         
-        private void testPopulateTable(RichEditDocumentServer wordProcessor) {
-            //String template = "c://Users//themis//Documents/ΠαράρτημαVI_Template.docx";
-            //String generatedfile = "c://Users//themis//Documents/ΠαράρτημαVI_Template2.docx";
-
-            //TableItem th = new TableItem(wordProcessor);
-            //th.loadTemplate(template);
-
-
-            //TableData td = new TableData();
-            //td.TableKey = "2";
-            //List<string> row1 = new List<string> { "col1", "col2", "col3", "col4", "col5", "col6", "col7", "col8", "col9", "col10", "col11" };
-            //List<string> row2 = new List<string> { "col1", "col2", "col3", "col4", "col5", "col6", "col7", "col8", "col9", "col10", "col11" };
-            //List<string> row3 = new List<string> { "col1", "col2", "col3", "col4", "col5", "col6", "col7", "col8", "col9", "col10", "col11" };
-            //List<string> row4 = new List<string> { "col1", "col2", "col3", "col4", "col5", "col6", "col7", "col8", "col9", "col10", "col11" };
-            //td.Rows.Add(row1);
-            //td.Rows.Add(row2);
-            //td.Rows.Add(row3);
-            //td.Rows.Add(row4);
-            //List<TableData> tds = new List<TableData>();
-            //tds.Add(td);
-
-            //th.loadTemplate(template);
-            //th.beginUpdate();
-            //th.populateTable(tds);
-            //th.saveDocument(generatedfile);
-
-        }
+        
         private void createSection(RichEditDocumentServer wordProcessor) {
             String template = "c://Users//themis//Documents/test3.docx";
             SectionItem sh = new SectionItem(wordProcessor);
