@@ -10,9 +10,7 @@ using System.Threading.Tasks;
 using CivilTechReportGenerator.Interfaces;
 
 namespace CivilTechReportGenerator {
-    abstract class DocumentX : IDocument {
-
-        public int x, y, pos = 0;
+    abstract class DocumentX : IDocumentX {      
 
         public RichEditDocumentServer srv;                        
 
@@ -22,8 +20,6 @@ namespace CivilTechReportGenerator {
         public DocumentX(RichEditDocumentServer _srv ) {
             this.srv = _srv;            
         }
-
-
 
         public void loadTemplate(String template) {
            

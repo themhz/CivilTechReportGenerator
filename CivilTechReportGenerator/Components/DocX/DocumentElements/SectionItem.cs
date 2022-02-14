@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CivilTechReportGenerator.Handlers {
-    class SectionItem : DocumentX {
+    class SectionItem : DocumentX, ISectionItem {
 
 
         private String _text;
@@ -21,14 +21,14 @@ namespace CivilTechReportGenerator.Handlers {
             set { _text = value; }
         }
 
-        public SectionItem(RichEditDocumentServer wordProcessor):base(wordProcessor) {            
+        public SectionItem(RichEditDocumentServer wordProcessor) : base(wordProcessor) {
         }
 
         public override void create() {
 
             Document document = this.srv.Document;
 
-            
+
             MessageBox.Show(document.Sections.Count().ToString());
             document.InsertSection(document.Range.End);
 
@@ -37,7 +37,7 @@ namespace CivilTechReportGenerator.Handlers {
         }
 
         public void delete(int index) {
-            this.srv.Document.Delete(this.srv.Document.Sections[index].Range);            
+            this.srv.Document.Delete(this.srv.Document.Sections[index].Range);
         }
 
         public void replace(String generatedfile, int pos) {

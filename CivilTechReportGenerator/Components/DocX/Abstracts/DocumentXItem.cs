@@ -12,23 +12,12 @@ using CivilTechReportGenerator.Handlers;
 
 namespace CivilTechReportGenerator {
     abstract class DocumentXItem : IDocumentXItem {
-
-        public int x;
+        
         public RichEditDocumentServer srv;
 
         public DocumentXItem(RichEditDocumentServer _srv) {
             this.srv = _srv;
-        }
-        public DocumentXItem setX(int val) {
-            x = val;
-            return this;
-        }
-
-        public int y;
-        public DocumentXItem setY(int val) {
-            y = val;
-            return this;
-        }
+        }    
 
         public int documentPosition;
         public DocumentXItem setDocumentPosition(int val) {

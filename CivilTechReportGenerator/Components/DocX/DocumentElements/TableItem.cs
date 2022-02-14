@@ -13,7 +13,7 @@ using System.Text.RegularExpressions;
 using CivilTechReportGenerator.Interfaces;
 
 namespace CivilTechReportGenerator.Handlers {
-    class TableItem: DocumentXItem {
+    class TableItem : DocumentXItem, ITableItem {
 
         RichEditDocumentServer wordProcessor;
         Regex myRegEx;
@@ -22,7 +22,7 @@ namespace CivilTechReportGenerator.Handlers {
         int rows, cols;
 
         public TableItem setRows(int val) {
-            rows =  val;
+            rows = val;
             return this;
         }
 
@@ -31,7 +31,7 @@ namespace CivilTechReportGenerator.Handlers {
             return this;
         }
 
-        public TableItem(RichEditDocumentServer _wordProcessor):base(_wordProcessor)  {
+        public TableItem(RichEditDocumentServer _wordProcessor) : base(_wordProcessor) {
             this.wordProcessor = _wordProcessor;
         }
 
@@ -47,7 +47,7 @@ namespace CivilTechReportGenerator.Handlers {
 
         //Creates a table in the document
         public override void create() {
-            
+
             //Create a new table and specify its layout type
             DocumentPosition position = this.wordProcessor.Document.CreatePosition(documentPosition);
             base.createSpace(documentPosition);
@@ -61,9 +61,9 @@ namespace CivilTechReportGenerator.Handlers {
         //Copies table in a specific position
         //as suggested https://supportcenter.devexpress.com/ticket/details/t293243/copy-paste-paragraph-or-table
         public void copy(int tableIndex, int posTarget, String generatedfile) {
-            
+
             base.createSpace(posTarget);
-            this.wordProcessor.Document.InsertDocumentContent(dpos, this.wordProcessor.Document.Tables[documentPosition].Range);          
+            this.wordProcessor.Document.InsertDocumentContent(dpos, this.wordProcessor.Document.Tables[documentPosition].Range);
         }
 
         public override void delete(int index) {
@@ -77,8 +77,8 @@ namespace CivilTechReportGenerator.Handlers {
 
             for (int i = 0; i < table.Rows[rowIndex].Cells.Count; i++) {
                 String text = this.wordProcessor.Document.GetText(table.Rows[rowIndex].Cells[i].Range);
-                this.wordProcessor.Document.InsertText(table.Rows[newRowIndex + 1].Cells[i].Range.Start, text);                
-            }            
+                this.wordProcessor.Document.InsertText(table.Rows[newRowIndex + 1].Cells[i].Range.Start, text);
+            }
             table.EndUpdate();
         }
 
@@ -86,15 +86,15 @@ namespace CivilTechReportGenerator.Handlers {
         // gets table items type TableData. Check folder Types for see the structurwe of TableData
         //You also need to pass the target file which will be the generatedfile. It is a string with the path of the file that will be
         //generated
-        public void populateTable(List<TableData> tableItems) {            
-            
+        public void populateTable(List<TableData> tableItems) {
+
             foreach (TableData td in tableItems) {
                 int tableKey = int.Parse(td.TableKey);
                 var table = this.wordProcessor.Document.Tables;
 
                 table[tableKey].BeginUpdate();
-                foreach (List<string> row in td.Rows) {                    
-                    int rowcount = table[tableKey].Rows.Count()-1;
+                foreach (List<string> row in td.Rows) {
+                    int rowcount = table[tableKey].Rows.Count() - 1;
                     table[tableKey].Rows.InsertAfter(rowcount);
                     for (int i = 0; i < row.Count; i++) {
                         this.wordProcessor.Document.InsertSingleLineText(table[tableKey][rowcount, i].Range.Start, row[i]);
@@ -103,17 +103,17 @@ namespace CivilTechReportGenerator.Handlers {
                 }
                 this.wordProcessor.Document.Tables[tableKey].EndUpdate();
             }
-            
+
         }
 
         public void replace(String generatedfile, int pos, Regex _myRegEx) {
 
             this.myRegEx = _myRegEx;
-            this.dr = this.wordProcessor.Document.FindAll(myRegEx).First();                                        
+            this.dr = this.wordProcessor.Document.FindAll(myRegEx).First();
             this.dpos = this.wordProcessor.Document.CreatePosition(dr.Start.ToInt());
             this.wordProcessor.Document.InsertText(dpos, " ");
             this.wordProcessor.Document.InsertDocumentContent(dpos, this.wordProcessor.Document.Tables[pos].Range);
-            this.wordProcessor.Document.Delete(dr);            
+            this.wordProcessor.Document.Delete(dr);
         }
 
     }

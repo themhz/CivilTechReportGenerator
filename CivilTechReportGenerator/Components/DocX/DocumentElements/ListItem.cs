@@ -11,8 +11,8 @@ using System.Threading.Tasks;
 using CivilTechReportGenerator.Interfaces;
 
 namespace CivilTechReportGenerator.Handlers {
-    class ListItem : IDocumentXItem  {
-        
+    class ListItem : IDocumentXItem, IListItem {
+
         public String text;
         public RichEditDocumentServer wordProcessor;
 
@@ -20,10 +20,10 @@ namespace CivilTechReportGenerator.Handlers {
             wordProcessor = _wordProcessor;
 
         }
-        
 
-        public override void create() {                       
-            
+
+        public override void create() {
+
         }
 
         public override void delete(int index) {
