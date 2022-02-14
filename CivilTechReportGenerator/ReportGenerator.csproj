@@ -128,7 +128,7 @@
   <ItemGroup>
     <Compile Include="Components\DocX\Abstracts\DocumentXItem.cs" />
     <Compile Include="Components\DocX\Abstracts\DocumentX.cs" />
-    <Compile Include="Components\DocX\Interfaces\IDocument.cs" />
+    <Compile Include="Components\DocX\Interfaces\IDocumentX.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -138,7 +138,7 @@
     <Compile Include="Components\DocX\DocumentElements\ListItem.cs" />
     <Compile Include="Components\DocX\DocumentHandler.cs" />
     <Compile Include="Components\DocX\DocumentElements\SectionItem.cs" />
-    <Compile Include="Components\DocX\Interfaces\IDocumentItem.cs" />
+    <Compile Include="Components\DocX\Interfaces\IDocumentXItem.cs" />
     <Compile Include="tests\DocxDevExpressHandler.cs" />
     <Compile Include="Components\DocX\DocumentElements\ParagraphItem.cs" />
     <Compile Include="Components\DocX\DocumentElements\TableItem.cs" />

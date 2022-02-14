@@ -22,38 +22,67 @@ namespace CivilTechReportGenerator {
         int a = 0;
         private void button1_Click(object sender, EventArgs e) {
             RichEditDocumentServer wordProcessor = new RichEditDocumentServer();
-            using (wordProcessor) {                
-                testReplace(wordProcessor);              
+            using (wordProcessor) {
+                test_countTables(wordProcessor);              
             }
         }
 
-        public void testReplace(RichEditDocumentServer wordProcessor) {
+        public void test_CreateTableAfterAnElementOnTheDocument(RichEditDocumentServer wordProcessor) {
             String template = "c://Users//themis//Documents/Test.docx";
             String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
 
             wordProcessor.LoadDocument(template);
-            
-            DocumentHandler dh = new DocumentHandler(wordProcessor)
-                .setTableItem(new TableItem(wordProcessor).setCols(2).setRows(3));
+            //int itemPosition = wordProcessor.Document.Paragraphs[3].Range.End.ToInt();
+            int itemPosition = wordProcessor.Document.Tables[2].Range.End.ToInt();
+            //int itemPosition = wordProcessor.Document.Sections[3].Range.End.ToInt();
+            //int itemPosition = wordProcessor.Document.NumberingLists[3].Range.End.ToInt();
 
-            dh.beginUpdate();            
-            dh.getTableItem().setPos(57).create();            
+            DocumentHandler dh = new DocumentHandler(wordProcessor)
+                .setDocumentItem(new TableItem(wordProcessor)
+                .setCols(2)
+                .setRows(3)
+                );
+            
+            dh.beginUpdate();
+            dh.getDocumentItem().setDocumentPosition(itemPosition).create();
+            dh.saveDocument(generatedfile);
+        }
+        public void test_deleteElement(RichEditDocumentServer wordProcessor) {
+            String template = "c://Users//themis//Documents/Test.docx";
+            String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
+            DocumentHandler dh = new DocumentHandler(wordProcessor);
+            
+            dh.loadTemplate(template);
+            dh.deleteElement(new TableItem(wordProcessor), 1);
             dh.saveDocument(generatedfile);
 
-            //Regex reg = new Regex("{{PARAGRAPH}}");
-            //th.replace(generatedfile, 1, reg);
         }
+        public void test_CopyRow(RichEditDocumentServer wordProcessor) {
+            String template = "c://Users//themis//Documents/Test.docx";
+            String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
+            DocumentHandler dh = new DocumentHandler(wordProcessor);
+            dh.loadTemplate(template);
 
-        public void deleteElement(RichEditDocumentServer wordProcessor) {
-            //String template = "c://Users//themis//Documents/Test.docx";
-            //String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
+            TableItem th = new TableItem(wordProcessor);
+            //TableIndex, RowIndex, NewRowIndex
+            th.copyRow(1, 0, 2);
+            //th.copyRow(1, 1, 3);
 
-            //TableItem th = new TableItem(wordProcessor);           
-            
+            dh.saveDocument(generatedfile);
+
+        }
+        private void test_countTables(RichEditDocumentServer wordProcessor) {
+            String template = "c://Users//themis//Documents/Test.docx";
+            String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
+            DocumentHandler dh = new DocumentHandler(wordProcessor);
+
+            //TableItem th = new TableItem(wordProcessor);
             //th.loadTemplate(template);
-            //th.delete(1, generatedfile);
 
+            //th.count();
         }
+
+
         public void scanDocumentV2(RichEditDocumentServer wordProcessor) {
             //String template = "c://Users//themis//Documents/Test.docx";
             //String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
@@ -79,18 +108,7 @@ namespace CivilTechReportGenerator {
             
             String text = dh.scanDocument();
             memoEdit1.Text = text;            
-        }
-        public void testCopyRow(RichEditDocumentServer wordProcessor) {
-            //String template = "c://Users//themis//Documents/Test-2.docx";
-            //String generatedfile = "c://Users//themis//Documents/Test-2_copy.docx";
-
-            //TableItem th = new TableItem(wordProcessor);
-            //th.loadTemplate(template);
-            //th.copyRow(1, 1, 3, generatedfile);
-            //th.copyRow(1, 1, 4, generatedfile);
-
-
-        }
+        }        
         public void testCopyElement(RichEditDocumentServer wordProcessor) {
             //String template = "c://Users//themis//Documents/Test-2.docx";
             //String generatedfile = "c://Users//themis//Documents/Test-2_copy.docx";
@@ -104,15 +122,7 @@ namespace CivilTechReportGenerator {
             parseDocument pd = new parseDocument();
             pd.OpenDocument("c://Users//themis//Documents/Test.docx");
         }
-        private void countTables(RichEditDocumentServer wordProcessor) {
-            //String template = "c://Users//themis//Documents/ΠαράρτημαVI_Template.docx";
-            //String generatedfile = "c://Users//themis//Documents/ΠαράρτημαVI_Template2.docx";
-
-            //TableItem th = new TableItem(wordProcessor);
-            //th.loadTemplate(template);
-
-            //th.count();
-        }
+        
         private void testPopulateTable(RichEditDocumentServer wordProcessor) {
             //String template = "c://Users//themis//Documents/ΠαράρτημαVI_Template.docx";
             //String generatedfile = "c://Users//themis//Documents/ΠαράρτημαVI_Template2.docx";
@@ -148,15 +158,15 @@ namespace CivilTechReportGenerator {
 
         }
         private void createParagraph(RichEditDocumentServer wordProcessor) {
-            String template = "c://Users//themis//Documents/test3.docx";
-            ParagraphItem ph = new ParagraphItem(wordProcessor);
-            ph.text = "dasdsadsa";
-            ph.x = 0;
-            ph.y = 1;
+            //String template = "c://Users//themis//Documents/test3.docx";
+            //ParagraphItem ph = new ParagraphItem(wordProcessor);
+            //ph.text = "dasdsadsa";
+            //ph.x = 0;
+            //ph.y = 1;
 
-            ph.loadTemplate(template);
+            //ph.loadTemplate(template);
 
-            ph.create();
+            //ph.create();
 
         }
         private void createTable(RichEditDocumentServer wordProcessor) {

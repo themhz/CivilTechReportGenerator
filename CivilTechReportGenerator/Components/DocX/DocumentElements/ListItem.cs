@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 using CivilTechReportGenerator.Interfaces;
 
 namespace CivilTechReportGenerator.Handlers {
-    class ListItem : IDocumentItem  {
+    class ListItem : IDocumentXItem  {
         
         public String text;
-        public RichEditDocumentServer _wordProcessor;
+        public RichEditDocumentServer wordProcessor;
 
-        public ListItem(RichEditDocumentServer wordProcessor) {
-            _wordProcessor = wordProcessor;
+        public ListItem(RichEditDocumentServer _wordProcessor) {
+            wordProcessor = _wordProcessor;
 
         }
         
@@ -26,10 +26,16 @@ namespace CivilTechReportGenerator.Handlers {
             
         }
 
-   
+        public override void delete(int index) {
+
+            wordProcessor.Document.Paragraphs.RemoveNumberingFromParagraph(wordProcessor.Document.Paragraphs[index]);
+
+        }
+
+
 
         public override int count() {
-            return _wordProcessor.Document.NumberingLists.Count();
+            return wordProcessor.Document.NumberingLists.Count();
         }
 
     }

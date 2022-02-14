@@ -5,9 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CivilTechReportGenerator.Interfaces {
-    abstract class IDocumentItem {
+    abstract class IDocumentXItem {
 
         public abstract void create();
         public abstract int count();
+        public abstract void delete(int index);
     }
 }
