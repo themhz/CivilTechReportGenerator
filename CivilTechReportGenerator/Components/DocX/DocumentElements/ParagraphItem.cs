@@ -12,15 +12,14 @@ using CivilTechReportGenerator.Interfaces;
 using System.Text.RegularExpressions;
 
 namespace CivilTechReportGenerator.Handlers {
-    class ParagraphItem : DocumentX {
+    class ParagraphItem : DocumentXItem {
         
+
         public String text;
-
-        public ParagraphItem(RichEditDocumentServer wordProcessor) : base(wordProcessor) {
-
-        }
-        
-
+        public RichEditDocumentServer srv;
+        public ParagraphItem(RichEditDocumentServer srv) : base(srv) {
+            this.srv = srv;
+        }        
         public override void create() {
            
             Document document = base.srv.Document;
@@ -31,38 +30,26 @@ namespace CivilTechReportGenerator.Handlers {
             Paragraph appendedParagraph = document.Paragraphs.Append();
             document.InsertText(appendedParagraph.Range.Start, this.text);
 
-            //// Insert a paragraph at the start of the second section:
-            //Paragraph paragraph = document.Paragraphs.Insert(document.Sections[1].Range.Start);
-            //DocumentPosition position = document.Paragraphs[paragraph.Index - 1].Range.Start;
-            //document.InsertText(position, "Inserted paragraph");
-
             // Finalize the document update:
             document.EndUpdate();
 
-            //DocumentPosition position = document.CreatePosition(_pos);
-
-
-            base.saveDocument();
-            
+            //DocumentPosition position = document.CreatePosition(_pos);                    
         }
-
-        public void replace(String generatedfile, int pos, Regex _myRegEx) {
+        public void replace(int pos, Regex _myRegEx) {
 
             var myRegEx = _myRegEx;
             DocumentRange dr = this.srv.Document.FindAll(myRegEx).First();
             DocumentPosition dpos = this.srv.Document.CreatePosition(dr.Start.ToInt());
             this.srv.Document.InsertText(dpos, " ");
             this.srv.Document.InsertDocumentContent(dpos, this.srv.Document.Sections[pos].Range);
-            this.srv.Document.Delete(dr);
-            base.saveDocument(generatedfile);
+            this.srv.Document.Delete(dr);            
         }
-
-        public void delete(int index, String generatedfile) {
-            this.srv.Document.Delete(this.srv.Document.Paragraphs[index].Range);
-            base.saveDocument(generatedfile);
+        public Table findParagraph(int pos) {
+            return this.srv.Document.Tables[pos];
         }
-
-
+        public override void delete(int index) {
+            this.srv.Document.Delete(this.srv.Document.Paragraphs[index].Range);            
+        }
         public override int count() {
             return this.srv.Document.Paragraphs.Count;
         }

@@ -16,34 +16,54 @@ namespace CivilTechReportGenerator.Handlers {
         
         public String text;
 
-        private ListItem listItem;
-        public DocumentHandler setSectionItem(ListItem _listItem) {
-            listItem = _listItem;
+        //private ListItem listItem;
+        //public DocumentHandler setSectionItem(ListItem _listItem) {
+        //    listItem = _listItem;
+        //    return this;
+        //}
+        //public ListItem getListItem() {
+        //    return listItem;
+        //}
+
+
+
+        //private ParagraphItem paragraphItem;
+        //public DocumentHandler setSectionItem(ParagraphItem _paragraphItem) {
+        //    paragraphItem = _paragraphItem;
+        //    return this;
+        //}
+        //public ParagraphItem getParagraphItem() {
+        //    return paragraphItem;
+        //}
+
+
+        //private SectionItem sectionItem;
+        //public DocumentHandler setSectionItem(SectionItem _sectionItem) {
+        //    sectionItem = _sectionItem;
+        //    return this;
+        //}
+        //public SectionItem getSectionItem() {
+        //    return sectionItem;
+        //}
+
+        //private TableItem tableItem;
+        //public DocumentHandler setTableItem(TableItem _tableItem) {
+        //    tableItem = _tableItem;
+        //    return this;
+        //}
+        //public TableItem getTableItem() {
+        //    return tableItem;
+        //}
+
+
+        private DocumentXItem item;
+        public DocumentHandler setDocumentItem(DocumentXItem _item) {
+            item = _item;
             return this;
         }
-
-        private ParagraphItem paragraphItem;
-        public DocumentHandler setSectionItem(ParagraphItem _paragraphItem) {
-            paragraphItem = _paragraphItem;
-            return this;
+        public DocumentXItem getDocumentItem() {
+            return item;
         }
-
-        private SectionItem sectionItem;
-        public DocumentHandler setSectionItem(SectionItem _sectionItem) {
-            sectionItem = _sectionItem;
-            return this;
-        }
-
-        private TableItem tableItem;
-        public DocumentHandler setTableItem(TableItem _tableItem) {
-            tableItem = _tableItem;
-            return this;
-        }
-
-        public TableItem getTableItem() {
-            return tableItem;
-        }
-
 
         public DocumentHandler(RichEditDocumentServer wordProcessor) : base(wordProcessor) {    
             
@@ -100,6 +120,9 @@ namespace CivilTechReportGenerator.Handlers {
             return elementCounter;
         }
         
-        
+
+        public void deleteElement(DocumentXItem item, int index) {
+            item.delete(index);
+        }
     }
 }

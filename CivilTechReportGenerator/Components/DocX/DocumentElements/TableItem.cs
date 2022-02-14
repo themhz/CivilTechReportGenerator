@@ -31,7 +31,7 @@ namespace CivilTechReportGenerator.Handlers {
             return this;
         }
 
-        public TableItem(RichEditDocumentServer _wordProcessor)  {
+        public TableItem(RichEditDocumentServer _wordProcessor):base(_wordProcessor)  {
             this.wordProcessor = _wordProcessor;
         }
 
@@ -47,32 +47,35 @@ namespace CivilTechReportGenerator.Handlers {
 
         //Creates a table in the document
         public override void create() {
-
+            
             //Create a new table and specify its layout type
-            DocumentPosition position = this.wordProcessor.Document.CreatePosition(pos);
+            DocumentPosition position = this.wordProcessor.Document.CreatePosition(documentPosition);
+            base.createSpace(documentPosition);
             Table table = wordProcessor.Document.Tables.Create(position, rows, cols);
+        }
+
+        public Table findTable(int pos) {
+            return this.wordProcessor.Document.Tables[pos];
         }
 
         //Copies table in a specific position
         //as suggested https://supportcenter.devexpress.com/ticket/details/t293243/copy-paste-paragraph-or-table
         public void copy(int tableIndex, int posTarget, String generatedfile) {
-
-            DocumentRange myRange = this.wordProcessor.Document.Tables[tableIndex].Range;
-            DocumentPosition dpos = this.wordProcessor.Document.CreatePosition(posTarget);
-            this.wordProcessor.Document.InsertText(dpos, " ");
-            this.wordProcessor.Document.InsertDocumentContent(dpos, this.wordProcessor.Document.Tables[pos].Range);          
+            
+            base.createSpace(posTarget);
+            this.wordProcessor.Document.InsertDocumentContent(dpos, this.wordProcessor.Document.Tables[documentPosition].Range);          
         }
 
-        public void delete(int index) {
-            this.wordProcessor.Document.Delete(this.wordProcessor.Document.Tables[index].Range);            
+        public override void delete(int index) {
+            this.wordProcessor.Document.Delete(this.wordProcessor.Document.Tables[index].Range);
         }
 
-        public void copyRow(int tableIndex, int rowIndex, int newRowIndex, String generatedfile) {
+        public void copyRow(int tableIndex, int rowIndex, int newRowIndex) {
             Table table = this.wordProcessor.Document.Tables[tableIndex];
             table.BeginUpdate();
-            table.Rows.InsertBefore(newRowIndex);                     
+            table.Rows.InsertAfter(newRowIndex);
 
-            for (int i = 0; i < table.Rows[1].Cells.Count; i++) {
+            for (int i = 0; i < table.Rows[rowIndex].Cells.Count; i++) {
                 String text = this.wordProcessor.Document.GetText(table.Rows[rowIndex].Cells[i].Range);
                 this.wordProcessor.Document.InsertText(table.Rows[newRowIndex + 1].Cells[i].Range.Start, text);                
             }            
