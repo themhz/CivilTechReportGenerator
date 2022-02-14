@@ -54,7 +54,6 @@ namespace CivilTechReportGenerator {
             //th.delete(1, generatedfile);
 
         }
-
         public void scanDocumentV2(RichEditDocumentServer wordProcessor) {
             //String template = "c://Users//themis//Documents/Test.docx";
             //String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
