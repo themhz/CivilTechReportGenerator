@@ -138,9 +138,21 @@ namespace CivilTechReportGenerator {
 
         public void test_CopyElement(RichEditDocumentServer wordProcessor) {
 
-            this.documentHandler.loadTemplate(this.template);
-            this.tableItem.dpos = this.documentHandler.wordProcessor.Document.CreatePosition(2);            
-            this.tableItem.copy(1, 2);
+            //this.documentHandler.loadTemplate(this.template);
+            //this.tableItem.dpos = this.documentHandler.wordProcessor.Document.CreatePosition(2);            
+            //this.tableItem.copy(1, 2);
+            //this.documentHandler.saveDocument(this.generatedfile);
+
+
+            wordProcessor.Document.LoadDocument(this.template, DocumentFormat.OpenXml);
+            DocumentRange myRange = wordProcessor.Document.CreateRange(0, 120);
+
+            //DocumentRange NewRange = wordProcessor.Document.CreateRange(10, 120);
+            //DocumentRange myRange = wordProcessor.Document.Selection;
+            wordProcessor.Document.Copy(myRange);
+            wordProcessor.Document.Paste(DocumentFormat.PlainText);
+
+            this.documentHandler.wordProcessor = wordProcessor;
             this.documentHandler.saveDocument(this.generatedfile);
         }
 
