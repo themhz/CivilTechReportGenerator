@@ -12,51 +12,11 @@ using CivilTechReportGenerator.Interfaces;
 using CivilTechReportGenerator.Types;
 
 namespace CivilTechReportGenerator.Handlers {
-    class DocumentHandler : DocumentX, IDocumentHandler {
+    public class DocumentHandler : DocumentX, IDocumentHandler {
 
-        public String text;
+        public String text { get; set; }
+        public DocumentXItem item { get; set; }
 
-        //private ListItem listItem;
-        //public DocumentHandler setSectionItem(ListItem _listItem) {
-        //    listItem = _listItem;
-        //    return this;
-        //}
-        //public ListItem getListItem() {
-        //    return listItem;
-        //}
-
-
-
-        //private ParagraphItem paragraphItem;
-        //public DocumentHandler setSectionItem(ParagraphItem _paragraphItem) {
-        //    paragraphItem = _paragraphItem;
-        //    return this;
-        //}
-        //public ParagraphItem getParagraphItem() {
-        //    return paragraphItem;
-        //}
-
-
-        //private SectionItem sectionItem;
-        //public DocumentHandler setSectionItem(SectionItem _sectionItem) {
-        //    sectionItem = _sectionItem;
-        //    return this;
-        //}
-        //public SectionItem getSectionItem() {
-        //    return sectionItem;
-        //}
-
-        //private TableItem tableItem;
-        //public DocumentHandler setTableItem(TableItem _tableItem) {
-        //    tableItem = _tableItem;
-        //    return this;
-        //}
-        //public TableItem getTableItem() {
-        //    return tableItem;
-        //}
-
-
-        private DocumentXItem item;
         public DocumentHandler setDocumentItem(DocumentXItem _item) {
             item = _item;
             return this;
@@ -74,7 +34,7 @@ namespace CivilTechReportGenerator.Handlers {
         }
 
         public String scanDocument() {
-            Document document = base.srv.Document;
+            Document document = base.wordProcessor.Document;
             DocumentIterator iterator = new DocumentIterator(document, true);
             MyVisitor visitor = new MyVisitor();
 

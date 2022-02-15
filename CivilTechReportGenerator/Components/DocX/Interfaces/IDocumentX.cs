@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CivilTechReportGenerator.Interfaces {
-    abstract class IDocumentX {
+    public abstract class IDocumentX {
 
         public abstract void create();
         public abstract int count();

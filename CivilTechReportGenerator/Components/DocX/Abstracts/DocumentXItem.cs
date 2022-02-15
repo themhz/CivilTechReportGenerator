@@ -11,7 +11,7 @@ using CivilTechReportGenerator.Interfaces;
 using CivilTechReportGenerator.Handlers;
 
 namespace CivilTechReportGenerator {
-    abstract class DocumentXItem : IDocumentXItem {
+    public abstract class DocumentXItem : IDocumentXItem {
         
         public RichEditDocumentServer srv;
 

@@ -13,13 +13,13 @@ using System.Text.RegularExpressions;
 using CivilTechReportGenerator.Interfaces;
 
 namespace CivilTechReportGenerator.Handlers {
-    class TableItem : DocumentXItem, ITableItem {
+    public class TableItem : DocumentXItem, ITableItem {
 
-        RichEditDocumentServer wordProcessor;
-        Regex myRegEx;
-        DocumentRange dr;
-        DocumentPosition dpos;
-        int rows, cols;
+        public RichEditDocumentServer wordProcessor;
+        public Regex myRegEx;
+        public DocumentRange dr;
+        public DocumentPosition dpos;
+        public int rows, cols;
 
         public TableItem setRows(int val) {
             rows = val;

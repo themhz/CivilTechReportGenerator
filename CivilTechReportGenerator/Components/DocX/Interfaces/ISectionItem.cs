@@ -1,7 +1,6 @@
 ﻿namespace CivilTechReportGenerator.Handlers {
-    interface ISectionItem {
+    public interface ISectionItem {
         string text { get; set; }
-
         int count();
         void create();
         void delete(int index);

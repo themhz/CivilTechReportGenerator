@@ -26,7 +26,7 @@ namespace CivilTechReportGenerator.Handlers {
 
         public override void create() {
 
-            Document document = this.srv.Document;
+            Document document = this.wordProcessor.Document;
 
 
             MessageBox.Show(document.Sections.Count().ToString());
@@ -37,22 +37,22 @@ namespace CivilTechReportGenerator.Handlers {
         }
 
         public void delete(int index) {
-            this.srv.Document.Delete(this.srv.Document.Sections[index].Range);
+            this.wordProcessor.Document.Delete(this.wordProcessor.Document.Sections[index].Range);
         }
 
         public void replace(String generatedfile, int pos) {
 
             System.Text.RegularExpressions.Regex myRegEx = new System.Text.RegularExpressions.Regex("{{SECTION}}");
-            DocumentRange dr = this.srv.Document.FindAll(myRegEx).First();
-            DocumentPosition dpos = this.srv.Document.CreatePosition(dr.Start.ToInt());
-            this.srv.Document.InsertText(dpos, " ");
-            this.srv.Document.InsertDocumentContent(dpos, this.srv.Document.Sections[pos].Range);
-            this.srv.Document.Delete(dr);
+            DocumentRange dr = this.wordProcessor.Document.FindAll(myRegEx).First();
+            DocumentPosition dpos = this.wordProcessor.Document.CreatePosition(dr.Start.ToInt());
+            this.wordProcessor.Document.InsertText(dpos, " ");
+            this.wordProcessor.Document.InsertDocumentContent(dpos, this.wordProcessor.Document.Sections[pos].Range);
+            this.wordProcessor.Document.Delete(dr);
             base.saveDocument(generatedfile);
         }
 
         public override int count() {
-            return this.srv.Document.Sections.Count;
+            return this.wordProcessor.Document.Sections.Count;
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 
 namespace CivilTechReportGenerator.Handlers {
-    interface IParagraphItem {
+    public interface IParagraphItem {
         int count();
         void create();
         void delete(int index);

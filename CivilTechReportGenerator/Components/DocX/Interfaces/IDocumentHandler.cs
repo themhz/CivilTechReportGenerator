@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 namespace CivilTechReportGenerator.Handlers {
-    interface IDocumentHandler {
+    public interface IDocumentHandler {
         int count();
         List<string[]> countElements();
         void create();

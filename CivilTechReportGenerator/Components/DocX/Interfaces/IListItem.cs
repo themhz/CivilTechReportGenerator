@@ -1,5 +1,5 @@
 ﻿namespace CivilTechReportGenerator.Handlers {
-    interface IListItem {
+    public interface IListItem {
         int count();
         void create();
         void delete(int index);

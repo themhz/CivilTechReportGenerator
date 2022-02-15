@@ -126,6 +126,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App.cs" />
     <Compile Include="Components\DocX\Abstracts\DocumentXItem.cs" />
     <Compile Include="Components\DocX\Abstracts\DocumentX.cs" />
     <Compile Include="Components\DocX\Interfaces\IDocumentHandler.cs" />
@@ -144,6 +145,7 @@
     <Compile Include="Components\DocX\DocumentHandler.cs" />
     <Compile Include="Components\DocX\DocumentElements\SectionItem.cs" />
     <Compile Include="Components\DocX\Interfaces\IDocumentXItem.cs" />
+    <Compile Include="IApp.cs" />
     <Compile Include="tests\DocxDevExpressHandler.cs" />
     <Compile Include="Components\DocX\DocumentElements\ParagraphItem.cs" />
     <Compile Include="Components\DocX\DocumentElements\TableItem.cs" />
