@@ -2,6 +2,7 @@
 using CivilTechReportGenerator.tests;
 using CivilTechReportGenerator.Types;
 using DevExpress.XtraRichEdit;
+using DevExpress.XtraRichEdit.API.Native;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,37 +14,40 @@ using System.Xml;
 namespace CivilTechReportGenerator {
     public class App : IApp {
 
+        public String template { set; get; }
+        public String generatedfile { set; get; }
+
         public RichEditDocumentServer wordProcessor { set; get; }
         public TableItem tableItem { set; get; }
+        public SectionItem sectionItem { set; get; }
         public DocumentHandler documentHandler { set; get; }
         public TableData tableData { set; get; }
-        public App(RichEditDocumentServer _wordProcessor, 
-            TableItem _tableItem, 
-            DocumentHandler _documentHandler, 
-            TableData _tableData) {
+        public App( RichEditDocumentServer _wordProcessor, TableItem _tableItem, SectionItem _sectionItem, 
+            DocumentHandler _documentHandler, TableData _tableData) {
+
             this.wordProcessor = _wordProcessor;
             this.tableItem = _tableItem;
             this.documentHandler = _documentHandler;
             this.tableData = _tableData;
-        }
+            this.sectionItem = _sectionItem;
+
+            this.template = "c://Users//themis//Documents/Test.docx";
+            this.generatedfile = "c://Users//themis//Documents/Test_copy.docx";
+    }
 
         public void run() {
-            //RichEditDocumentServer wordProcessor = new RichEditDocumentServer();
             using (wordProcessor) {
-
-                test_populateTable(wordProcessor);
+                test_CopyElement(wordProcessor);
             }
         }
 
 
         public void test_CreateTableAfterAnElementOnTheDocument(RichEditDocumentServer wordProcessor) {
-            String template = "c://Users//themis//Documents/Test.docx";
-            String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
-
+            
             this.documentHandler.wordProcessor = wordProcessor;
             this.tableItem.wordProcessor = wordProcessor;
 
-            this.documentHandler.wordProcessor.LoadDocument(template);
+            this.documentHandler.wordProcessor.LoadDocument(this.template);
             //int itemPosition = wordProcessor.Document.Paragraphs[3].Range.End.ToInt();
             int itemPosition = this.documentHandler.wordProcessor.Document.Tables[1].Range.End.ToInt();
             //int itemPosition = wordProcessor.Document.Sections[3].Range.End.ToInt();
@@ -57,50 +61,45 @@ namespace CivilTechReportGenerator {
 
             this.documentHandler.beginUpdate();
             this.documentHandler.getDocumentItem().setDocumentPosition(itemPosition).create();
-            this.documentHandler.saveDocument(generatedfile);          
+            this.documentHandler.saveDocument(this.generatedfile);          
         }
         public void test_deleteElement(RichEditDocumentServer wordProcessor) {
-            String template = "c://Users//themis//Documents/Test.docx";
-            String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
+            
             this.documentHandler.wordProcessor = wordProcessor;
             this.tableItem.wordProcessor = wordProcessor;
 
-            this.documentHandler.loadTemplate(template);
+            this.documentHandler.loadTemplate(this.template);
             this.documentHandler.deleteElement(this.tableItem, 1);
-            this.documentHandler.saveDocument(generatedfile);
+            this.documentHandler.saveDocument(this.generatedfile);
 
         }
         public void test_CopyRow(RichEditDocumentServer wordProcessor) {
-            String template = "c://Users//themis//Documents/Test.docx";
-            String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
+            
             this.documentHandler.wordProcessor = wordProcessor;
             this.tableItem.wordProcessor = wordProcessor;
 
-            this.documentHandler.loadTemplate(template);
+            this.documentHandler.loadTemplate(this.template);
             this.tableItem.copyRow(1, 0, 1);           
-            this.documentHandler.saveDocument(generatedfile);
+            this.documentHandler.saveDocument(this.generatedfile);
 
         }
         private void test_countTables(RichEditDocumentServer wordProcessor) {
-            String template = "c://Users//themis//Documents/Test.docx";
-            String generatedfile = "c://Users//themis//Documents/Test.docx";
+            
             this.documentHandler.wordProcessor = wordProcessor;
             this.tableItem.wordProcessor = wordProcessor;
 
-            this.documentHandler.loadTemplate(generatedfile);
+            this.documentHandler.loadTemplate(this.generatedfile);
             int i = this.documentHandler.setDocumentItem(this.tableItem).getDocumentItem().count();
             MessageBox.Show(i.ToString());
 
         }
-        private void test_populateTable(RichEditDocumentServer wordProcessor) {
-            String template = "c://Users//themis//Documents/Test.docx";
-            String generatedfile = "c://Users//themis//Documents/Test_copy.docx";
+        private void test_populateTable(RichEditDocumentServer wordProcessor) {            
 
             this.documentHandler.wordProcessor = wordProcessor;
             this.tableItem.wordProcessor = wordProcessor;
 
             this.documentHandler.setDocumentItem(this.tableItem);
-            this.documentHandler.loadTemplate(template);
+            this.documentHandler.loadTemplate(this.template);
 
 
             this.tableData.TableKey = "1";
@@ -120,8 +119,29 @@ namespace CivilTechReportGenerator {
 
             this.tableItem.populateTable(tds);            
 
-            this.documentHandler.saveDocument(generatedfile);
+            this.documentHandler.saveDocument(this.generatedfile);
 
+        }
+
+        private void test_createSection(RichEditDocumentServer wordProcessor) {            
+
+            this.documentHandler.wordProcessor = wordProcessor;
+            this.sectionItem.wordProcessor = wordProcessor;
+
+            this.sectionItem.loadTemplate(this.template);
+            this.sectionItem.create();
+
+            this.documentHandler.saveDocument(this.generatedfile);
+
+        }
+
+
+        public void test_CopyElement(RichEditDocumentServer wordProcessor) {
+
+            this.documentHandler.loadTemplate(this.template);
+            this.tableItem.dpos = this.documentHandler.wordProcessor.Document.CreatePosition(2);            
+            this.tableItem.copy(1, 2);
+            this.documentHandler.saveDocument(this.generatedfile);
         }
 
 
@@ -151,28 +171,13 @@ namespace CivilTechReportGenerator {
             //String text = dh.scanDocument();
             //memoEdit1.Text = text;
         }
-        public void testCopyElement(RichEditDocumentServer wordProcessor) {
-            //String template = "c://Users//themis//Documents/Test-2.docx";
-            //String generatedfile = "c://Users//themis//Documents/Test-2_copy.docx";
-
-            //TableItem th = new TableItem(wordProcessor);
-            //th.loadTemplate(template);
-            //th.copy(0, 14, generatedfile);
-
-        }
+       
         private void parseDocument() {
             parseDocument pd = new parseDocument();
-            pd.OpenDocument("c://Users//themis//Documents/Test.docx");
+            pd.OpenDocument("c://Users//themis//Documents/Test.docx");            
         }
 
-
-        private void createSection(RichEditDocumentServer wordProcessor) {
-            String template = "c://Users//themis//Documents/test3.docx";
-            SectionItem sh = new SectionItem(wordProcessor);
-            sh.loadTemplate(template);
-            sh.create();
-
-        }
+        
         private void createParagraph(RichEditDocumentServer wordProcessor) {
             //String template = "c://Users//themis//Documents/test3.docx";
             //ParagraphItem ph = new ParagraphItem(wordProcessor);
@@ -242,5 +247,6 @@ namespace CivilTechReportGenerator {
             XmlHandler xh = new XmlHandler(path, _doc);
             String xml = xh.getXml();
         }
+        
     }
 }

@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace CivilTechReportGenerator.Handlers {
     public interface ITableItem {
-        void copy(int tableIndex, int posTarget, string generatedfile);
+        void copy(int tableIndex, int posTarget);
         void copyRow(int tableIndex, int rowIndex, int newRowIndex);
         int count();
         void countTableRows(int index);

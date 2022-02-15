@@ -13,10 +13,9 @@ using CivilTechReportGenerator.Handlers;
 namespace CivilTechReportGenerator {
     public abstract class DocumentXItem : IDocumentXItem {
         
-        public RichEditDocumentServer srv;
+        public RichEditDocumentServer wordProcessor;
 
-        public DocumentXItem(RichEditDocumentServer _srv) {
-            this.srv = _srv;
+        public DocumentXItem() {            
         }    
 
         public int documentPosition;
@@ -26,8 +25,8 @@ namespace CivilTechReportGenerator {
         }
 
         public void createSpace(int posTarget) {
-            DocumentPosition dpos = this.srv.Document.CreatePosition(posTarget);
-            this.srv.Document.InsertText(dpos, " ");
+            DocumentPosition dpos = this.wordProcessor.Document.CreatePosition(posTarget);
+            this.wordProcessor.Document.InsertText(dpos, " ");
         }
 
     }

@@ -13,13 +13,13 @@ using System.Text.RegularExpressions;
 using CivilTechReportGenerator.Interfaces;
 
 namespace CivilTechReportGenerator.Handlers {
-    public class TableItem : DocumentXItem, ITableItem {
-
-        public RichEditDocumentServer wordProcessor;
-        public Regex myRegEx;
-        public DocumentRange dr;
-        public DocumentPosition dpos;
-        public int rows, cols;
+    
+    public class TableItem : DocumentXItem, ITableItem {        
+        public Regex myRegEx { set; get; }
+        public DocumentRange dr { set; get; }
+        public DocumentPosition dpos { set; get; }
+        public int rows { set; get; }
+        public int cols { set; get; }
 
         public TableItem setRows(int val) {
             rows = val;
@@ -31,8 +31,8 @@ namespace CivilTechReportGenerator.Handlers {
             return this;
         }
 
-        public TableItem(RichEditDocumentServer _wordProcessor) : base(_wordProcessor) {
-            this.wordProcessor = _wordProcessor;
+        public TableItem(RichEditDocumentServer _wordProcessor){
+            this.wordProcessor = _wordProcessor;            
         }
 
         //Counts how many tables are in the document
@@ -60,10 +60,10 @@ namespace CivilTechReportGenerator.Handlers {
 
         //Copies table in a specific position
         //as suggested https://supportcenter.devexpress.com/ticket/details/t293243/copy-paste-paragraph-or-table
-        public void copy(int tableIndex, int posTarget, String generatedfile) {
+        public void copy(int tableIndex, int posTarget) {
 
-            base.createSpace(posTarget);
-            this.wordProcessor.Document.InsertDocumentContent(dpos, this.wordProcessor.Document.Tables[documentPosition].Range);
+            base.createSpace(posTarget);            
+            this.wordProcessor.Document.InsertDocumentContent(this.dpos, this.wordProcessor.Document.Tables[tableIndex].Range);
         }
 
         public override void delete(int index) {

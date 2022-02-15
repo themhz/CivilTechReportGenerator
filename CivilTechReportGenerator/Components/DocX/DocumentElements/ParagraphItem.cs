@@ -13,16 +13,14 @@ using System.Text.RegularExpressions;
 
 namespace CivilTechReportGenerator.Handlers {
     class ParagraphItem : DocumentXItem, IParagraphItem {
-
-
-        public String text;
+        public String text ;
         public RichEditDocumentServer srv;
-        public ParagraphItem(RichEditDocumentServer srv) : base(srv) {
+        public ParagraphItem(RichEditDocumentServer srv)  {
             this.srv = srv;
         }
         public override void create() {
 
-            Document document = base.srv.Document;
+            Document document = base.wordProcessor.Document;
             // Start the document update:
             document.BeginUpdate();
 

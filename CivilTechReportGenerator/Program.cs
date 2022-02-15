@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Autofac;
@@ -9,6 +11,7 @@ using CivilTechReportGenerator.Handlers;
 using CivilTechReportGenerator.Interfaces;
 using CivilTechReportGenerator.Types;
 using DevExpress.XtraRichEdit;
+using DevExpress.XtraRichEdit.API.Native;
 
 namespace CivilTechReportGenerator
 {
@@ -30,15 +33,7 @@ namespace CivilTechReportGenerator
 
             using (var scope = Container.BeginLifetimeScope()) {
                 //scope.Resolve<Application>().Run();                
-                var app = scope.Resolve<IApp>();
-                var listItem = scope.Resolve<IListItem>();
-                var paragraphItem = scope.Resolve<IParagraphItem>();
-                var sectionItem = scope.Resolve<ISectionItem>();
-                var tableItem = scope.Resolve<ITableItem>();
-                var listTableData = scope.Resolve<List<TableData>>();
-
-                //List<TableData>
-
+                var app = scope.Resolve<IApp>();             
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run(new Form1(app));
@@ -58,6 +53,10 @@ namespace CivilTechReportGenerator
             builder.RegisterType<App>().As<IApp>();
             builder.RegisterType<RichEditDocumentServer>();
             builder.RegisterType<List<TableData>>();
+            builder.RegisterType<Regex>();
+            builder.RegisterType<DocumentHandler>().As<IDocumentHandler>();
+            builder.RegisterType<TableData>();
+
 
             return builder.Build();
         }

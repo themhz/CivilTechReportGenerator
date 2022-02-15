@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CivilTechReportGenerator.Handlers {
-    class SectionItem : DocumentX, ISectionItem {
+    public class SectionItem : DocumentX, ISectionItem {
 
 
         private String _text;
@@ -32,8 +32,7 @@ namespace CivilTechReportGenerator.Handlers {
             MessageBox.Show(document.Sections.Count().ToString());
             document.InsertSection(document.Range.End);
 
-            //more samples here https://docs.devexpress.com/OfficeFileAPI/DevExpress.XtraRichEdit.API.Native.Section#related-examples
-            base.saveDocument();
+            //more samples here https://docs.devexpress.com/OfficeFileAPI/DevExpress.XtraRichEdit.API.Native.Section#related-examples            
         }
 
         public void delete(int index) {
