@@ -1,0 +1,5 @@
+C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator_v1\obj\Debug\net5.0\ReportGenerator_100.csproj.AssemblyReference.cache
+C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator_v1\obj\Debug\net5.0\ReportGenerator_100.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator_v1\obj\Debug\net5.0\ReportGenerator_100.AssemblyInfoInputs.cache
+C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator_v1\obj\Debug\net5.0\ReportGenerator_100.AssemblyInfo.cs
+C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator_v1\obj\Debug\net5.0\ReportGenerator_100.csproj.CoreCompileInputs.cache

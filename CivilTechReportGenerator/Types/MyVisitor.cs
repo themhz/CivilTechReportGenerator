@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CivilTechReportGenerator.Types {
+namespace ReportGenerator.Types {
     public class MyVisitor : DocumentVisitorBase {
         readonly StringBuilder buffer;
         public MyVisitor() { this.buffer = new StringBuilder(); }

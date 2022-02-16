@@ -7,13 +7,13 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Autofac;
-using CivilTechReportGenerator.Handlers;
-using CivilTechReportGenerator.Interfaces;
-using CivilTechReportGenerator.Types;
+using ReportGenerator.Handlers;
+using ReportGenerator.Interfaces;
+using ReportGenerator.Types;
 using DevExpress.XtraRichEdit;
 using DevExpress.XtraRichEdit.API.Native;
 
-namespace CivilTechReportGenerator
+namespace ReportGenerator
 {
     static class Program
     {
@@ -33,7 +33,7 @@ namespace CivilTechReportGenerator
 
             using (var scope = Container.BeginLifetimeScope()) {
                 //scope.Resolve<Application>().Run();                
-                var app = scope.Resolve<IApp>();             
+                var app = scope.Resolve<ITests>();             
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run(new Form1(app));
@@ -50,7 +50,7 @@ namespace CivilTechReportGenerator
             builder.RegisterType<ParagraphItem>().As<IParagraphItem>();
             builder.RegisterType<SectionItem>().As<ISectionItem>();
             builder.RegisterType<TableItem>().As<ITableItem>();
-            builder.RegisterType<App>().As<IApp>();
+            builder.RegisterType<Tests>().As<ITests>();
             builder.RegisterType<RichEditDocumentServer>();
             builder.RegisterType<List<TableData>>();
             builder.RegisterType<Regex>();

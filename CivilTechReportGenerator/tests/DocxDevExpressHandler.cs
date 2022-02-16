@@ -7,9 +7,9 @@ using System.Windows.Forms;
 using DevExpress.XtraRichEdit;
 using DevExpress.XtraRichEdit.API.Native;
 using System.Drawing;
-using CivilTechReportGenerator.Types;
+using ReportGenerator.Types;
 
-namespace CivilTechReportGenerator {
+namespace ReportGenerator {
     class DocxDevExpressHandler {
         public String template;
         public String filePath;

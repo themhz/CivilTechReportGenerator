@@ -1,6 +1,6 @@
-﻿using CivilTechReportGenerator.Handlers;
-using CivilTechReportGenerator.tests;
-using CivilTechReportGenerator.Types;
+﻿using ReportGenerator.Handlers;
+using ReportGenerator.tests;
+using ReportGenerator.Types;
 using DevExpress.XtraRichEdit;
 using System;
 using System.Collections.Generic;
@@ -14,11 +14,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 
-namespace CivilTechReportGenerator {
+namespace ReportGenerator {
     public partial class Form1 : Form {
         int a = 0;
-        public IApp app { get; }
-        public Form1(IApp _app) {
+        public ITests app { get; }
+        public Form1(ITests _app) {
             InitializeComponent();
             this.app = _app;
         }        

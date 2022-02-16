@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CivilTechReportGenerator.tests {
+namespace ReportGenerator.tests {
     class parseDocument {
        
         public void OpenDocument(string fileName) {
