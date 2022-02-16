@@ -8,10 +8,7 @@ using System.Threading.Tasks;
 
 namespace ReportGenerator_v1 {
     class ReportType {
-        public IReport createDocX() {
-            return new DevExpressDocX(); 
-        }
-
+      
 
 
     }

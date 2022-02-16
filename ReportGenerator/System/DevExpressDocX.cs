@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ReportGenerator_v1.System {
+
     class DevExpressDocX : IReport {
 
         public RichEditDocumentServer wordProcessor;
@@ -18,6 +19,7 @@ namespace ReportGenerator_v1.System {
         public IReport create() {
             Console.WriteLine("creating report");
             using (this.wordProcessor) {
+
 
             }
             return null;
