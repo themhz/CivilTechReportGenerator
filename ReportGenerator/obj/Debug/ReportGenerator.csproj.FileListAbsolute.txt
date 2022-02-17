@@ -1,5 +1,3 @@
-C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\obj\Debug\ReportGenerator.csproj.AssemblyReference.cache
-C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\obj\Debug\ReportGenerator.csproj.CoreCompileInputs.cache
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\ReportGenerator.exe.config
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\ReportGenerator.exe
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\ReportGenerator.pdb
@@ -52,6 +50,8 @@ C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\es\DevExpress.Printing.v21.2.Core.resources.dll
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\ja\DevExpress.Printing.v21.2.Core.resources.dll
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\ru\DevExpress.Printing.v21.2.Core.resources.dll
+C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\obj\Debug\ReportGenerator.csproj.CoreCompileInputs.cache
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\obj\Debug\ReportGenerator.csproj.CopyComplete
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\obj\Debug\ReportGenerator.exe
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\obj\Debug\ReportGenerator.pdb
+C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\obj\Debug\ReportGenerator.csproj.AssemblyReference.cache

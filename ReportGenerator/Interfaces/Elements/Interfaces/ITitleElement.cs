@@ -5,5 +5,6 @@
         ITitleElement delete();
         ITitleElement copy();
         ITitleElement paste();
+        
     }
 }

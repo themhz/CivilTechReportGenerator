@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ReportGenerator;
+using System;
 
 namespace ReportGenerator_v1.System {
     class App {
@@ -11,8 +8,12 @@ namespace ReportGenerator_v1.System {
             this.reportGenerator = _reportGenerator;
         }
 
-        public void start() {
-            this.reportGenerator.CreateDocX();
+        //Starts the application by using the report type.
+        //You pass in reportgenerator the class type of IReport
+        public void start(IReport reportType) {
+
+            this.reportGenerator.CreateDocX(reportType);
+            //Console.ReadLine();
         }
     }
 }

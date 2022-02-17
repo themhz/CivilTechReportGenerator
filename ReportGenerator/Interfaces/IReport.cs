@@ -1,11 +1,12 @@
-﻿namespace ReportGenerator {
+﻿using System;
+
+namespace ReportGenerator {
     public interface IReport {
+        String template { set; get; }
+        String generatedfile { set; get; }
         IReport create();
-        void delete();
-        ITitleElement title();
-        ITableElement table();
-        IListElement list();        
-        IParagraphElement paragraph();
-        IImage image();
+        void save();
+        void parse();
+        void delete();        
     }
 }

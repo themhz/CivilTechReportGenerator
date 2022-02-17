@@ -1,8 +1,7 @@
-﻿using System;
-using System.Reflection;
-using Autofac;
+﻿using Autofac;
 using DevExpress.XtraRichEdit;
 using ReportGenerator_v1.System;
+using System.Reflection;
 
 namespace ReportGenerator_v1 {
     class Program {
@@ -12,21 +11,22 @@ namespace ReportGenerator_v1 {
             var Container = BuildContainer();
             using (var scope = Container.BeginLifetimeScope()) {
                 var app = scope.Resolve<App>();
-                app.start();
+                //var reportType = scope.Resolve<ExceedDocX>();
+                var reportType = scope.Resolve<DevExpressDocX>();
+
+                app.start(reportType);
             }
-
-
-
         }
 
+        //This is the container for the autofac. You register all your objects here
+        //https://autofac.readthedocs.io/en/latest/index.html
         private static IContainer BuildContainer() {
-                var builder = new ContainerBuilder();
-                builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly()).AsSelf().AsImplementedInterfaces();
+            var builder = new ContainerBuilder();
+            builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly()).AsSelf().AsImplementedInterfaces();
+            builder.RegisterType<RichEditDocumentServer>();
+            builder.RegisterType<ExceedDocX>();
 
-                builder.RegisterType<RichEditDocumentServer>();
-            
-
-                return builder.Build();
+            return builder.Build();
         }
     }
 }

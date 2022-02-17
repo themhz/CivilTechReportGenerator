@@ -1,9 +1,4 @@
 ﻿using ReportGenerator;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ReportGenerator_v1.System {
     class ReportGenerator {
@@ -13,10 +8,14 @@ namespace ReportGenerator_v1.System {
             this.DocXReport = _docXReport;
         }
 
-        public void CreateDocX() {
-            
-            this.DocXReport.create();
+        public void CreateDocX(IReport reportType) {
+            this.DocXReport = reportType;
+            this.DocXReport.template = "c://Users//themis//Documents/Test.docx";
+            this.DocXReport.generatedfile = "c://Users//themis//Documents/Test_Generated.docx";
+            this.DocXReport = this.DocXReport.create();
         }
+
+        
 
     }
 }
