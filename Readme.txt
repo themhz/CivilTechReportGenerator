@@ -1,12 +1,13 @@
-The root of the application is the ReportGenerator. ReportGenerator_tests are the tests.
-Program starts from program.cs
-in the main we add the type of the docx reporting type generator that we will use.
+The root of the application is the ReportGenerator.  
+ReportGenerator_tests are the tests.  
+Program starts from program.cs  
+in the main we add the type of the docx reporting type generator that we will use.  
 
-Declaring this means that we use the DevExpress tools in order to parse and create DocX files
-var reportType = scope.Resolve<DevExpressDocX>();
+Declaring this means that we use the DevExpress tools in order to parse and create DocX files   
+var reportType = scope.Resolve<DevExpressDocX>();  
 
- The system folder contains the main application files
- App.cs starts the ReportGenerator.cs and creates a DocX report
+ The system folder contains the main application files  
+ App.cs starts the ReportGenerator.cs and creates a DocX report  
 
  public void start(IReport reportType) {
             
