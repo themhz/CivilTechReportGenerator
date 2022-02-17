@@ -42,6 +42,7 @@ namespace ReportGenerator_v1.System {
 
 
         public void parse() {
+
             this.replaceTextWithNewTable("{table1}", 2,3);
         }
 
