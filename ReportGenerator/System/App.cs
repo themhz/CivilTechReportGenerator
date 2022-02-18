@@ -8,7 +8,8 @@ namespace ReportGenerator_v1.System {
             this.reportGenerator = _reportGenerator;
         }
 
-        //Starts the application by using the report type.
+        //Starts the application by using the report type that was passed by
+        //program.cs
         //You pass in reportgenerator the class type of IReport
         public void start(IReport reportType) {
 

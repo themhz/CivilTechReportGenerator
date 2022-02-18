@@ -111,6 +111,8 @@
     <Compile Include="System\IReports\DevExpressDocX.cs" />
     <Compile Include="System\ReportGenerator.cs" />
     <Compile Include="System\ReportType.cs" />
+    <Compile Include="Types\MyVisitor.cs" />
+    <Compile Include="Types\TableData.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

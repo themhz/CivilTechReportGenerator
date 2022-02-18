@@ -1,4 +1,4 @@
-The root of the application is the ReportGenerator.  
+The root of the application is the ReportGenerator folder.  
 ReportGenerator_tests are the tests.  
 Program starts from program.cs  
 in the main we add the type of the docx reporting type generator that we will use.  
