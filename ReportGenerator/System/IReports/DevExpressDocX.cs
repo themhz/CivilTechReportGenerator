@@ -2,6 +2,7 @@
 using DevExpress.XtraRichEdit.API.Native;
 using DevExpress.XtraRichEdit.API.Native.Implementation;
 using ReportGenerator;
+using ReportGenerator.DataSources;
 using ReportGenerator.Interfaces.Elements;
 using ReportGenerator.Types;
 using System;
@@ -13,15 +14,17 @@ namespace ReportGenerator_v1.System {
 
     class DevExpressDocX : IReport {
 
-        public RichEditDocumentServer wordProcessor;
+        public RichEditDocumentServer wordProcessor { set; get; }
+        public IDataSource datasource { set; get; }
         public String template { set; get; }
         public String generatedfile { set; get; }
         private DocumentRange sourceRange { set; get; }
         private DocumentRange targetRange { set; get; }
-        
 
-        public DevExpressDocX(RichEditDocumentServer _wordProcessor) {
+
+        public DevExpressDocX(RichEditDocumentServer _wordProcessor, IDataSource _datasource) {
             this.wordProcessor = _wordProcessor;
+            this.datasource = _datasource;
         }
         public IReport create() {
             Console.WriteLine("creating file report");
@@ -41,9 +44,9 @@ namespace ReportGenerator_v1.System {
 
         public void save() {
             this.wordProcessor.Document.EndUpdate();
-            Console.WriteLine("Saving file report");            
-            this.wordProcessor.SaveDocument(this.generatedfile, DocumentFormat.OpenXml);            
-            Console.WriteLine("Report save in :"+ this.template);            
+            Console.WriteLine("Saving file report");
+            this.wordProcessor.SaveDocument(this.generatedfile, DocumentFormat.OpenXml);
+            Console.WriteLine("Report save in :" + this.template);
         }
 
         //This function is under construction. It will be used to parse the word template document and conscrtruct the report
@@ -79,16 +82,13 @@ namespace ReportGenerator_v1.System {
             //delete();
 
             //#populate Table, this uses a dummy datasource at the moment
-            //this.populateTable(this.getTable(1));
-
+            this.populateTable(this.getTable(1));
         }
-
         //Τhe only way to copy and paste something is via InsertDocumentContent method
         //https://supportcenter.devexpress.com/ticket/details/t725837/richeditdocumentserver-copy-paste-problem
-        public void copy() {            
+        public void copy() {
             wordProcessor.Document.InsertDocumentContent(this.targetRange.End, this.sourceRange);
         }
-
         //Moves any table 
         public void move() {
             wordProcessor.Document.InsertDocumentContent(this.targetRange.End, this.sourceRange);
@@ -100,12 +100,12 @@ namespace ReportGenerator_v1.System {
             this.targetRange = this.getTextRange(text);
             this.wordProcessor.Document.Tables.Create(this.targetRange.Start, rows, cols);
             this.delete();
-        }        
+        }
         protected DocumentRange getElementRange() {
             return null;
         }
         public Table getTable(int position) {
-           return this.wordProcessor.Document.Tables[position];            
+            return this.wordProcessor.Document.Tables[position];
         }
         public Paragraph getParagraph(int position) {
             return this.wordProcessor.Document.Paragraphs[position];
@@ -115,43 +115,28 @@ namespace ReportGenerator_v1.System {
             return this.wordProcessor.Document.FindAll(myRegEx).First();
         }
         public void delete() {
-            this.wordProcessor.Document.Delete(this.targetRange);            
+            this.wordProcessor.Document.Delete(this.targetRange);
         }
-
-        private void populateTable(Table table) {
-            TableData tabledata = new TableData();
-            List<List<string>> rows = new List<List<string>>();
-
-            List<string> row1 = new List<string> { "col1", "col2", "col3", "col4" };
-            List<string> row2 = new List<string> { "col1", "col2", "col3", "col4" };
-            List<string> row3 = new List<string> { "col1", "col2", "col3", "col4" };
-            List<string> row4 = new List<string> { "col1", "col2", "col3", "col4" };
-
-            //tabledata.TableKey = "1";
-            tabledata.Rows.Add(row1);
-            tabledata.Rows.Add(row2);
-            tabledata.Rows.Add(row3);
-            tabledata.Rows.Add(row4);            
-                        
-            List<TableData> tableDatas = new List<TableData>();
-            tableDatas.Add(tabledata);
-
-            foreach (TableData td in tableDatas) {
-                //int tableKey = int.Parse(td.TableKey);
-                var tbl = this.wordProcessor.Document.Tables;
-
-                table.BeginUpdate();
-                foreach (List<string> row in td.Rows) {
-                    int rowcount = table.Rows.Count() - 1;
-                    table.Rows.InsertAfter(rowcount);
-                    for (int i = 0; i < row.Count; i++) {
-                        this.wordProcessor.Document.InsertSingleLineText(table[rowcount, i].Range.Start, row[i]);
-                    }
-
-                }
-                table.EndUpdate();
+        private void populateTable(Table targetTable) {
+            foreach (TableData tabledata in this.datasource.getTableData()) {
+                targetTable.BeginUpdate();
+                this.addTableRows(targetTable, tabledata);
+                targetTable.EndUpdate();
             }
-
         }
+        private void addTableRows(Table targetTable, TableData tabledata) {
+            foreach (List<string> row in tabledata.Rows) {
+                addTableRow(targetTable, row);
+            }
+        }
+        private void addTableRow(Table targetTable, List<string> row) {
+            int rowcount = targetTable.Rows.Count() - 1;
+            targetTable.Rows.InsertAfter(rowcount);
+            for (int i = 0; i < row.Count; i++) {
+                this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, i].Range.Start, row[i]);
+            }
+        }
+
+
     }
 }

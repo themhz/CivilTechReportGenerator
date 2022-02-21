@@ -1,6 +1,10 @@
 ﻿using Autofac;
 using DevExpress.XtraRichEdit;
+using ReportGenerator;
+using ReportGenerator.DataSources;
+using ReportGenerator.Types;
 using ReportGenerator_v1.System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace ReportGenerator_v1 {
@@ -23,8 +27,15 @@ namespace ReportGenerator_v1 {
         private static IContainer BuildContainer() {
             var builder = new ContainerBuilder();
             builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly()).AsSelf().AsImplementedInterfaces();
-            builder.RegisterType<RichEditDocumentServer>();
-            builder.RegisterType<ExceedDocX>();
+            builder.RegisterType<RichEditDocumentServer>().As<RichEditDocumentServer>();
+            builder.RegisterType<ExceedDocX>().As<ExceedDocX>();
+            builder.RegisterType<List<List<string>>>().As<List<List<string>>>();
+            builder.RegisterType<List<TableData>>().As<List<TableData>>();
+            builder.RegisterType<TableData>().As<TableData>();
+            builder.RegisterType<DevExpressDocX>().As<IReport>();            
+
+
+
 
             return builder.Build();
         }

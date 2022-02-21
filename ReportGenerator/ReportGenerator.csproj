@@ -88,6 +88,7 @@
   <ItemGroup>
     <Compile Include="DataSources\Database.cs" />
     <Compile Include="DataSources\DocX.cs" />
+    <Compile Include="DataSources\Interfaces\IDataSource.cs" />
     <Compile Include="DataSources\Xml.cs" />
     <Compile Include="Interfaces\ElementItems\IIListElementItem.cs" />
     <Compile Include="Interfaces\ElementItems\ITableElementItem.cs" />
@@ -97,7 +98,6 @@
     <Compile Include="Interfaces\Elements\Interfaces\ITableElement.cs" />
     <Compile Include="Interfaces\Elements\Interfaces\ITitleElement.cs" />
     <Compile Include="Interfaces\Elements\TableElement.cs" />
-    <Compile Include="Interfaces\IDataSource.cs" />
     <Compile Include="Interfaces\IReport.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
