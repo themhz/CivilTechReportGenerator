@@ -29,27 +29,24 @@ namespace ReportGenerator_v1.System {
         public IReport create() {
             Console.WriteLine("creating file report");
             using (this.wordProcessor) {
-                this.load();
+                //this.load();
                 this.parse();
-                this.save();
+                //this.save();
             }
             Console.WriteLine("file report created");
             return this;
         }
-
         public void load() {
             this.wordProcessor.Document.BeginUpdate();
             this.wordProcessor.LoadDocument(this.template);
         }
-
         public void save() {
             this.wordProcessor.Document.EndUpdate();
             Console.WriteLine("Saving file report");
             this.wordProcessor.SaveDocument(this.generatedfile, DocumentFormat.OpenXml);
             Console.WriteLine("Report save in :" + this.template);
         }
-
-        //This function is under construction. It will be used to parse the word template document and conscrtruct the report
+                //This function is under construction. It will be used to parse the word template document and conscrtruct the report
         //However some commans are implemented.. more to come..
         public void parse() {
 
@@ -82,7 +79,9 @@ namespace ReportGenerator_v1.System {
             //delete();
 
             //#populate Table, this uses a dummy datasource at the moment
-            this.populateTable(this.getTable(1));
+            //this.populateTable(this.getTable(1));
+
+            var data = datasource.getData();
         }
         //Τhe only way to copy and paste something is via InsertDocumentContent method
         //https://supportcenter.devexpress.com/ticket/details/t725837/richeditdocumentserver-copy-paste-problem

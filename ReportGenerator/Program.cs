@@ -3,6 +3,7 @@ using DevExpress.XtraRichEdit;
 using ReportGenerator;
 using ReportGenerator.DataSources;
 using ReportGenerator.Types;
+using ReportGenerator_v1.DataSources;
 using ReportGenerator_v1.System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -32,7 +33,8 @@ namespace ReportGenerator_v1 {
             builder.RegisterType<List<List<string>>>().As<List<List<string>>>();
             builder.RegisterType<List<TableData>>().As<List<TableData>>();
             builder.RegisterType<TableData>().As<TableData>();
-            builder.RegisterType<DevExpressDocX>().As<IReport>();            
+            builder.RegisterType<DevExpressDocX>().As<IReport>();
+            builder.RegisterType<Xml>().As<IDataSource>();
 
 
 

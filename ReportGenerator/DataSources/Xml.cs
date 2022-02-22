@@ -2,7 +2,9 @@
 
 using ReportGenerator.DataSources;
 using ReportGenerator.Types;
+using System;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace ReportGenerator_v1.DataSources {
     class Xml : IDataSource {
@@ -10,7 +12,20 @@ namespace ReportGenerator_v1.DataSources {
         List<TableData> listOfTables;
         TableData tabledata;
         public List<List<string>> getData() {
-            throw new global::System.NotImplementedException();
+
+            //XmlDocument doc = new XmlDocument();
+            ////d:\Trans\databases\testReport.xml
+            //doc.Load("d:\\Trans\\databases\\testReport.xml");
+
+            //XmlNode node = doc.DocumentElement.SelectSingleNode("/PageA");
+            XmlTextReader reader = new XmlTextReader("d:\\Trans\\databases\\testReport.xml");
+
+            while (reader.Read()) {
+                // Do some work here on the data.
+                Console.WriteLine(reader.Name);
+            }
+            Console.ReadLine();
+            return null;
         }
 
         public List<TableData> getTableData() {
