@@ -20,9 +20,30 @@ namespace ReportGenerator_v1.DataSources {
             //XmlNode node = doc.DocumentElement.SelectSingleNode("/PageA");
             XmlTextReader reader = new XmlTextReader("d:\\Trans\\databases\\testReport.xml");
 
+            int counter = 0;
             while (reader.Read()) {
                 // Do some work here on the data.
-                Console.WriteLine(reader.Name);
+                switch (reader.NodeType) {
+                    case XmlNodeType.Element: // The node is an element.
+                        Console.Write("<" + reader.Name);
+                        while (reader.MoveToNextAttribute()) // Read the attributes.
+                            Console.Write(" " + reader.Name + "='" + reader.Value + "'");                        
+                            Console.WriteLine(">");
+                        break;
+                    case XmlNodeType.Text: //Display the text in each element.
+                        Console.WriteLine("text is :"+ reader.Value);
+                        break;
+                    case XmlNodeType.EndElement: //Display the end of the element.
+                        Console.Write("</" + reader.Name);
+                        Console.WriteLine(">");
+                        break;                        
+                }
+
+
+                if (counter > 40) {
+                    break;
+                }
+                counter++;
             }
             Console.ReadLine();
             return null;
