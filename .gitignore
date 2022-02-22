@@ -1,6 +1,6 @@
-CivilTechReportGenerator\bin
-CivilTechReportGenerator\obj
-.vs
-packages
+/CivilTechReportGenerator/bin
+/CivilTechReportGenerator/obj
+/.vs
+/packages
 
 
