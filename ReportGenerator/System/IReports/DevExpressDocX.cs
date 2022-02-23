@@ -29,9 +29,9 @@ namespace ReportGenerator_v1.System {
         public IReport create() {
             Console.WriteLine("creating file report");
             using (this.wordProcessor) {
-                //this.load();
+                this.load();
                 this.parse();
-                //this.save();
+                this.save();
             }
             Console.WriteLine("file report created");
             return this;
@@ -80,8 +80,22 @@ namespace ReportGenerator_v1.System {
 
             //#populate Table, this uses a dummy datasource at the moment
             //this.populateTable(this.getTable(1));
+                                    
 
-            var data = datasource.getData();
+            //#Replace text with new text
+            this.replaceTextWithNewText("{{ProjectName}}", datasource.GetValue("Projects.ProjectName").ToString());
+            this.replaceTextWithNewText("{{Address1}}", datasource.GetValue("Projects.Address1").ToString());
+            this.replaceTextWithNewText("{{SolutionEngineersSynopsis}}", datasource.GetValue("Projects.SolutionEngineersSynopsis").ToString());
+            this.replaceTextWithNewText("{{SolutionPrintedYear}}", datasource.GetValue("Projects.SolutionPrintedYear").ToString());
+            this.replaceTextWithNewText("{{TEECurrentVersion}}", datasource.GetValue("Projects.TEECurrentVersion").ToString());
+            this.replaceTextWithNewText("{{TEESN}}", datasource.GetValue("Projects.TEESN").ToString());
+            this.replaceTextWithNewText("{{SoftwareName}}", datasource.GetValue("Projects.SoftwareName").ToString());
+            this.replaceTextWithNewText("{{EnergyBuildingRegistrationNumber}}", datasource.GetValue("Projects.EnergyBuildingRegistrationNumber").ToString());
+            this.replaceTextWithNewText("{{EnergyBuildingVersion}}", datasource.GetValue("Projects.EnergyBuildingVersion").ToString());
+            this.replaceTextWithNewText("{{EnergyBuildingSN}}", datasource.GetValue("Projects.EnergyBuildingSN").ToString());
+
+
+
         }
         //Τhe only way to copy and paste something is via InsertDocumentContent method
         //https://supportcenter.devexpress.com/ticket/details/t725837/richeditdocumentserver-copy-paste-problem
@@ -100,6 +114,13 @@ namespace ReportGenerator_v1.System {
             this.wordProcessor.Document.Tables.Create(this.targetRange.Start, rows, cols);
             this.delete();
         }
+
+        public void replaceTextWithNewText(String sourceText, String targetText) {
+            this.wordProcessor.Document.BeginUpdate();
+            this.targetRange = this.getTextRange(sourceText);
+            this.wordProcessor.Document.Replace(targetRange, targetText);
+            //this.delete();
+        }
         protected DocumentRange getElementRange() {
             return null;
         }
@@ -117,11 +138,11 @@ namespace ReportGenerator_v1.System {
             this.wordProcessor.Document.Delete(this.targetRange);
         }
         private void populateTable(Table targetTable) {
-            foreach (TableData tabledata in this.datasource.getTableData()) {
-                targetTable.BeginUpdate();
-                this.addTableRows(targetTable, tabledata);
-                targetTable.EndUpdate();
-            }
+            //foreach (TableData tabledata in this.datasource.getTableData()) {
+            //    targetTable.BeginUpdate();
+            //    this.addTableRows(targetTable, tabledata);
+            //    targetTable.EndUpdate();
+            //}
         }
         private void addTableRows(Table targetTable, TableData tabledata) {
             foreach (List<string> row in tabledata.Rows) {

@@ -86,8 +86,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataSources\Database.cs" />
-    <Compile Include="DataSources\DocX.cs" />
     <Compile Include="DataSources\Interfaces\IDataSource.cs" />
     <Compile Include="DataSources\Xml.cs" />
     <Compile Include="Interfaces\ElementItems\IIListElementItem.cs" />

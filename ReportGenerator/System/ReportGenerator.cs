@@ -10,8 +10,8 @@ namespace ReportGenerator_v1.System {
 
         public void CreateDocX(IReport reportType) {
             this.DocXReport = reportType;
-            this.DocXReport.template = "c://Users//themis//Documents/Test.docx";
-            this.DocXReport.generatedfile = "c://Users//themis//Documents/Test_Generated.docx";
+            this.DocXReport.template = "c://Users//themis//Documents/report_template.docx";
+            this.DocXReport.generatedfile = "c://Users//themis//Documents/report_template_generated.docx";
             this.DocXReport = this.DocXReport.create();
         }
 

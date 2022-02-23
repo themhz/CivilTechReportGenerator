@@ -13,8 +13,7 @@ namespace ReportGenerator_v1.System {
         //You pass in reportgenerator the class type of IReport
         public void start(IReport reportType) {
 
-            this.reportGenerator.CreateDocX(reportType);
-            //Console.ReadLine();
+            this.reportGenerator.CreateDocX(reportType);            
         }
     }
 }
