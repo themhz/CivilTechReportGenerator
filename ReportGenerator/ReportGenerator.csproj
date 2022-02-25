@@ -88,14 +88,7 @@
   <ItemGroup>
     <Compile Include="DataSources\Interfaces\IDataSource.cs" />
     <Compile Include="DataSources\Xml.cs" />
-    <Compile Include="Interfaces\ElementItems\IIListElementItem.cs" />
-    <Compile Include="Interfaces\ElementItems\ITableElementItem.cs" />
-    <Compile Include="Interfaces\Elements\Interfaces\IImage.cs" />
-    <Compile Include="Interfaces\Elements\Interfaces\IListElement.cs" />
-    <Compile Include="Interfaces\Elements\Interfaces\IParagraphElement.cs" />
-    <Compile Include="Interfaces\Elements\Interfaces\ITableElement.cs" />
-    <Compile Include="Interfaces\Elements\Interfaces\ITitleElement.cs" />
-    <Compile Include="Interfaces\Elements\TableElement.cs" />
+    <Compile Include="Helpers\MathOperations.cs" />
     <Compile Include="Interfaces\IReport.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -108,12 +101,12 @@
     <Compile Include="System\IReports\ExceedDocX.cs" />
     <Compile Include="System\IReports\DevExpressDocX.cs" />
     <Compile Include="System\ReportGenerator.cs" />
-    <Compile Include="System\ReportType.cs" />
     <Compile Include="Types\MyVisitor.cs" />
     <Compile Include="Types\TableData.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="DataSources\files\report_template.docx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -131,6 +124,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DataSources\files\testReport.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -8,12 +8,14 @@ using System.Xml;
 using System.Data;
 
 namespace ReportGenerator_v1.DataSources {
-    class Xml : IDataSource {
+    public class Xml : IDataSource {
         private DataSet _dataSet;
         private Dictionary<String, DataColumn> binder;
+        private String xmlPath = "C:\\Users\\themis\\source\\repos\\CivilTechReportGenerator\\ReportGenerator\\DataSources\\files\\testReport.xml";
 
         public Xml() {
             this.binder = getDictionary();
+            
         }
 
         public object GetValue(string field, int index = 0) {
@@ -31,7 +33,7 @@ namespace ReportGenerator_v1.DataSources {
             var dictionary = new Dictionary<String, DataColumn>();
 
             _dataSet = new DataSet();
-            _dataSet.ReadXml("d:\\Trans\\databases\\testReport.xml");
+            _dataSet.ReadXml(this.xmlPath);
 
             foreach (DataTable table in _dataSet.Tables) {
                 foreach (DataColumn column in table.Columns) {
@@ -41,5 +43,28 @@ namespace ReportGenerator_v1.DataSources {
 
             return dictionary;
         }
+
+        public XmlNodeList getList(String field) {
+
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(this.xmlPath);
+            var nsmgr = new XmlNamespaceManager(xmlDoc.NameTable);
+            nsmgr.AddNamespace("ns", "http://www.civilteam.gr/dsBuildingHeatInsulation.xsd");
+            XmlNodeList nodeList = xmlDoc.DocumentElement.SelectNodes($"//ns:dsBuildingHeatInsulation//ns:{field}", nsmgr);
+
+            return nodeList;
+        }
+
+        public Dictionary<String, DataColumn> getXmlDictionary() {
+            XmlTextReader reader = new XmlTextReader(this.xmlPath);
+            while (reader.Read()) {
+                // Do some work here on the data.
+                Console.WriteLine(reader.Name);
+            }
+            Console.ReadLine();
+            return null;
+        }
+
+
     }
 }

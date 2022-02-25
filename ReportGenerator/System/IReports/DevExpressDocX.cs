@@ -3,12 +3,15 @@ using DevExpress.XtraRichEdit.API.Native;
 using DevExpress.XtraRichEdit.API.Native.Implementation;
 using ReportGenerator;
 using ReportGenerator.DataSources;
-using ReportGenerator.Interfaces.Elements;
+using ReportGenerator.Helpers;
 using ReportGenerator.Types;
+using ReportGenerator_v1.DataSources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace ReportGenerator_v1.System {
 
@@ -50,6 +53,7 @@ namespace ReportGenerator_v1.System {
         //However some commans are implemented.. more to come..
         public void parse() {
 
+            
             //#Replace text with new table
             //this.replaceTextWithNewTable("{table1}", 2,3);
 
@@ -83,18 +87,61 @@ namespace ReportGenerator_v1.System {
                                     
 
             //#Replace text with new text
-            this.replaceTextWithNewText("{{ProjectName}}", datasource.GetValue("Projects.ProjectName").ToString());
-            this.replaceTextWithNewText("{{Address1}}", datasource.GetValue("Projects.Address1").ToString());
-            this.replaceTextWithNewText("{{SolutionEngineersSynopsis}}", datasource.GetValue("Projects.SolutionEngineersSynopsis").ToString());
-            this.replaceTextWithNewText("{{SolutionPrintedYear}}", datasource.GetValue("Projects.SolutionPrintedYear").ToString());
-            this.replaceTextWithNewText("{{TEECurrentVersion}}", datasource.GetValue("Projects.TEECurrentVersion").ToString());
-            this.replaceTextWithNewText("{{TEESN}}", datasource.GetValue("Projects.TEESN").ToString());
-            this.replaceTextWithNewText("{{SoftwareName}}", datasource.GetValue("Projects.SoftwareName").ToString());
-            this.replaceTextWithNewText("{{EnergyBuildingRegistrationNumber}}", datasource.GetValue("Projects.EnergyBuildingRegistrationNumber").ToString());
-            this.replaceTextWithNewText("{{EnergyBuildingVersion}}", datasource.GetValue("Projects.EnergyBuildingVersion").ToString());
-            this.replaceTextWithNewText("{{EnergyBuildingSN}}", datasource.GetValue("Projects.EnergyBuildingSN").ToString());
+            this.replaceTextWithNewText("{{Projects.ProjectName}}", datasource.GetValue("Projects.ProjectName").ToString());
+            this.replaceTextWithNewText("{{Projects.Address1}}", datasource.GetValue("Projects.Address1").ToString());
+            this.replaceTextWithNewText("{{Projects.SolutionEngineersSynopsis}}", datasource.GetValue("Projects.SolutionEngineersSynopsis").ToString());
+            this.replaceTextWithNewText("{{Projects.SolutionPrintedYear}}", datasource.GetValue("Projects.SolutionPrintedYear").ToString());
+            this.replaceTextWithNewText("{{Projects.TEECurrentVersion}}", datasource.GetValue("Projects.TEECurrentVersion").ToString());
+            this.replaceTextWithNewText("{{Projects.TEESN}}", datasource.GetValue("Projects.TEESN").ToString());
+            this.replaceTextWithNewText("{{Projects.SoftwareName}}", datasource.GetValue("Projects.SoftwareName").ToString());
+            this.replaceTextWithNewText("{{Projects.EnergyBuildingRegistrationNumber}}", datasource.GetValue("Projects.EnergyBuildingRegistrationNumber").ToString());
+            this.replaceTextWithNewText("{{Projects.EnergyBuildingVersion}}", datasource.GetValue("Projects.EnergyBuildingVersion").ToString());
+            this.replaceTextWithNewText("{{Projects.EnergyBuildingSN}}", datasource.GetValue("Projects.EnergyBuildingSN").ToString());
 
 
+            this.replaceTextWithNewText("{{BuildingsGeneral.CityID}}", datasource.GetValue("BuildingsGeneral.CityID").ToString());
+            this.replaceTextWithNewText("{{BuildingsGeneral.Elevation}}", datasource.GetValue("BuildingsGeneral.Elevation").ToString());
+            this.replaceTextWithNewText("{{BuildingsGeneral.ClimaticZoneName}}", datasource.GetValue("BuildingsGeneral.ClimaticZoneName").ToString());
+            this.replaceTextWithNewText("{{PageCBuildings.RecNumber}}", datasource.GetValue("PageCBuildings.RecNumber").ToString());
+            this.replaceTextWithNewText("{{PageCBuildings.Name}}", datasource.GetValue("PageCBuildings.Name").ToString());
+
+
+            this.replaceTextWithNewText("{{SpecialAttributes.FT}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.FT").ToString()));
+            this.replaceTextWithNewText("{{SpecialAttributes.FW}}", datasource.GetValue("SpecialAttributes.FW").ToString());
+            this.replaceTextWithNewText("{{SpecialAttributes.FR}}", datasource.GetValue("SpecialAttributes.FW").ToString());
+            this.replaceTextWithNewText("{{SpecialAttributes.FFB}}", datasource.GetValue("SpecialAttributes.FFB").ToString());
+            this.replaceTextWithNewText("{{SpecialAttributes.FFU}}", datasource.GetValue("SpecialAttributes.FFU").ToString());
+            this.replaceTextWithNewText("{{SpecialAttributes.FFA}}", datasource.GetValue("SpecialAttributes.FFA").ToString());
+            this.replaceTextWithNewText("{{SpecialAttributes.FTU}}", datasource.GetValue("SpecialAttributes.FTU").ToString());
+            this.replaceTextWithNewText("{{SpecialAttributes.FTB}}", datasource.GetValue("SpecialAttributes.FTB").ToString());
+            this.replaceTextWithNewText("{{SpecialAttributes.FGF}}", datasource.GetValue("SpecialAttributes.FGF").ToString());
+
+            this.replaceTextWithNewText("{{SpecialAttributes.F}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.F").ToString()));
+            this.replaceTextWithNewText("{{SpecialAttributes.BuildingVolume}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.BuildingVolume").ToString()));
+            this.replaceTextWithNewText("{{SpecialAttributes.FV}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.FV").ToString()));
+            this.replaceTextWithNewText("{{SpecialAttributes.Umax}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.Umax").ToString()));
+
+            String[,] contents = new String[11, 2] {
+                { "Υπολογισμός συντελεστών θερμοπερατότητας αδιαφανών δομικών στοιχείων", "3"},
+                { "1. Υπολογισμός συντελεστών θερμοπερατότητας αδιαφανών δομικών στοιχείων", "4"},
+                { "2. Υπολογισμός ισοδύναμων συντελεστών θερμοπερατότητας αδιαφανών δομικών στοιχείων σε επαφή με το έδαφος", "11"},
+                { "3. Υπολογισμός συντελεστών θερμοπερατότητας και συντελεστών ηλιακών κερδών  διαφανών δομικών στοιχείων", "12"},
+                { "4. Κατακόρυφα αδιαφανή δομικά στοιχεία", "13"},
+                { "5. Οριζόντια αδιαφανή δομικά στοιχεία", "21"},
+                { "6. Διαφανή δομικά στοιχεία", "24"},
+                { "7. Μη θερμαινόμενοι χώροι", "25"},
+                { "8. Θερμογέφυρες", "26"},
+                { "9. Υπολογισμός μέγιστου επιτρεπτού και πραγματοποιήσιμου Um του κτηρίου", "36"},
+                { "10. Υπολογισμός αθέλητου αερισμού", "38"}            };
+
+            //Report Type 1
+            XmlNodeList list = ((Xml)datasource).getList("PageA");
+
+            
+            var test = ((Xml)datasource).getXmlDictionary();
+
+
+            //this.replaceTextWithNewText("{{}}", datasource.GetValue("").ToString());
 
         }
         //Τhe only way to copy and paste something is via InsertDocumentContent method
