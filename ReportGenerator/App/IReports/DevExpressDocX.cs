@@ -12,6 +12,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
+using System.IO;
+using System.Drawing;
 
 namespace ReportGenerator_v1.System {
 
@@ -135,11 +137,19 @@ namespace ReportGenerator_v1.System {
                 { "10. Υπολογισμός αθέλητου αερισμού", "38"}            };
 
             //Report Type 1
-            XmlNodeList list = ((Xml)datasource).getList("PageA");
-
-            
-            var test = ((Xml)datasource).getXmlDictionary();
-
+            XmlNodeList list = ((Xml)datasource).getList("PageA");                       
+            foreach(XmlNode parentnode in list) {
+                foreach (XmlNode childnode in parentnode.ChildNodes) {
+                    var node = childnode.Name;
+                    var value = childnode.InnerText;
+                    if(childnode.Name == "Image") {
+                        this.replaceTextWithImage("{{PageA." + childnode.Name + "}}", value);
+                    } else {
+                        this.replaceTextWithNewText("{{PageA." + childnode.Name + "}}", value);
+                    }
+                    
+                }
+            }
 
             //this.replaceTextWithNewText("{{}}", datasource.GetValue("").ToString());
 
@@ -165,8 +175,30 @@ namespace ReportGenerator_v1.System {
         public void replaceTextWithNewText(String sourceText, String targetText) {
             this.wordProcessor.Document.BeginUpdate();
             this.targetRange = this.getTextRange(sourceText);
-            this.wordProcessor.Document.Replace(targetRange, targetText);
-            //this.delete();
+            if(this.targetRange != null)
+                this.wordProcessor.Document.Replace(targetRange, targetText);            
+        }
+
+        public void replaceTextWithImage(String sourceText, String targetText) {
+            this.wordProcessor.Document.BeginUpdate();
+            this.wordProcessor.Document.Unit = DevExpress.Office.DocumentUnit.Inch;
+            this.targetRange = this.getTextRange(sourceText);
+            if (this.targetRange != null) {
+
+                //data:image/gif;base64,
+                //this image is a single pixel (black)
+                byte[] bytes = Convert.FromBase64String(targetText);
+
+                ;
+                bytes = ImageResizer.resize(bytes, 700, 700);
+                using (MemoryStream ms = new MemoryStream(bytes)) {                    
+                    DocumentImageSource image = DocumentImageSource.FromStream(ms);                    
+                    this.wordProcessor.Document.Images.Insert(this.targetRange.Start, image);
+                }
+
+                this.delete();
+            }
+            //this.wordProcessor.Document.Replace(targetRange, targetText);
         }
         protected DocumentRange getElementRange() {
             return null;
@@ -178,8 +210,13 @@ namespace ReportGenerator_v1.System {
             return this.wordProcessor.Document.Paragraphs[position];
         }
         public DocumentRange getTextRange(String search) {
-            Regex myRegEx = new Regex(search);
-            return this.wordProcessor.Document.FindAll(myRegEx).First();
+            try {
+                Regex myRegEx = new Regex(search);
+                return this.wordProcessor.Document.FindAll(myRegEx).First();
+            } catch (Exception ex) {
+                return null;
+            }
+            
         }
         public void delete() {
             this.wordProcessor.Document.Delete(this.targetRange);
