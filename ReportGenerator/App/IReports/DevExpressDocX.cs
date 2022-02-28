@@ -137,22 +137,67 @@ namespace ReportGenerator_v1.System {
                 { "10. Υπολογισμός αθέλητου αερισμού", "38"}            };
 
             //Report Type 1
-            XmlNodeList list = ((Xml)datasource).getList("PageA");                       
-            foreach(XmlNode parentnode in list) {
-                foreach (XmlNode childnode in parentnode.ChildNodes) {
+            XmlNodeList PageAList = ((Xml)datasource).getList("PageA");
+            
+            foreach(XmlNode page in PageAList) {
+                foreach (XmlNode childnode in page.ChildNodes) {
                     var node = childnode.Name;
                     var value = childnode.InnerText;
+                    var ID = "";
+                    
+                    if (childnode.Name == "ID") {
+                        ID = childnode.InnerText;
+                        XmlNodeList DetailList = ((Xml)datasource).getList("PageADetails[ns:PageADetailID='"+ ID + "']");
+                        this.populatePageADetails(DetailList);
+                        
+                    }
+
                     if(childnode.Name == "Image") {
                         this.replaceTextWithImage("{{PageA." + childnode.Name + "}}", value);
                     } else {
                         this.replaceTextWithNewText("{{PageA." + childnode.Name + "}}", value);
                     }
-                    
                 }
+
+                break;
             }
-
             //this.replaceTextWithNewText("{{}}", datasource.GetValue("").ToString());
+        }
 
+        public void populatePageADetails(XmlNodeList DetailList) {
+            DocumentRange r = this.getTextRange("{{PageADetails}}");
+
+            int tableIndex = 0;
+            foreach (XmlNode node in DetailList) {
+                List<string> rows = new List<string>();
+                foreach (XmlNode row in node) {
+                    rows.Add(row.InnerText);
+                }
+                this.targetRange = this.wordProcessor.Document.Tables[0].Range;
+                
+                //if (tableIndex > 0) {
+                //    break;
+                //    this.targetRange = this.wordProcessor.Document.Tables[tableIndex].Range;
+                //    this.sourceRange = this.wordProcessor.Document.Tables[tableIndex - 1].Range;
+                //    this.copy();
+                //} else {
+                //    this.targetRange = this.wordProcessor.Document.Tables[tableIndex].Range;
+                //    this.sourceRange = this.targetRange;
+                //    this.copy();
+                //}
+
+                this.addTableRow(this.wordProcessor.Document.Tables[0], rows);
+                tableIndex++;
+                break;
+                
+            }
+            
+            //foreach(Table table in this.wordProcessor.Document.Tables) {
+            //    this.addTableRow(table,);
+            //}
+            //foreach(XmlNode xmlnode in DetailList) {
+
+            //}            
         }
         //Τhe only way to copy and paste something is via InsertDocumentContent method
         //https://supportcenter.devexpress.com/ticket/details/t725837/richeditdocumentserver-copy-paste-problem
@@ -221,13 +266,7 @@ namespace ReportGenerator_v1.System {
         public void delete() {
             this.wordProcessor.Document.Delete(this.targetRange);
         }
-        private void populateTable(Table targetTable) {
-            //foreach (TableData tabledata in this.datasource.getTableData()) {
-            //    targetTable.BeginUpdate();
-            //    this.addTableRows(targetTable, tabledata);
-            //    targetTable.EndUpdate();
-            //}
-        }
+    
         private void addTableRows(Table targetTable, TableData tabledata) {
             foreach (List<string> row in tabledata.Rows) {
                 addTableRow(targetTable, row);
@@ -236,9 +275,19 @@ namespace ReportGenerator_v1.System {
         private void addTableRow(Table targetTable, List<string> row) {
             int rowcount = targetTable.Rows.Count() - 1;
             targetTable.Rows.InsertAfter(rowcount);
-            for (int i = 0; i < row.Count; i++) {
-                this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, i].Range.Start, row[i]);
-            }
+            
+            this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 0].Range.Start, row[10]);
+            this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 1].Range.Start, row[3]);
+            this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 2].Range.Start, row[4]);
+            this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 3].Range.Start, row[5]);
+            this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 4].Range.Start, row[6]);
+            this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 5].Range.Start, MathOperations.formatTwoDecimalWithoutRound(row[7], 4));
+
+
+        }
+
+        private void addText(DocumentRange range, String value) {
+            this.wordProcessor.Document.InsertSingleLineText(range.Start, value);
         }
 
 
