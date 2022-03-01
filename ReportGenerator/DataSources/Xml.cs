@@ -33,7 +33,8 @@ namespace ReportGenerator_v1.DataSources {
             var dictionary = new Dictionary<String, DataColumn>();
 
             _dataSet = new DataSet();
-            _dataSet.ReadXml(this.xmlPath);
+            _dataSet.ReadXmlSchema(this.xmlPath);
+            _dataSet.ReadXml(this.xmlPath, XmlReadMode.ReadSchema);
 
             foreach (DataTable table in _dataSet.Tables) {
                 foreach (DataColumn column in table.Columns) {
