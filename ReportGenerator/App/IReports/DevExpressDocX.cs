@@ -225,23 +225,32 @@ namespace ReportGenerator_v1.System {
 
 
                 this.replaceTextWithImage("{{PageA." + page["Image"].Name + "}}", page["Image"].InnerText);
-                //this.replaceTextWithNewText("{{PageA.Name}}", page["Name"].InnerText);
-                //this.replaceTextWithNewText("{{PageA.ElementTypeCase}}", page["ElementTypeCase"].InnerText);
-                //this.replaceTextWithNewText("{{PageA.Ri}}", page["Ri"].InnerText);
-                //this.replaceTextWithNewText("{{PageA.R}}", page["R"].InnerText);
-                //this.replaceTextWithNewText("{{PageA.Ra}}", page["Ra"].InnerText);
-                //this.replaceTextWithNewText("{{PageA.Rall}}", page["Rall"].InnerText);
+                this.replaceTextWithNewText("{{PageA.Name}}", page["Name"].InnerText);
+                this.replaceTextWithNewText("{{PageA.ElementTypeCase}}", page["ElementTypeCase"].InnerText);
+                this.replaceTextWithNewText("{{PageA.Ri}}", MathOperations.formatTwoDecimalWithoutRound(page["Ri"].InnerText,2));
+                this.replaceTextWithNewText("{{PageA.R}}", MathOperations.formatTwoDecimalWithoutRound(page["R"].InnerText,2));
+                this.replaceTextWithNewText("{{PageA.Ra}}", MathOperations.formatTwoDecimalWithoutRound(page["Ra"].InnerText,2));
+                this.replaceTextWithNewText("{{PageA.Rall}}", MathOperations.formatTwoDecimalWithoutRound(page["Rall"].InnerText,2));
 
 
-                
+
                 //this.wordProcessor.Document.Delete(startRange);
                 //this.wordProcessor.Document.Delete(endRange);
 
 
 
                 counter++;
-                if(counter==2)
+                if (counter == 4) {                    
+                    this.wordProcessor.Document.Delete(totalRange);
+
+                    for(int i = 0; i < counter; i++) {
+                        startRange = this.getTextRange("{{START}}");
+                        endRange = this.getTextRange("{{END}}");
+                        this.wordProcessor.Document.Delete(startRange);
+                        this.wordProcessor.Document.Delete(endRange);
+                    }                    
                     break;
+                }
             }
         }
     }
