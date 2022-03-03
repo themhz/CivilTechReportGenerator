@@ -207,49 +207,61 @@ namespace ReportGenerator_v1.System {
             XmlNodeList PageAList = ((Xml)datasource).getList("PageA");
             //foreach PageA
             int counter = 0;
+            
+            
             foreach (XmlNode page in PageAList) {
                 //Foreach child nodes of page A get the fields if ID, BuildingID, TypeID, RecNumber etc..                
 
 
                 //Code that creates sections and clones templates
-                DocumentRange startRange = this.getTextRange("{{START}}");
-                DocumentRange endRange = this.getTextRange("{{END}}");
-                DocumentRange totalRange = wordProcessor.Document.CreateRange(startRange.Start.ToInt(), endRange.End.ToInt());
+                DocumentRange startRange = this.getTextRange("{{START}}"); //βρίσκει το Start
+                DocumentRange endRange = this.getTextRange("{{END}}");  //Βρίσκει το end              
+                DocumentRange copiedRange = wordProcessor.Document.CreateRange(startRange.Start.ToInt(), endRange.End.ToInt()); // Μαρκάρει την εμβέλεια από το start μέχρι το end
 
-                //Copy table to a new line
 
-                wordProcessor.Document.InsertDocumentContent(wordProcessor.Document.InsertSection(endRange.End).Range.Start, totalRange);
+                
+                //var section = wordProcessor.Document.InsertSection(endRange.End);
+                //wordProcessor.Document.ReplaceAll("{{END}}", DevExpress.Office.Characters.PageBreak.ToString(), SearchOptions.None);
+                
+                
+
+
+
+                //wordProcessor.Document.Replace(endRange, DevExpress.Office.Characters.PageBreak.ToString());
+                //wordProcessor.Document.InsertDocumentContent(endRange.Start, DevExpress.Office.Characters.PageBreak.ToString());                                
+                //wordProcessor.Document.InsertDocumentContent(wordProcessor.Document.InsertSection(endRange.End).Range.End, copiedRange);
+                //wordProcessor.Document.InsertDocumentContent(wordProcessor.Document.InsertSection(endRange.End).Range.Start, copiedRange);
+                //wordProcessor.Document.InsertDocumentContent(endRange.End, copiedRange);
+                
 
                 XmlNodeList DetailList = ((Xml)datasource).getList("PageADetails[ns:PageADetailID='" + page["ID"].InnerText + "']");
-                this.populatePageADetails(DetailList, this.wordProcessor.Document.Tables[counter]);
+                this.populatePageADetails(DetailList, this.wordProcessor.Document.Tables[counter+1]);
 
-
+               
                 this.replaceTextWithImage("{{PageA." + page["Image"].Name + "}}", page["Image"].InnerText);
-                this.replaceTextWithNewText("{{PageA.Name}}", page["Name"].InnerText);
+                this.replaceTextWithNewText("{{PageA.Name}}", page["Name"].InnerText + " counter = "+ counter.ToString());
                 this.replaceTextWithNewText("{{PageA.ElementTypeCase}}", page["ElementTypeCase"].InnerText);
-                this.replaceTextWithNewText("{{PageA.Ri}}", MathOperations.formatTwoDecimalWithoutRound(page["Ri"].InnerText,2));
-                this.replaceTextWithNewText("{{PageA.R}}", MathOperations.formatTwoDecimalWithoutRound(page["R"].InnerText,2));
-                this.replaceTextWithNewText("{{PageA.Ra}}", MathOperations.formatTwoDecimalWithoutRound(page["Ra"].InnerText,2));
-                this.replaceTextWithNewText("{{PageA.Rall}}", MathOperations.formatTwoDecimalWithoutRound(page["Rall"].InnerText,2));
+                this.replaceTextWithNewText("{{PageA.Ri}}", MathOperations.formatTwoDecimalWithoutRound(page["Ri"].InnerText, 2));
+                this.replaceTextWithNewText("{{PageA.R}}", MathOperations.formatTwoDecimalWithoutRound(page["R"].InnerText, 2));
+                this.replaceTextWithNewText("{{PageA.Ra}}", MathOperations.formatTwoDecimalWithoutRound(page["Ra"].InnerText, 2));
+                this.replaceTextWithNewText("{{PageA.Rall}}", MathOperations.formatTwoDecimalWithoutRound(page["Rall"].InnerText, 2));
 
-
-
-                //this.wordProcessor.Document.Delete(startRange);
-                //this.wordProcessor.Document.Delete(endRange);
-
+                wordProcessor.Document.InsertDocumentContent(endRange.End, copiedRange); //Εισάγω την εμβέλεια που μάρκαρα στο document μετά το τέλος {{end}}
 
 
                 counter++;
-                if (counter == 4) {                    
-                    this.wordProcessor.Document.Delete(totalRange);
+                if (counter == 2) {                    
+                    //this.wordProcessor.Document.Delete(copiedRange);
 
-                    for(int i = 0; i < counter; i++) {
-                        startRange = this.getTextRange("{{START}}");
-                        endRange = this.getTextRange("{{END}}");
-                        this.wordProcessor.Document.Delete(startRange);
-                        this.wordProcessor.Document.Delete(endRange);
-                    }                    
+                    //for(int i = 0; i < counter; i++) {
+                    //    startRange = this.getTextRange("{{START}}");
+                    //    endRange = this.getTextRange("{{END}}");
+                    //    this.wordProcessor.Document.Delete(startRange);
+                    //    this.wordProcessor.Document.Delete(endRange);
+                    //}                    
                     break;
+                } else {
+                    wordProcessor.Document.InsertText(endRange.End, DevExpress.Office.Characters.PageBreak.ToString());
                 }
             }
         }
