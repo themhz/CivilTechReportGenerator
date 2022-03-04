@@ -38,7 +38,7 @@ namespace ReportGenerator_v1.System {
                 this.load();
                 this.parse();
                 this.save();
-                this.merge();
+                this.openfile();
             }
             Console.WriteLine("file report created");
             return this;
@@ -53,18 +53,16 @@ namespace ReportGenerator_v1.System {
             this.wordProcessor.SaveDocument(this.generatedfile, DocumentFormat.OpenXml);
             Console.WriteLine("Report save in :" + this.template);
         }
-
-        public void merge() {
+        public void openfile() {
             Process.Start(new ProcessStartInfo(this.generatedfile) { UseShellExecute = true });
         }
         //This function is under construction. It will be used to parse the word template document and conscrtruct the report
         //However some commans are implemented.. more to come..
         public void parse() {
-
-            this.reportTemplate2();
+            this.reportTemplate3();
+            //this.reportTemplate2();
             //this.replaceTextWithNewText("{{}}", datasource.GetValue("").ToString());
         }
-
         public void populatePageADetails(XmlNodeList DetailList, Table table) {
             DocumentRange r = this.getTextRange("{{PageADetails}}");
 
@@ -155,8 +153,6 @@ namespace ReportGenerator_v1.System {
             }
 
         }
-      
-
         private void reportTemplate1() {
             //#Replace text with new text
             this.replaceTextWithNewText("{{Projects.ProjectName}}", datasource.GetValue("Projects.ProjectName").ToString());
@@ -277,7 +273,6 @@ namespace ReportGenerator_v1.System {
                
             }
         }
-
         private void reportTemplate2() {
             //#Replace text with new text
             
@@ -344,13 +339,23 @@ namespace ReportGenerator_v1.System {
                 string templateNameFull = Path.Combine(Directory.GetCurrentDirectory(),this.template);
                 richServer.LoadDocumentTemplate(documentTemplate);
                 var document = richServer.Document;
-                
-                
-                this.wordProcessor.Document.InsertDocumentContent(drange.End, richServer.Document.Range, InsertOptions.UseDestinationStyles );
+                this.wordProcessor.Document.InsertDocumentContent(drange.End, richServer.Document.Range, InsertOptions.KeepTextOnly);
             }
+
             this.replaceTextWithNewText("{{TITLE}}", "");
 
         }
-     
+        private void reportTemplate3() {
+
+            Regex r = new Regex("{{.*?}}");
+            var result = this.wordProcessor.Document.FindAll(r).GetAsFrozen() as DocumentRange[];
+
+            for(int i=0; i < result.Length; i++) {
+                var data = this.wordProcessor.Document.GetText(result[i]);
+
+            }
+            
+        }
+
     }
 }
