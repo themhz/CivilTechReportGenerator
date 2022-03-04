@@ -14,6 +14,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.IO;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace ReportGenerator_v1.System {
 
@@ -37,6 +38,7 @@ namespace ReportGenerator_v1.System {
                 this.load();
                 this.parse();
                 this.save();
+                this.merge();
             }
             Console.WriteLine("file report created");
             return this;
@@ -51,11 +53,15 @@ namespace ReportGenerator_v1.System {
             this.wordProcessor.SaveDocument(this.generatedfile, DocumentFormat.OpenXml);
             Console.WriteLine("Report save in :" + this.template);
         }
-                //This function is under construction. It will be used to parse the word template document and conscrtruct the report
+
+        public void merge() {
+            Process.Start(new ProcessStartInfo(this.generatedfile) { UseShellExecute = true });
+        }
+        //This function is under construction. It will be used to parse the word template document and conscrtruct the report
         //However some commans are implemented.. more to come..
         public void parse() {
 
-            this.reportTemplate1();
+            this.reportTemplate2();
             //this.replaceTextWithNewText("{{}}", datasource.GetValue("").ToString());
         }
 
@@ -198,9 +204,9 @@ namespace ReportGenerator_v1.System {
                 { "7. Μη θερμαινόμενοι χώροι", "25"},
                 { "8. Θερμογέφυρες", "26"},
                 { "9. Υπολογισμός μέγιστου επιτρεπτού και πραγματοποιήσιμου Um του κτηρίου", "36"},
-                { "10. Υπολογισμός αθέλητου αερισμού", "38"}            };
+                { "10. Υπολογισμός αθέλητου αερισμού", "38"}
 
-
+            };
            
 
             ////Report Type 1
@@ -215,17 +221,51 @@ namespace ReportGenerator_v1.System {
 
                 //Code that creates sections and clones templates
                 DocumentRange startRange = this.getTextRange("{{START}}"); //βρίσκει το Start
-                DocumentRange endRange = this.getTextRange("{{END}}");  //Βρίσκει το end              
-                DocumentRange copiedRange = wordProcessor.Document.CreateRange(startRange.Start.ToInt(), endRange.End.ToInt()); // Μαρκάρει την εμβέλεια από το start μέχρι το end
+                DocumentRange endRange = this.getTextRange("{{END}}");  //Βρίσκει το end
+                DocumentRange copiedRange =null;
+                if (startRange != null && startRange != null){
+                    copiedRange = wordProcessor.Document.CreateRange(startRange.Start.ToInt(), endRange.End.ToInt()); // Μαρκάρει την εμβέλεια από το start μέχρι το end
+
+                    XmlNodeList DetailList = ((Xml)datasource).getList("PageADetails[ns:PageADetailID='" + page["ID"].InnerText + "']");
+                    this.populatePageADetails(DetailList, this.wordProcessor.Document.Tables[counter + 1]);
 
 
+                    this.replaceTextWithImage("{{PageA." + page["Image"].Name + "}}", page["Image"].InnerText);
+                    this.replaceTextWithNewText("{{PageA.Name}}", page["Name"].InnerText + " counter = " + counter.ToString());
+                    this.replaceTextWithNewText("{{PageA.ElementTypeCase}}", page["ElementTypeCase"].InnerText);
+                    this.replaceTextWithNewText("{{PageA.Ri}}", MathOperations.formatTwoDecimalWithoutRound(page["Ri"].InnerText, 2));
+                    this.replaceTextWithNewText("{{PageA.R}}", MathOperations.formatTwoDecimalWithoutRound(page["R"].InnerText, 2));
+                    this.replaceTextWithNewText("{{PageA.Ra}}", MathOperations.formatTwoDecimalWithoutRound(page["Ra"].InnerText, 2));
+                    this.replaceTextWithNewText("{{PageA.Rall}}", MathOperations.formatTwoDecimalWithoutRound(page["Rall"].InnerText, 2));
+
+
+
+                    wordProcessor.Document.InsertDocumentContent(endRange.End, copiedRange); //Εισάγω την εμβέλεια που μάρκαρα στο document μετά το τέλος {{end}}
+
+                    break;
+                    counter++;
+                    if (counter == 2) {
+                        //this.wordProcessor.Document.Delete(copiedRange);
+
+                        //for(int i = 0; i < counter; i++) {
+                        //    startRange = this.getTextRange("{{START}}");
+                        //    endRange = this.getTextRange("{{END}}");
+                        //    this.wordProcessor.Document.Delete(startRange);
+                        //    this.wordProcessor.Document.Delete(endRange);
+                        //}                    
+                        break;
+                    } else {
+                        wordProcessor.Document.InsertText(endRange.End, DevExpress.Office.Characters.PageBreak.ToString());
+
+                    }
+                }
+              
+                
+                                
                 
                 //var section = wordProcessor.Document.InsertSection(endRange.End);
                 //wordProcessor.Document.ReplaceAll("{{END}}", DevExpress.Office.Characters.PageBreak.ToString(), SearchOptions.None);
-                
-                
-
-
+                                
 
                 //wordProcessor.Document.Replace(endRange, DevExpress.Office.Characters.PageBreak.ToString());
                 //wordProcessor.Document.InsertDocumentContent(endRange.Start, DevExpress.Office.Characters.PageBreak.ToString());                                
@@ -234,36 +274,83 @@ namespace ReportGenerator_v1.System {
                 //wordProcessor.Document.InsertDocumentContent(endRange.End, copiedRange);
                 
 
-                XmlNodeList DetailList = ((Xml)datasource).getList("PageADetails[ns:PageADetailID='" + page["ID"].InnerText + "']");
-                this.populatePageADetails(DetailList, this.wordProcessor.Document.Tables[counter+1]);
-
                
-                this.replaceTextWithImage("{{PageA." + page["Image"].Name + "}}", page["Image"].InnerText);
-                this.replaceTextWithNewText("{{PageA.Name}}", page["Name"].InnerText + " counter = "+ counter.ToString());
-                this.replaceTextWithNewText("{{PageA.ElementTypeCase}}", page["ElementTypeCase"].InnerText);
-                this.replaceTextWithNewText("{{PageA.Ri}}", MathOperations.formatTwoDecimalWithoutRound(page["Ri"].InnerText, 2));
-                this.replaceTextWithNewText("{{PageA.R}}", MathOperations.formatTwoDecimalWithoutRound(page["R"].InnerText, 2));
-                this.replaceTextWithNewText("{{PageA.Ra}}", MathOperations.formatTwoDecimalWithoutRound(page["Ra"].InnerText, 2));
-                this.replaceTextWithNewText("{{PageA.Rall}}", MathOperations.formatTwoDecimalWithoutRound(page["Rall"].InnerText, 2));
-
-                wordProcessor.Document.InsertDocumentContent(endRange.End, copiedRange); //Εισάγω την εμβέλεια που μάρκαρα στο document μετά το τέλος {{end}}
-
-
-                counter++;
-                if (counter == 2) {                    
-                    //this.wordProcessor.Document.Delete(copiedRange);
-
-                    //for(int i = 0; i < counter; i++) {
-                    //    startRange = this.getTextRange("{{START}}");
-                    //    endRange = this.getTextRange("{{END}}");
-                    //    this.wordProcessor.Document.Delete(startRange);
-                    //    this.wordProcessor.Document.Delete(endRange);
-                    //}                    
-                    break;
-                } else {
-                    wordProcessor.Document.InsertText(endRange.End, DevExpress.Office.Characters.PageBreak.ToString());
-                }
             }
         }
+
+        private void reportTemplate2() {
+            //#Replace text with new text
+            
+            this.replaceTextWithNewText("{{Projects.ProjectName}}", datasource.GetValue("Projects.ProjectName").ToString());
+            this.replaceTextWithNewText("{{Projects.Address1}}", datasource.GetValue("Projects.Address1").ToString());
+            this.replaceTextWithNewText("{{Projects.SolutionEngineersSynopsis}}", datasource.GetValue("Projects.SolutionEngineersSynopsis").ToString());
+            this.replaceTextWithNewText("{{Projects.SolutionPrintedYear}}", datasource.GetValue("Projects.SolutionPrintedYear").ToString());
+            this.replaceTextWithNewText("{{Projects.TEECurrentVersion}}", datasource.GetValue("Projects.TEECurrentVersion").ToString());
+            this.replaceTextWithNewText("{{Projects.TEESN}}", datasource.GetValue("Projects.TEESN").ToString());
+            this.replaceTextWithNewText("{{Projects.SoftwareName}}", datasource.GetValue("Projects.SoftwareName").ToString());
+            this.replaceTextWithNewText("{{Projects.EnergyBuildingRegistrationNumber}}", datasource.GetValue("Projects.EnergyBuildingRegistrationNumber").ToString());
+            this.replaceTextWithNewText("{{Projects.EnergyBuildingVersion}}", datasource.GetValue("Projects.EnergyBuildingVersion").ToString());
+            this.replaceTextWithNewText("{{Projects.EnergyBuildingSN}}", datasource.GetValue("Projects.EnergyBuildingSN").ToString());
+
+
+            this.replaceTextWithNewText("{{BuildingsGeneral.CityID}}", datasource.GetValue("BuildingsGeneral.CityID").ToString());
+            this.replaceTextWithNewText("{{BuildingsGeneral.Elevation}}", datasource.GetValue("BuildingsGeneral.Elevation").ToString());
+            this.replaceTextWithNewText("{{BuildingsGeneral.ClimaticZoneName}}", datasource.GetValue("BuildingsGeneral.ClimaticZoneName").ToString());
+            this.replaceTextWithNewText("{{PageCBuildings.RecNumber}}", datasource.GetValue("PageCBuildings.RecNumber").ToString());
+            this.replaceTextWithNewText("{{PageCBuildings.Name}}", datasource.GetValue("PageCBuildings.Name").ToString());
+
+
+            this.replaceTextWithNewText("{{SpecialAttributes.FT}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.FT").ToString()));
+            this.replaceTextWithNewText("{{SpecialAttributes.FW}}", datasource.GetValue("SpecialAttributes.FW").ToString());
+            this.replaceTextWithNewText("{{SpecialAttributes.FR}}", datasource.GetValue("SpecialAttributes.FW").ToString());
+            this.replaceTextWithNewText("{{SpecialAttributes.FFB}}", datasource.GetValue("SpecialAttributes.FFB").ToString());
+            this.replaceTextWithNewText("{{SpecialAttributes.FFU}}", datasource.GetValue("SpecialAttributes.FFU").ToString());
+            this.replaceTextWithNewText("{{SpecialAttributes.FFA}}", datasource.GetValue("SpecialAttributes.FFA").ToString());
+            this.replaceTextWithNewText("{{SpecialAttributes.FTU}}", datasource.GetValue("SpecialAttributes.FTU").ToString());
+            this.replaceTextWithNewText("{{SpecialAttributes.FTB}}", datasource.GetValue("SpecialAttributes.FTB").ToString());
+            this.replaceTextWithNewText("{{SpecialAttributes.FGF}}", datasource.GetValue("SpecialAttributes.FGF").ToString());
+
+            this.replaceTextWithNewText("{{SpecialAttributes.F}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.F").ToString()));
+            this.replaceTextWithNewText("{{SpecialAttributes.BuildingVolume}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.BuildingVolume").ToString()));
+            this.replaceTextWithNewText("{{SpecialAttributes.FV}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.FV").ToString()));
+            this.replaceTextWithNewText("{{SpecialAttributes.Umax}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.Umax").ToString()));
+
+            String[,] contents = new String[11, 2] {
+                { "Υπολογισμός συντελεστών θερμοπερατότητας αδιαφανών δομικών στοιχείων", "3"},
+                { "1. Υπολογισμός συντελεστών θερμοπερατότητας αδιαφανών δομικών στοιχείων", "4"},
+                { "2. Υπολογισμός ισοδύναμων συντελεστών θερμοπερατότητας αδιαφανών δομικών στοιχείων σε επαφή με το έδαφος", "11"},
+                { "3. Υπολογισμός συντελεστών θερμοπερατότητας και συντελεστών ηλιακών κερδών  διαφανών δομικών στοιχείων", "12"},
+                { "4. Κατακόρυφα αδιαφανή δομικά στοιχεία", "13"},
+                { "5. Οριζόντια αδιαφανή δομικά στοιχεία", "21"},
+                { "6. Διαφανή δομικά στοιχεία", "24"},
+                { "7. Μη θερμαινόμενοι χώροι", "25"},
+                { "8. Θερμογέφυρες", "26"},
+                { "9. Υπολογισμός μέγιστου επιτρεπτού και πραγματοποιήσιμου Um του κτηρίου", "36"},
+                { "10. Υπολογισμός αθέλητου αερισμού", "38"}
+            };
+            
+
+            //RichEditDocumentServer wordProcessor = new RichEditDocumentServer();
+            //this.wordProcessor.Document.LoadDocument("C:\\Users\\themis\\source\\repos\\CivilTechReportGenerator\\ReportGenerator\\DataSources\\files\\templates\\template_part1.docx");
+            //this.InsertDocVariableField(wordProcessor.Document);
+
+            //wordProcessor.Document.Fields.Update();
+
+            string documentTemplate = Path.Combine("C:\\Users\\themis\\source\\repos\\CivilTechReportGenerator\\ReportGenerator\\DataSources\\files\\templates\\template_part3.docx");
+            //wordProcessor.Document.LoadDocument(documentNameFull);
+            DocumentRange drange = getTextRange("{{TITLE}}");
+            using (RichEditDocumentServer richServer = new RichEditDocumentServer()) {
+                
+                string templateNameFull = Path.Combine(Directory.GetCurrentDirectory(),this.template);
+                richServer.LoadDocumentTemplate(documentTemplate);
+                var document = richServer.Document;
+                
+                
+                this.wordProcessor.Document.InsertDocumentContent(drange.End, richServer.Document.Range, InsertOptions.UseDestinationStyles );
+            }
+            this.replaceTextWithNewText("{{TITLE}}", "");
+
+        }
+     
     }
 }

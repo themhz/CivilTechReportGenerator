@@ -128,8 +128,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="DataSources\files\report_template.docx" />
-    <None Include="DataSources\files\report_template_ver1.docx" />
+    <None Include="DataSources\files\report_template2.docx" />
+    <None Include="DataSources\files\templates\template_part3.docx" />
+    <None Include="DataSources\files\templates\template_part2.docx" />
+    <None Include="DataSources\files\templates\template_part1.docx" />
+    <None Include="DataSources\files\temp\report_template.docx" />
+    <None Include="DataSources\files\old\report_template_ver1.docx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
