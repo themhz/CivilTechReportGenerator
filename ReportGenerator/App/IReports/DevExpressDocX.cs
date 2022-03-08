@@ -15,6 +15,10 @@ using System.Xml.Linq;
 using System.IO;
 using System.Drawing;
 using System.Diagnostics;
+using System.Collections;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace ReportGenerator_v1.System {
 
@@ -59,9 +63,18 @@ namespace ReportGenerator_v1.System {
         //This function is under construction. It will be used to parse the word template document and conscrtruct the report
         //However some commans are implemented.. more to come..
         public void parse() {
-            this.reportTemplate3();
-            //this.reportTemplate2();
-            //this.replaceTextWithNewText("{{}}", datasource.GetValue("").ToString());
+            CommentCollection comments = this.wordProcessor.Document.Comments;
+
+            foreach(Comment comment in comments) {
+                
+                SubDocument doc = comment.BeginUpdate();
+                string field = doc.GetText(doc.Range).Replace("”", "\"").Replace("{{", "{").Replace("}}", "}");
+                comment.EndUpdate(doc);
+                this.checkField(field, comment);
+
+            }
+       
+            Console.ReadLine();       
         }
         public void populatePageADetails(XmlNodeList DetailList, Table table) {
             DocumentRange r = this.getTextRange("{{PageADetails}}");
@@ -95,6 +108,12 @@ namespace ReportGenerator_v1.System {
             this.targetRange = this.getTextRange(text);
             this.wordProcessor.Document.Tables.Create(this.targetRange.Start, rows, cols);
             this.delete();
+        }
+        public void replaceRangeWithNewText(DocumentRange sourceRange, String targetText) {
+            this.wordProcessor.Document.BeginUpdate();
+            this.targetRange = sourceRange;
+            if (this.targetRange != null)
+                this.wordProcessor.Document.Replace(targetRange, targetText);
         }
         public void replaceTextWithNewText(String sourceText, String targetText) {
             this.wordProcessor.Document.BeginUpdate();
@@ -345,16 +364,70 @@ namespace ReportGenerator_v1.System {
             this.replaceTextWithNewText("{{TITLE}}", "");
 
         }
-        private void reportTemplate3() {
+        private Dictionary<String, JObject> scanDocument() {
 
             Regex r = new Regex("{{.*?}}");
             var result = this.wordProcessor.Document.FindAll(r).GetAsFrozen() as DocumentRange[];
-
-            for(int i=0; i < result.Length; i++) {
-                var data = this.wordProcessor.Document.GetText(result[i]);
-
+            Dictionary<String, JObject> fields = new Dictionary<String, JObject>();
+            for (int i=0; i < result.Length; i++) {
+                //var data = this.wordProcessor.Document.GetText(result[i]);
+                String field = this.wordProcessor.Document.GetText(result[i]).Replace("”", "\"").Replace("{{", "{").Replace("}}", "}");
+                this.replaceTextWithNewText(field, "{{"+i.ToString()+"}}");
+                JObject o1 = JObject.Parse(field);
+                fields.Add("{{" + i.ToString() + "}}", o1);
             }
-            
+
+            return fields;
+        }
+        private void checkField(String field, Comment comment) {
+            JObject jo = JObject.Parse(field);
+            //Console.WriteLine(jo);
+            switch (jo.GetValue("type").ToString()) {
+                case "field":
+                    this.parseField(jo, comment);
+                    break;
+                case "list":
+                    this.parseList(jo, comment);
+                    break;
+                case "template":
+                    this.parseTemplate(jo, comment);                    
+                    break;
+            }
+
+        }
+
+        private void replaceTextWithTemplate(String field) {
+            string documentTemplate = Path.Combine("C:\\Users\\themis\\source\\repos\\CivilTechReportGenerator\\ReportGenerator\\DataSources\\files\\templates\\template_part3.docx");
+            //wordProcessor.Document.LoadDocument(documentNameFull);
+            DocumentRange drange = getTextRange(field);
+            using (RichEditDocumentServer richServer = new RichEditDocumentServer()) {
+
+                string templateNameFull = Path.Combine(Directory.GetCurrentDirectory(), this.template);
+                richServer.LoadDocumentTemplate(documentTemplate);
+                var document = richServer.Document;
+                this.wordProcessor.Document.InsertDocumentContent(drange.End, richServer.Document.Range, InsertOptions.KeepTextOnly);
+            }
+
+            this.replaceTextWithNewText(field, "");
+        }
+
+
+        //To be continued
+        public void parseField(JObject jo, Comment comment) {
+            Console.WriteLine(jo + " is field");
+            //jo.GetValue("name").ToString();
+
+            //this.replaceRangeWithNewText(comment.Range, );
+            //this.replaceTextWithNewText("{{Projects.ProjectName}}", datasource.GetValue("Projects.ProjectName").ToString());
+        }
+
+        public void parseList(JObject jo, Comment comment) {
+            Console.WriteLine(jo + " is List");
+        }
+
+        public void parseTemplate(JObject jo, Comment comment) {
+            Console.WriteLine(jo + " is template");
+            //this.replaceTextWithTemplate(field.ToString());
         }
 
     }

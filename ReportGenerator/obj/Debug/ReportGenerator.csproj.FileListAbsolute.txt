@@ -63,3 +63,5 @@ C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\System.Text.Encodings.Web.xml
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\System.Text.Json.xml
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\System.ValueTuple.xml
+C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\Newtonsoft.Json.dll
+C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\Newtonsoft.Json.xml
