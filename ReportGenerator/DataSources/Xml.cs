@@ -25,7 +25,7 @@ namespace ReportGenerator_v1.DataSources {
                 return column.Table.Rows[index][column.Ordinal];
             }
             else {
-                return null;
+                return field;
             }
         }
 

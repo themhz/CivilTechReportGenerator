@@ -65,7 +65,7 @@ namespace ReportGenerator_v1.System {
         public void parse() {
             CommentCollection comments = this.wordProcessor.Document.Comments;
 
-            foreach(Comment comment in comments) {
+            foreach(Comment comment in comments.ToList()) {
                 
                 SubDocument doc = comment.BeginUpdate();
                 string field = doc.GetText(doc.Range).Replace("”", "\"").Replace("{{", "{").Replace("}}", "}");
@@ -416,8 +416,7 @@ namespace ReportGenerator_v1.System {
         public void parseField(JObject jo, Comment comment) {
             Console.WriteLine(jo + " is field");
             //jo.GetValue("name").ToString();
-
-            //this.replaceRangeWithNewText(comment.Range, );
+            this.replaceRangeWithNewText(comment.Range, datasource.GetValue(jo.GetValue("name").ToString()).ToString());
             //this.replaceTextWithNewText("{{Projects.ProjectName}}", datasource.GetValue("Projects.ProjectName").ToString());
         }
 
