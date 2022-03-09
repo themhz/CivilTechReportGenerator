@@ -1,30 +1,26 @@
 ﻿using DevExpress.XtraRichEdit;
 using DevExpress.XtraRichEdit.API.Native;
-using DevExpress.XtraRichEdit.API.Native.Implementation;
 using ReportGenerator;
 using ReportGenerator.DataSources;
 using ReportGenerator.Helpers;
-using ReportGenerator.Types;
 using ReportGenerator_v1.DataSources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
-using System.Xml.Linq;
 using System.IO;
-using System.Drawing;
 using System.Diagnostics;
-using System.Collections;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
-using System.Text.Json;
+using System.Configuration;
+
 
 namespace ReportGenerator_v1.System {
 
     class DevExpressDocX : IReport {
 
         public RichEditDocumentServer wordProcessor { set; get; }
+        public RichEditDocumentServer tempWordProcessor { set; get; }
         public IDataSource datasource { set; get; }
         public String template { set; get; }
         public String generatedfile { set; get; }
@@ -65,31 +61,25 @@ namespace ReportGenerator_v1.System {
         public void parse() {
             CommentCollection comments = this.wordProcessor.Document.Comments;
 
-            foreach(Comment comment in comments.ToList()) {
-                
+            foreach (Comment comment in comments.ToList()) {
+
                 SubDocument doc = comment.BeginUpdate();
-                string field = doc.GetText(doc.Range).Replace("”", "\"").Replace("{{", "{").Replace("}}", "}");
+                String field = doc.GetText(doc.Range).Replace("”", "\"").Replace("{{", "{").Replace("}}", "}");
                 comment.EndUpdate(doc);
                 this.checkField(field, comment);
-
             }
-       
-            Console.ReadLine();       
+            //Console.ReadLine();       
         }
-        public void populatePageADetails(XmlNodeList DetailList, Table table) {
-            DocumentRange r = this.getTextRange("{{PageADetails}}");
-
-            int tableIndex = 0;
+        public void populatePageADetails(XmlNodeList DetailList, Table table) {            
             foreach (XmlNode node in DetailList) {
                 //List<string> rows = new List<string>();
                 Dictionary<String, String> cols = new Dictionary<string, string>();
                 foreach (XmlNode row in node) {
                     cols.Add(row.Name, row.InnerText);
-                }                             
-                this.addTableRow(table, cols);
-                tableIndex++;                               
+                }
+                this.addTableRow(table, cols);                
             }
-         
+
 
         }
         //Τhe only way to copy and paste something is via InsertDocumentContent method
@@ -118,24 +108,25 @@ namespace ReportGenerator_v1.System {
         public void replaceTextWithNewText(String sourceText, String targetText) {
             this.wordProcessor.Document.BeginUpdate();
             this.targetRange = this.getTextRange(sourceText);
-            if(this.targetRange != null)
-                this.wordProcessor.Document.Replace(targetRange, targetText);            
+            if (this.targetRange != null)
+                this.wordProcessor.Document.Replace(targetRange, targetText);
         }
-        public void replaceTextWithImage(String sourceText, String targetText) {
+        public void replaceTextWithImage(DocumentRange sourceRange, String targetText) {
             this.wordProcessor.Document.BeginUpdate();
             this.wordProcessor.Document.Unit = DevExpress.Office.DocumentUnit.Inch;
-            this.targetRange = this.getTextRange(sourceText);
-            if (this.targetRange != null) {                
-                byte[] bytes = Convert.FromBase64String(targetText);                
+            this.targetRange = sourceRange;  //this.getTextRange(sourceText);
+            if (this.targetRange != null) {
+                byte[] bytes = Convert.FromBase64String(targetText);
                 bytes = ImageResizer.resize(bytes, 700, 700);
-                using (MemoryStream ms = new MemoryStream(bytes)) {                    
-                    DocumentImageSource image = DocumentImageSource.FromStream(ms);                    
+                using (MemoryStream ms = new MemoryStream(bytes)) {
+                    DocumentImageSource image = DocumentImageSource.FromStream(ms);
                     this.wordProcessor.Document.Images.Insert(this.targetRange.Start, image);
                 }
                 this.delete();
             }
             //this.wordProcessor.Document.Replace(targetRange, targetText);
         }        
+        //Get the table on the document based on the index
         public Table getTable(int position) {
             return this.wordProcessor.Document.Tables[position];
         }
@@ -149,14 +140,11 @@ namespace ReportGenerator_v1.System {
             } catch (Exception ex) {
                 return null;
             }
-            
+
         }
         public void delete() {
             this.wordProcessor.Document.Delete(this.targetRange);
-        }
-        private void addText(DocumentRange range, String value) {
-            this.wordProcessor.Document.InsertSingleLineText(range.Start, value);
-        }
+        }        
         private void addTableRow(Table targetTable, Dictionary<String, String> cols) {
             int rowcount = targetTable.Rows.Count() - 1;
             targetTable.Rows.InsertAfter(rowcount);
@@ -167,218 +155,12 @@ namespace ReportGenerator_v1.System {
                 this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 3].Range.Start, cols["d"].ToString());
                 this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 4].Range.Start, cols["λ"].ToString());
                 this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 5].Range.Start, MathOperations.formatTwoDecimalWithoutRound(cols["dλ"].ToString(), 4));
-            }catch(Exception ex) {
+            } catch (Exception ex) {
 
             }
 
-        }
-        private void reportTemplate1() {
-            //#Replace text with new text
-            this.replaceTextWithNewText("{{Projects.ProjectName}}", datasource.GetValue("Projects.ProjectName").ToString());
-            this.replaceTextWithNewText("{{Projects.Address1}}", datasource.GetValue("Projects.Address1").ToString());
-            this.replaceTextWithNewText("{{Projects.SolutionEngineersSynopsis}}", datasource.GetValue("Projects.SolutionEngineersSynopsis").ToString());
-            this.replaceTextWithNewText("{{Projects.SolutionPrintedYear}}", datasource.GetValue("Projects.SolutionPrintedYear").ToString());
-            this.replaceTextWithNewText("{{Projects.TEECurrentVersion}}", datasource.GetValue("Projects.TEECurrentVersion").ToString());
-            this.replaceTextWithNewText("{{Projects.TEESN}}", datasource.GetValue("Projects.TEESN").ToString());
-            this.replaceTextWithNewText("{{Projects.SoftwareName}}", datasource.GetValue("Projects.SoftwareName").ToString());
-            this.replaceTextWithNewText("{{Projects.EnergyBuildingRegistrationNumber}}", datasource.GetValue("Projects.EnergyBuildingRegistrationNumber").ToString());
-            this.replaceTextWithNewText("{{Projects.EnergyBuildingVersion}}", datasource.GetValue("Projects.EnergyBuildingVersion").ToString());
-            this.replaceTextWithNewText("{{Projects.EnergyBuildingSN}}", datasource.GetValue("Projects.EnergyBuildingSN").ToString());
+        }        
 
-
-            this.replaceTextWithNewText("{{BuildingsGeneral.CityID}}", datasource.GetValue("BuildingsGeneral.CityID").ToString());
-            this.replaceTextWithNewText("{{BuildingsGeneral.Elevation}}", datasource.GetValue("BuildingsGeneral.Elevation").ToString());
-            this.replaceTextWithNewText("{{BuildingsGeneral.ClimaticZoneName}}", datasource.GetValue("BuildingsGeneral.ClimaticZoneName").ToString());
-            this.replaceTextWithNewText("{{PageCBuildings.RecNumber}}", datasource.GetValue("PageCBuildings.RecNumber").ToString());
-            this.replaceTextWithNewText("{{PageCBuildings.Name}}", datasource.GetValue("PageCBuildings.Name").ToString());
-
-
-            this.replaceTextWithNewText("{{SpecialAttributes.FT}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.FT").ToString()));
-            this.replaceTextWithNewText("{{SpecialAttributes.FW}}", datasource.GetValue("SpecialAttributes.FW").ToString());
-            this.replaceTextWithNewText("{{SpecialAttributes.FR}}", datasource.GetValue("SpecialAttributes.FW").ToString());
-            this.replaceTextWithNewText("{{SpecialAttributes.FFB}}", datasource.GetValue("SpecialAttributes.FFB").ToString());
-            this.replaceTextWithNewText("{{SpecialAttributes.FFU}}", datasource.GetValue("SpecialAttributes.FFU").ToString());
-            this.replaceTextWithNewText("{{SpecialAttributes.FFA}}", datasource.GetValue("SpecialAttributes.FFA").ToString());
-            this.replaceTextWithNewText("{{SpecialAttributes.FTU}}", datasource.GetValue("SpecialAttributes.FTU").ToString());
-            this.replaceTextWithNewText("{{SpecialAttributes.FTB}}", datasource.GetValue("SpecialAttributes.FTB").ToString());
-            this.replaceTextWithNewText("{{SpecialAttributes.FGF}}", datasource.GetValue("SpecialAttributes.FGF").ToString());
-
-            this.replaceTextWithNewText("{{SpecialAttributes.F}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.F").ToString()));
-            this.replaceTextWithNewText("{{SpecialAttributes.BuildingVolume}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.BuildingVolume").ToString()));
-            this.replaceTextWithNewText("{{SpecialAttributes.FV}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.FV").ToString()));
-            this.replaceTextWithNewText("{{SpecialAttributes.Umax}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.Umax").ToString()));
-
-            String[,] contents = new String[11, 2] {
-                { "Υπολογισμός συντελεστών θερμοπερατότητας αδιαφανών δομικών στοιχείων", "3"},
-                { "1. Υπολογισμός συντελεστών θερμοπερατότητας αδιαφανών δομικών στοιχείων", "4"},
-                { "2. Υπολογισμός ισοδύναμων συντελεστών θερμοπερατότητας αδιαφανών δομικών στοιχείων σε επαφή με το έδαφος", "11"},
-                { "3. Υπολογισμός συντελεστών θερμοπερατότητας και συντελεστών ηλιακών κερδών  διαφανών δομικών στοιχείων", "12"},
-                { "4. Κατακόρυφα αδιαφανή δομικά στοιχεία", "13"},
-                { "5. Οριζόντια αδιαφανή δομικά στοιχεία", "21"},
-                { "6. Διαφανή δομικά στοιχεία", "24"},
-                { "7. Μη θερμαινόμενοι χώροι", "25"},
-                { "8. Θερμογέφυρες", "26"},
-                { "9. Υπολογισμός μέγιστου επιτρεπτού και πραγματοποιήσιμου Um του κτηρίου", "36"},
-                { "10. Υπολογισμός αθέλητου αερισμού", "38"}
-
-            };
-           
-
-            ////Report Type 1
-            XmlNodeList PageAList = ((Xml)datasource).getList("PageA");
-            //foreach PageA
-            int counter = 0;
-            
-            
-            foreach (XmlNode page in PageAList) {
-                //Foreach child nodes of page A get the fields if ID, BuildingID, TypeID, RecNumber etc..                
-
-
-                //Code that creates sections and clones templates
-                DocumentRange startRange = this.getTextRange("{{START}}"); //βρίσκει το Start
-                DocumentRange endRange = this.getTextRange("{{END}}");  //Βρίσκει το end
-                DocumentRange copiedRange =null;
-                if (startRange != null && startRange != null){
-                    copiedRange = wordProcessor.Document.CreateRange(startRange.Start.ToInt(), endRange.End.ToInt()); // Μαρκάρει την εμβέλεια από το start μέχρι το end
-
-                    XmlNodeList DetailList = ((Xml)datasource).getList("PageADetails[ns:PageADetailID='" + page["ID"].InnerText + "']");
-                    this.populatePageADetails(DetailList, this.wordProcessor.Document.Tables[counter + 1]);
-
-
-                    this.replaceTextWithImage("{{PageA." + page["Image"].Name + "}}", page["Image"].InnerText);
-                    this.replaceTextWithNewText("{{PageA.Name}}", page["Name"].InnerText + " counter = " + counter.ToString());
-                    this.replaceTextWithNewText("{{PageA.ElementTypeCase}}", page["ElementTypeCase"].InnerText);
-                    this.replaceTextWithNewText("{{PageA.Ri}}", MathOperations.formatTwoDecimalWithoutRound(page["Ri"].InnerText, 2));
-                    this.replaceTextWithNewText("{{PageA.R}}", MathOperations.formatTwoDecimalWithoutRound(page["R"].InnerText, 2));
-                    this.replaceTextWithNewText("{{PageA.Ra}}", MathOperations.formatTwoDecimalWithoutRound(page["Ra"].InnerText, 2));
-                    this.replaceTextWithNewText("{{PageA.Rall}}", MathOperations.formatTwoDecimalWithoutRound(page["Rall"].InnerText, 2));
-
-
-
-                    wordProcessor.Document.InsertDocumentContent(endRange.End, copiedRange); //Εισάγω την εμβέλεια που μάρκαρα στο document μετά το τέλος {{end}}
-
-                    break;
-                    counter++;
-                    if (counter == 2) {
-                        //this.wordProcessor.Document.Delete(copiedRange);
-
-                        //for(int i = 0; i < counter; i++) {
-                        //    startRange = this.getTextRange("{{START}}");
-                        //    endRange = this.getTextRange("{{END}}");
-                        //    this.wordProcessor.Document.Delete(startRange);
-                        //    this.wordProcessor.Document.Delete(endRange);
-                        //}                    
-                        break;
-                    } else {
-                        wordProcessor.Document.InsertText(endRange.End, DevExpress.Office.Characters.PageBreak.ToString());
-
-                    }
-                }
-              
-                
-                                
-                
-                //var section = wordProcessor.Document.InsertSection(endRange.End);
-                //wordProcessor.Document.ReplaceAll("{{END}}", DevExpress.Office.Characters.PageBreak.ToString(), SearchOptions.None);
-                                
-
-                //wordProcessor.Document.Replace(endRange, DevExpress.Office.Characters.PageBreak.ToString());
-                //wordProcessor.Document.InsertDocumentContent(endRange.Start, DevExpress.Office.Characters.PageBreak.ToString());                                
-                //wordProcessor.Document.InsertDocumentContent(wordProcessor.Document.InsertSection(endRange.End).Range.End, copiedRange);
-                //wordProcessor.Document.InsertDocumentContent(wordProcessor.Document.InsertSection(endRange.End).Range.Start, copiedRange);
-                //wordProcessor.Document.InsertDocumentContent(endRange.End, copiedRange);
-                
-
-               
-            }
-        }
-        private void reportTemplate2() {
-            //#Replace text with new text
-            
-            this.replaceTextWithNewText("{{Projects.ProjectName}}", datasource.GetValue("Projects.ProjectName").ToString());
-            this.replaceTextWithNewText("{{Projects.Address1}}", datasource.GetValue("Projects.Address1").ToString());
-            this.replaceTextWithNewText("{{Projects.SolutionEngineersSynopsis}}", datasource.GetValue("Projects.SolutionEngineersSynopsis").ToString());
-            this.replaceTextWithNewText("{{Projects.SolutionPrintedYear}}", datasource.GetValue("Projects.SolutionPrintedYear").ToString());
-            this.replaceTextWithNewText("{{Projects.TEECurrentVersion}}", datasource.GetValue("Projects.TEECurrentVersion").ToString());
-            this.replaceTextWithNewText("{{Projects.TEESN}}", datasource.GetValue("Projects.TEESN").ToString());
-            this.replaceTextWithNewText("{{Projects.SoftwareName}}", datasource.GetValue("Projects.SoftwareName").ToString());
-            this.replaceTextWithNewText("{{Projects.EnergyBuildingRegistrationNumber}}", datasource.GetValue("Projects.EnergyBuildingRegistrationNumber").ToString());
-            this.replaceTextWithNewText("{{Projects.EnergyBuildingVersion}}", datasource.GetValue("Projects.EnergyBuildingVersion").ToString());
-            this.replaceTextWithNewText("{{Projects.EnergyBuildingSN}}", datasource.GetValue("Projects.EnergyBuildingSN").ToString());
-
-
-            this.replaceTextWithNewText("{{BuildingsGeneral.CityID}}", datasource.GetValue("BuildingsGeneral.CityID").ToString());
-            this.replaceTextWithNewText("{{BuildingsGeneral.Elevation}}", datasource.GetValue("BuildingsGeneral.Elevation").ToString());
-            this.replaceTextWithNewText("{{BuildingsGeneral.ClimaticZoneName}}", datasource.GetValue("BuildingsGeneral.ClimaticZoneName").ToString());
-            this.replaceTextWithNewText("{{PageCBuildings.RecNumber}}", datasource.GetValue("PageCBuildings.RecNumber").ToString());
-            this.replaceTextWithNewText("{{PageCBuildings.Name}}", datasource.GetValue("PageCBuildings.Name").ToString());
-
-
-            this.replaceTextWithNewText("{{SpecialAttributes.FT}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.FT").ToString()));
-            this.replaceTextWithNewText("{{SpecialAttributes.FW}}", datasource.GetValue("SpecialAttributes.FW").ToString());
-            this.replaceTextWithNewText("{{SpecialAttributes.FR}}", datasource.GetValue("SpecialAttributes.FW").ToString());
-            this.replaceTextWithNewText("{{SpecialAttributes.FFB}}", datasource.GetValue("SpecialAttributes.FFB").ToString());
-            this.replaceTextWithNewText("{{SpecialAttributes.FFU}}", datasource.GetValue("SpecialAttributes.FFU").ToString());
-            this.replaceTextWithNewText("{{SpecialAttributes.FFA}}", datasource.GetValue("SpecialAttributes.FFA").ToString());
-            this.replaceTextWithNewText("{{SpecialAttributes.FTU}}", datasource.GetValue("SpecialAttributes.FTU").ToString());
-            this.replaceTextWithNewText("{{SpecialAttributes.FTB}}", datasource.GetValue("SpecialAttributes.FTB").ToString());
-            this.replaceTextWithNewText("{{SpecialAttributes.FGF}}", datasource.GetValue("SpecialAttributes.FGF").ToString());
-
-            this.replaceTextWithNewText("{{SpecialAttributes.F}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.F").ToString()));
-            this.replaceTextWithNewText("{{SpecialAttributes.BuildingVolume}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.BuildingVolume").ToString()));
-            this.replaceTextWithNewText("{{SpecialAttributes.FV}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.FV").ToString()));
-            this.replaceTextWithNewText("{{SpecialAttributes.Umax}}", MathOperations.formatTwoDecimalWithoutRound(datasource.GetValue("SpecialAttributes.Umax").ToString()));
-
-            String[,] contents = new String[11, 2] {
-                { "Υπολογισμός συντελεστών θερμοπερατότητας αδιαφανών δομικών στοιχείων", "3"},
-                { "1. Υπολογισμός συντελεστών θερμοπερατότητας αδιαφανών δομικών στοιχείων", "4"},
-                { "2. Υπολογισμός ισοδύναμων συντελεστών θερμοπερατότητας αδιαφανών δομικών στοιχείων σε επαφή με το έδαφος", "11"},
-                { "3. Υπολογισμός συντελεστών θερμοπερατότητας και συντελεστών ηλιακών κερδών  διαφανών δομικών στοιχείων", "12"},
-                { "4. Κατακόρυφα αδιαφανή δομικά στοιχεία", "13"},
-                { "5. Οριζόντια αδιαφανή δομικά στοιχεία", "21"},
-                { "6. Διαφανή δομικά στοιχεία", "24"},
-                { "7. Μη θερμαινόμενοι χώροι", "25"},
-                { "8. Θερμογέφυρες", "26"},
-                { "9. Υπολογισμός μέγιστου επιτρεπτού και πραγματοποιήσιμου Um του κτηρίου", "36"},
-                { "10. Υπολογισμός αθέλητου αερισμού", "38"}
-            };
-            
-
-            //RichEditDocumentServer wordProcessor = new RichEditDocumentServer();
-            //this.wordProcessor.Document.LoadDocument("C:\\Users\\themis\\source\\repos\\CivilTechReportGenerator\\ReportGenerator\\DataSources\\files\\templates\\template_part1.docx");
-            //this.InsertDocVariableField(wordProcessor.Document);
-
-            //wordProcessor.Document.Fields.Update();
-
-            string documentTemplate = Path.Combine("C:\\Users\\themis\\source\\repos\\CivilTechReportGenerator\\ReportGenerator\\DataSources\\files\\templates\\template_part3.docx");
-            //wordProcessor.Document.LoadDocument(documentNameFull);
-            DocumentRange drange = getTextRange("{{TITLE}}");
-            using (RichEditDocumentServer richServer = new RichEditDocumentServer()) {
-                
-                string templateNameFull = Path.Combine(Directory.GetCurrentDirectory(),this.template);
-                richServer.LoadDocumentTemplate(documentTemplate);
-                var document = richServer.Document;
-                this.wordProcessor.Document.InsertDocumentContent(drange.End, richServer.Document.Range, InsertOptions.KeepTextOnly);
-            }
-
-            this.replaceTextWithNewText("{{TITLE}}", "");
-
-        }
-        private Dictionary<String, JObject> scanDocument() {
-
-            Regex r = new Regex("{{.*?}}");
-            var result = this.wordProcessor.Document.FindAll(r).GetAsFrozen() as DocumentRange[];
-            Dictionary<String, JObject> fields = new Dictionary<String, JObject>();
-            for (int i=0; i < result.Length; i++) {
-                //var data = this.wordProcessor.Document.GetText(result[i]);
-                String field = this.wordProcessor.Document.GetText(result[i]).Replace("”", "\"").Replace("{{", "{").Replace("}}", "}");
-                this.replaceTextWithNewText(field, "{{"+i.ToString()+"}}");
-                JObject o1 = JObject.Parse(field);
-                fields.Add("{{" + i.ToString() + "}}", o1);
-            }
-
-            return fields;
-        }
         private void checkField(String field, Comment comment) {
             JObject jo = JObject.Parse(field);
             //Console.WriteLine(jo);
@@ -386,38 +168,46 @@ namespace ReportGenerator_v1.System {
                 case "field":
                     this.parseField(jo, comment);
                     break;
+                case "image":
+                    this.parseImage(jo, comment);
+                    break;
                 case "list":
                     this.parseList(jo, comment);
                     break;
                 case "template":
-                    this.parseTemplate(jo, comment);                    
+                    this.parseTemplate(jo, comment);
+                    break;
+                case "table":
+                    this.parseTable(jo, comment);
                     break;
             }
 
         }
 
-        private void replaceTextWithTemplate(String field) {
-            string documentTemplate = Path.Combine("C:\\Users\\themis\\source\\repos\\CivilTechReportGenerator\\ReportGenerator\\DataSources\\files\\templates\\template_part3.docx");
-            //wordProcessor.Document.LoadDocument(documentNameFull);
-            DocumentRange drange = getTextRange(field);
-            using (RichEditDocumentServer richServer = new RichEditDocumentServer()) {
+        private void replaceTextWithTemplate(Comment comment, String file) {
+            string documentTemplate = Path.Combine(ConfigurationManager.AppSettings["templates"] + file + ".docx");
 
-                string templateNameFull = Path.Combine(Directory.GetCurrentDirectory(), this.template);
-                richServer.LoadDocumentTemplate(documentTemplate);
-                var document = richServer.Document;
-                this.wordProcessor.Document.InsertDocumentContent(drange.End, richServer.Document.Range, InsertOptions.KeepTextOnly);
+            using (RichEditDocumentServer subWordPrecessor = new RichEditDocumentServer()) {
+                subWordPrecessor.LoadDocumentTemplate(documentTemplate);
+
+                this.tempWordProcessor = this.wordProcessor;
+                this.wordProcessor = subWordPrecessor;
+                foreach (Comment c in subWordPrecessor.Document.Comments.ToList()) {
+                    SubDocument doc = c.BeginUpdate();
+                    String field = doc.GetText(doc.Range).Replace("”", "\"").Replace("“", "\"");
+                    this.checkField(field, c);
+                }
+                this.wordProcessor = this.tempWordProcessor;
+                this.wordProcessor.Document.InsertDocumentContent(comment.Range.End, subWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
             }
-
-            this.replaceTextWithNewText(field, "");
+            this.wordProcessor.Document.Delete(comment.Range);
         }
 
 
         //To be continued
         public void parseField(JObject jo, Comment comment) {
             Console.WriteLine(jo + " is field");
-            //jo.GetValue("name").ToString();
             this.replaceRangeWithNewText(comment.Range, datasource.GetValue(jo.GetValue("name").ToString()).ToString());
-            //this.replaceTextWithNewText("{{Projects.ProjectName}}", datasource.GetValue("Projects.ProjectName").ToString());
         }
 
         public void parseList(JObject jo, Comment comment) {
@@ -426,8 +216,33 @@ namespace ReportGenerator_v1.System {
 
         public void parseTemplate(JObject jo, Comment comment) {
             Console.WriteLine(jo + " is template");
-            //this.replaceTextWithTemplate(field.ToString());
+            this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString());
         }
 
+        public void parseImage(JObject jo, Comment comment) {
+            Console.WriteLine(jo + " is image");
+            this.replaceTextWithImage(comment.Range, jo.GetValue("name").ToString());
+        }
+        public void parseTable(JObject jo, Comment comment) {            
+            string data = jo.GetValue("fields").ToString().Replace("[", " ").Replace("]", " ").Replace(Environment.NewLine, "");
+            string[] fields = data.Split(new char[]{ ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            TableCell tableCell = this.wordProcessor.Document.Tables.GetTableCell(comment.Range.Start);
+
+            if(tableCell != null) {
+                int rowcount = tableCell.Table.Rows.Count() - 1;
+                tableCell.Table.Rows.InsertAfter(rowcount);
+
+                //XmlNodeList DetailList = ((Xml)datasource).getList("PageADetails[ns:PageADetailID='" + page["ID"].InnerText + "']");
+                //this.populatePageADetails(DetailList, this.wordProcessor.Document.Tables[counter + 1]);
+
+                int counter = 0;
+                foreach (String value in fields) {
+                    Console.WriteLine(value.Replace("\"", ""));
+                    this.wordProcessor.Document.InsertSingleLineText(tableCell.Table[rowcount, counter].Range.Start, value.Replace("\"", ""));
+                    counter++;
+                }
+            }
+        }
     }
 }
