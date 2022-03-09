@@ -204,7 +204,7 @@ namespace ReportGenerator_v1.System {
         }
 
 
-        //To be continued
+       
         public void parseField(JObject jo, Comment comment) {
             Console.WriteLine(jo + " is field");
             this.replaceRangeWithNewText(comment.Range, datasource.GetValue(jo.GetValue("name").ToString()).ToString());
@@ -223,6 +223,7 @@ namespace ReportGenerator_v1.System {
             Console.WriteLine(jo + " is image");
             this.replaceTextWithImage(comment.Range, jo.GetValue("name").ToString());
         }
+        //To be continued
         public void parseTable(JObject jo, Comment comment) {            
             string data = jo.GetValue("fields").ToString().Replace("[", " ").Replace("]", " ").Replace(Environment.NewLine, "");
             string[] fields = data.Split(new char[]{ ',' }, StringSplitOptions.RemoveEmptyEntries);
