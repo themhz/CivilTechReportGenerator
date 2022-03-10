@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml;
 using System.Data;
+using System.Linq;
 
 namespace ReportGenerator_v1.DataSources {
     public class Xml : IDataSource {
@@ -35,6 +36,15 @@ namespace ReportGenerator_v1.DataSources {
             _dataSet = new DataSet();
             _dataSet.ReadXmlSchema(this.xmlPath);
             _dataSet.ReadXml(this.xmlPath, XmlReadMode.ReadSchema);
+
+            IEnumerable<DataRow> productsQuery =
+            from PageA in _dataSet.Tables["PageADetails"].AsEnumerable()
+            select PageA;
+
+            IEnumerable<DataRow> query2 =
+                productsQuery.Where(p => p.Field<string>("PageADetailID") == "3fa38dfb-d3e5-4f86-85df-87256a745910");
+
+
 
             foreach (DataTable table in _dataSet.Tables) {
                 foreach (DataColumn column in table.Columns) {

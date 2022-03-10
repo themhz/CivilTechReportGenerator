@@ -211,3 +211,33 @@ private void reportTemplate1() {
 
             }
         }
+
+
+
+private void addTableRow(Table targetTable, Dictionary<string, string> cols) {
+            int rowcount = targetTable.Rows.Count() - 1;
+            targetTable.Rows.InsertAfter(rowcount);
+            try {
+                this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 0].Range.Start, cols["Index"].ToString());
+                this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 1].Range.Start, cols["Name"].ToString());
+                this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 2].Range.Start, cols["Density"].ToString());
+                this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 3].Range.Start, cols["d"].ToString());
+                this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 4].Range.Start, cols["λ"].ToString());
+                this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 5].Range.Start, MathOperations.formatTwoDecimalWithoutRound(cols["dλ"].ToString(), 4));
+            } catch (Exception ex) {
+
+            }
+
+        }        
+
+public void move() {
+            wordProcessor.Document.InsertDocumentContent(this.targetRange.End, this.sourceRange);
+            this.targetRange = this.sourceRange;
+            this.delete();
+        }
+
+//Τhe only way to copy and paste something is via InsertDocumentContent method
+        //https://supportcenter.devexpress.com/ticket/details/t725837/richeditdocumentserver-copy-paste-problem
+public void copy() {
+            wordProcessor.Document.InsertDocumentContent(this.targetRange.End, this.sourceRange);
+        }

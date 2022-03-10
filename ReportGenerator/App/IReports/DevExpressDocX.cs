@@ -13,7 +13,7 @@ using System.IO;
 using System.Diagnostics;
 using Newtonsoft.Json.Linq;
 using System.Configuration;
-
+using System.Text.Json.Nodes;
 
 namespace ReportGenerator_v1.System {
 
@@ -59,14 +59,20 @@ namespace ReportGenerator_v1.System {
         //This function is under construction. It will be used to parse the word template document and conscrtruct the report
         //However some commans are implemented.. more to come..
         public void parse() {
+            //Collect all comments and loop through them in order to parse each one of them individually and create the document elemtnts
             CommentCollection comments = this.wordProcessor.Document.Comments;
-
             foreach (Comment comment in comments.ToList()) {
-
+                //this block of code is used to get the comments and save them in a string variable
+                //all the block is needed according to devexpress
                 SubDocument doc = comment.BeginUpdate();
                 String field = doc.GetText(doc.Range).Replace("”", "\"").Replace("{{", "{").Replace("}}", "}");
                 comment.EndUpdate(doc);
-                this.checkField(field, comment);
+                
+                //After collecting the individual comment witch is in json format, it will be passed to the internal function parseFieldTypes in order to 
+                //parse and create the fields
+                this.parseFieldTypes(field, comment);
+
+                //then move to the next comment..
             }
             //Console.ReadLine();       
         }
@@ -81,42 +87,32 @@ namespace ReportGenerator_v1.System {
             }
 
 
-        }
-        //Τhe only way to copy and paste something is via InsertDocumentContent method
-        //https://supportcenter.devexpress.com/ticket/details/t725837/richeditdocumentserver-copy-paste-problem
-        public void copy() {
-            wordProcessor.Document.InsertDocumentContent(this.targetRange.End, this.sourceRange);
-        }
-        //Moves any table 
-        public void move() {
-            wordProcessor.Document.InsertDocumentContent(this.targetRange.End, this.sourceRange);
-            this.targetRange = this.sourceRange;
-            this.delete();
-        }
-        public void replaceTextWithNewTable(String text, int rows, int cols) {
+        }                        
+        public void replaceTextWithNewTable(string text, int rows, int cols) {
             this.wordProcessor.Document.BeginUpdate();
             this.targetRange = this.getTextRange(text);
             this.wordProcessor.Document.Tables.Create(this.targetRange.Start, rows, cols);
             this.delete();
         }
-        public void replaceRangeWithNewText(DocumentRange sourceRange, String targetText) {
+        public void replaceRangeWithNewText(DocumentRange sourceRange, string targetText) {
             this.wordProcessor.Document.BeginUpdate();
             this.targetRange = sourceRange;
             if (this.targetRange != null)
                 this.wordProcessor.Document.Replace(targetRange, targetText);
         }
-        public void replaceTextWithNewText(String sourceText, String targetText) {
+        public void replaceTextWithNewText(string sourceText, string targetText) {
             this.wordProcessor.Document.BeginUpdate();
             this.targetRange = this.getTextRange(sourceText);
             if (this.targetRange != null)
                 this.wordProcessor.Document.Replace(targetRange, targetText);
         }
-        public void replaceTextWithImage(DocumentRange sourceRange, String targetText) {
+        public void replaceTextWithImage(DocumentRange sourceRange, string targetText) {
             this.wordProcessor.Document.BeginUpdate();
             this.wordProcessor.Document.Unit = DevExpress.Office.DocumentUnit.Inch;
             this.targetRange = sourceRange;  //this.getTextRange(sourceText);
             if (this.targetRange != null) {
-                byte[] bytes = Convert.FromBase64String(targetText);
+                
+                byte[] bytes = Convert.FromBase64String(this.datasource.GetValue(targetText).ToString());
                 bytes = ImageResizer.resize(bytes, 700, 700);
                 using (MemoryStream ms = new MemoryStream(bytes)) {
                     DocumentImageSource image = DocumentImageSource.FromStream(ms);
@@ -133,7 +129,7 @@ namespace ReportGenerator_v1.System {
         public Paragraph getParagraph(int position) {
             return this.wordProcessor.Document.Paragraphs[position];
         }
-        public DocumentRange getTextRange(String search) {
+        public DocumentRange getTextRange(string search) {
             try {
                 Regex myRegEx = new Regex(search);
                 return this.wordProcessor.Document.FindAll(myRegEx).First();
@@ -145,7 +141,7 @@ namespace ReportGenerator_v1.System {
         public void delete() {
             this.wordProcessor.Document.Delete(this.targetRange);
         }        
-        private void addTableRow(Table targetTable, Dictionary<String, String> cols) {
+        private void addTableRow(Table targetTable, Dictionary<string, string> cols) {
             int rowcount = targetTable.Rows.Count() - 1;
             targetTable.Rows.InsertAfter(rowcount);
             try {
@@ -158,33 +154,55 @@ namespace ReportGenerator_v1.System {
             } catch (Exception ex) {
 
             }
-
         }        
 
-        private void checkField(String field, Comment comment) {
-            JObject jo = JObject.Parse(field);
-            //Console.WriteLine(jo);
+        //Routed to different elements depending on the type
+        private void parseFieldTypes(string field, Comment comment, string id="") {
+            JObject jo = JObject.Parse(field);                        
             switch (jo.GetValue("type").ToString()) {
                 case "field":
-                    this.parseField(jo, comment);
+                    this.parseField(jo, comment, id);
                     break;
                 case "image":
-                    this.parseImage(jo, comment);
+                    this.parseImage(jo, comment, id);
                     break;
                 case "list":
-                    this.parseList(jo, comment);
+                    this.parseList(jo, comment, id);
                     break;
                 case "template":
-                    this.parseTemplate(jo, comment);
+                    if (jo.ContainsKey("recursion")) {
+                        this.parseTemplateRecursively(jo, comment, id);
+                    } else {
+                        this.parseTemplate(jo, comment, id);
+                    }
                     break;
                 case "table":
-                    this.parseTable(jo, comment);
+                    this.parseTable(jo, comment, id);
                     break;
             }
 
         }
 
-        private void replaceTextWithTemplate(Comment comment, String file) {
+        private void replaceTextWithTemplate(Comment comment, string file) {
+            string documentTemplate = Path.Combine(ConfigurationManager.AppSettings["templates"] + file + ".docx");
+
+            using (RichEditDocumentServer subWordPrecessor = new RichEditDocumentServer()) {
+                subWordPrecessor.LoadDocumentTemplate(documentTemplate);
+
+                this.tempWordProcessor = this.wordProcessor;
+                this.wordProcessor = subWordPrecessor;
+                foreach (Comment c in subWordPrecessor.Document.Comments.ToList()) {
+                    SubDocument doc = c.BeginUpdate();
+                    string field = doc.GetText(doc.Range).Replace("”", "\"").Replace("“", "\"");
+                    this.parseFieldTypes(field, c);
+                }
+                this.wordProcessor = this.tempWordProcessor;
+                this.wordProcessor.Document.InsertDocumentContent(comment.Range.End, subWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
+            }
+            this.wordProcessor.Document.Delete(comment.Range);
+        }
+
+        private void replaceTextWithTemplate(Comment comment, string file, string id) {
             string documentTemplate = Path.Combine(ConfigurationManager.AppSettings["templates"] + file + ".docx");
 
             using (RichEditDocumentServer subWordPrecessor = new RichEditDocumentServer()) {
@@ -195,36 +213,37 @@ namespace ReportGenerator_v1.System {
                 foreach (Comment c in subWordPrecessor.Document.Comments.ToList()) {
                     SubDocument doc = c.BeginUpdate();
                     String field = doc.GetText(doc.Range).Replace("”", "\"").Replace("“", "\"");
-                    this.checkField(field, c);
+
+                    if(field!="")
+                        this.parseFieldTypes(field, c, id);
                 }
                 this.wordProcessor = this.tempWordProcessor;
                 this.wordProcessor.Document.InsertDocumentContent(comment.Range.End, subWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
             }
-            this.wordProcessor.Document.Delete(comment.Range);
+            
         }
 
 
-       
-        public void parseField(JObject jo, Comment comment) {
+        public void parseField(JObject jo, Comment comment, string id = "") {
             Console.WriteLine(jo + " is field");
             this.replaceRangeWithNewText(comment.Range, datasource.GetValue(jo.GetValue("name").ToString()).ToString());
         }
 
-        public void parseList(JObject jo, Comment comment) {
+        public void parseList(JObject jo, Comment comment, string id = "") {
             Console.WriteLine(jo + " is List");
         }
 
-        public void parseTemplate(JObject jo, Comment comment) {
+        public void parseTemplate(JObject jo, Comment comment, string id = "") {
             Console.WriteLine(jo + " is template");
             this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString());
-        }
+        }        
 
-        public void parseImage(JObject jo, Comment comment) {
+        public void parseImage(JObject jo, Comment comment, string id = "") {
             Console.WriteLine(jo + " is image");
+            
             this.replaceTextWithImage(comment.Range, jo.GetValue("name").ToString());
-        }
-        //To be continued
-        public void parseTable(JObject jo, Comment comment) {            
+        }      
+        public void parseTable(JObject jo, Comment comment, string id = "") {            
             string data = jo.GetValue("fields").ToString().Replace("[", " ").Replace("]", " ").Replace(Environment.NewLine, "");
             string[] fields = data.Split(new char[]{ ',' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -234,16 +253,19 @@ namespace ReportGenerator_v1.System {
                 int rowcount = tableCell.Table.Rows.Count() - 1;
                 tableCell.Table.Rows.InsertAfter(rowcount);
 
-                //XmlNodeList DetailList = ((Xml)datasource).getList("PageADetails[ns:PageADetailID='" + page["ID"].InnerText + "']");
-                //this.populatePageADetails(DetailList, this.wordProcessor.Document.Tables[counter + 1]);
-
-                int counter = 0;
-                foreach (String value in fields) {
-                    Console.WriteLine(value.Replace("\"", ""));
-                    this.wordProcessor.Document.InsertSingleLineText(tableCell.Table[rowcount, counter].Range.Start, value.Replace("\"", ""));
-                    counter++;
-                }
+                XmlNodeList DetailList = ((Xml)datasource).getList("PageADetails[ns:PageADetailID='" + id + "']");
+                this.populatePageADetails(DetailList, tableCell.Table);                              
             }
+        }
+
+        public void parseTemplateRecursively(JObject jo, Comment comment, string id="") {
+
+            string recursiveElement = jo.GetValue("recursion").ToString();
+            XmlNodeList PageAList = ((Xml)datasource).getList(recursiveElement);
+            foreach (XmlNode page in PageAList) {                
+                this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), page["ID"].InnerText);
+            }
+            this.wordProcessor.Document.Delete(comment.Range);
         }
     }
 }
