@@ -73,21 +73,23 @@ namespace ReportGenerator_v1.System {
                 this.parseFieldTypes(field, comment);
 
                 //then move to the next comment..
+
             }
+            Regex r = new Regex("{PBR}");
+            wordProcessor.Document.ReplaceAll(r, DevExpress.Office.Characters.PageBreak.ToString());
+            
             //Console.ReadLine();       
         }
-        public void populatePageADetails(XmlNodeList DetailList, Table table) {            
-            foreach (XmlNode node in DetailList) {
-                //List<string> rows = new List<string>();
+        public void populatePageADetails(XmlNodeList DetailList, Table table, JObject jo) {            
+            foreach (XmlNode node in DetailList) {                
                 Dictionary<String, String> cols = new Dictionary<string, string>();
                 foreach (XmlNode row in node) {
                     cols.Add(row.Name, row.InnerText);
                 }
-                this.addTableRow(table, cols);                
+                this.addTableRow(table, cols, jo);                
             }
-
-
-        }                        
+            this.populateTableTotals(DetailList, table,jo);
+        }
         public void replaceTextWithNewTable(string text, int rows, int cols) {
             this.wordProcessor.Document.BeginUpdate();
             this.targetRange = this.getTextRange(text);
@@ -106,10 +108,10 @@ namespace ReportGenerator_v1.System {
             if (this.targetRange != null)
                 this.wordProcessor.Document.Replace(targetRange, targetText);
         }
-        public void replaceTextWithImage(DocumentRange sourceRange, string targetText) {
+        public void replaceTextWithImage(DocumentRange sourceRange, string targetText, string id) {
             this.wordProcessor.Document.BeginUpdate();
             this.wordProcessor.Document.Unit = DevExpress.Office.DocumentUnit.Inch;
-            this.targetRange = sourceRange;  //this.getTextRange(sourceText);
+            this.targetRange = sourceRange;
             if (this.targetRange != null) {
                 
                 byte[] bytes = Convert.FromBase64String(this.datasource.GetValue(targetText).ToString());
@@ -140,22 +142,39 @@ namespace ReportGenerator_v1.System {
         }
         public void delete() {
             this.wordProcessor.Document.Delete(this.targetRange);
-        }        
-        private void addTableRow(Table targetTable, Dictionary<string, string> cols) {
+        }                
+        private void addTableRow(Table targetTable, Dictionary<string, string> cols, JObject jo) {
             int rowcount = targetTable.Rows.Count() - 1;
             targetTable.Rows.InsertAfter(rowcount);
-            try {
-                this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 0].Range.Start, cols["Index"].ToString());
-                this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 1].Range.Start, cols["Name"].ToString());
-                this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 2].Range.Start, cols["Density"].ToString());
-                this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 3].Range.Start, cols["d"].ToString());
-                this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 4].Range.Start, cols["λ"].ToString());
-                this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 5].Range.Start, MathOperations.formatTwoDecimalWithoutRound(cols["dλ"].ToString(), 4));
-            } catch (Exception ex) {
-
-            }
+            var colvalues = jo.GetValue("cols");
+            if(colvalues != null) {
+                for(int i = 0; i < colvalues.Count(); i++) {
+                    this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, i].Range.Start, cols[colvalues[i].ToString()].ToString());
+                }
+                
+            }            
         }        
 
+        private void populateTableTotals(XmlNodeList DetailList, Table table, JObject jo) {
+            int rowcount = table.Rows.Count() - 1;
+            var totals = jo.GetValue("total");
+            //table.Rows.InsertAfter(rowcount);
+
+            int index = -1;
+            for (int i = 0; i < totals.Count(); i++) {
+                for (int j=0;j< jo.GetValue("cols").Count(); j++) {                
+                    if (totals[i]["col"].ToString() == jo.GetValue("cols")[j].ToString()) {
+                        
+                        this.wordProcessor.Document.InsertSingleLineText(table[rowcount, j].Range.Start, "3");
+                    }
+                }
+            }
+
+            //for (int i = 0; i < totals.Count(); i++) {
+            //    this.wordProcessor.Document.InsertSingleLineText(table[rowcount, Int32.Parse(totals[i].ToString())].Range.Start, "3");
+            //}
+
+        }
         //Routed to different elements depending on the type
         private void parseFieldTypes(string field, Comment comment, string id="") {
             JObject jo = JObject.Parse(field);                        
@@ -240,21 +259,19 @@ namespace ReportGenerator_v1.System {
 
         public void parseImage(JObject jo, Comment comment, string id = "") {
             Console.WriteLine(jo + " is image");
-            
-            this.replaceTextWithImage(comment.Range, jo.GetValue("name").ToString());
-        }      
-        public void parseTable(JObject jo, Comment comment, string id = "") {            
-            string data = jo.GetValue("fields").ToString().Replace("[", " ").Replace("]", " ").Replace(Environment.NewLine, "");
-            string[] fields = data.Split(new char[]{ ',' }, StringSplitOptions.RemoveEmptyEntries);
+            XmlNodeList DetailList = ((Xml)datasource).getList("PageA[ns:ID='" + id + "']");
 
+            //this.replaceTextWithImage(comment.Range, jo.GetValue("name").ToString(), id);
+            this.replaceTextWithImage(comment.Range, DetailList[0]["Image"].InnerText, id);            
+        }      
+
+        public void parseTable(JObject jo, Comment comment, string id = "") {            
+            string data = jo.GetValue("cols").ToString().Replace("[", " ").Replace("]", " ").Replace(Environment.NewLine, "");            
             TableCell tableCell = this.wordProcessor.Document.Tables.GetTableCell(comment.Range.Start);
 
             if(tableCell != null) {
-                int rowcount = tableCell.Table.Rows.Count() - 1;
-                tableCell.Table.Rows.InsertAfter(rowcount);
-
                 XmlNodeList DetailList = ((Xml)datasource).getList("PageADetails[ns:PageADetailID='" + id + "']");
-                this.populatePageADetails(DetailList, tableCell.Table);                              
+                this.populatePageADetails(DetailList, tableCell.Table, jo);                              
             }
         }
 

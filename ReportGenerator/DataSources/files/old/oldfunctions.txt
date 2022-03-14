@@ -241,3 +241,20 @@ public void move() {
 public void copy() {
             wordProcessor.Document.InsertDocumentContent(this.targetRange.End, this.sourceRange);
         }
+
+
+
+
+
+//OLD CODE
+
+//try {
+                
+            //    //this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 1].Range.Start, cols["Name"].ToString());
+            //    //this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 2].Range.Start, cols["Density"].ToString());
+            //    //this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 3].Range.Start, cols["d"].ToString());
+            //    //this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 4].Range.Start, cols["λ"].ToString());
+            //    //this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, 5].Range.Start, MathOperations.formatTwoDecimalWithoutRound(cols["dλ"].ToString(), 4));
+            //} catch (Exception ex) {
+
+            //}

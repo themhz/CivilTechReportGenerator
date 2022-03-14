@@ -30,21 +30,20 @@ namespace ReportGenerator_v1.DataSources {
             }
         }
 
+        public object GetValueByID(string field, int index = 0, string id="") {
+
+            //XmlNodeList DetailList = ((Xml)datasource).getList("PageA[ns:ID='" + id + "']");
+            var element = this.getList("PageA[ns:ID='" + id + "']");
+
+            return null;
+        }
+
         private Dictionary<String, DataColumn> getDictionary() {
             var dictionary = new Dictionary<String, DataColumn>();
 
             _dataSet = new DataSet();
             _dataSet.ReadXmlSchema(this.xmlPath);
-            _dataSet.ReadXml(this.xmlPath, XmlReadMode.ReadSchema);
-
-            IEnumerable<DataRow> productsQuery =
-            from PageA in _dataSet.Tables["PageADetails"].AsEnumerable()
-            select PageA;
-
-            IEnumerable<DataRow> query2 =
-                productsQuery.Where(p => p.Field<string>("PageADetailID") == "3fa38dfb-d3e5-4f86-85df-87256a745910");
-
-
+            _dataSet.ReadXml(this.xmlPath, XmlReadMode.ReadSchema);            
 
             foreach (DataTable table in _dataSet.Tables) {
                 foreach (DataColumn column in table.Columns) {
