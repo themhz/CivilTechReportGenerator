@@ -26,8 +26,6 @@ namespace ReportGenerator_v1.System {
         public String generatedfile { set; get; }
         private DocumentRange sourceRange { set; get; }
         private DocumentRange targetRange { set; get; }
-
-
         public DevExpressDocX(RichEditDocumentServer _wordProcessor, IDataSource _datasource) {
             this.wordProcessor = _wordProcessor;
             this.datasource = _datasource;
@@ -80,7 +78,7 @@ namespace ReportGenerator_v1.System {
             
             //Console.ReadLine();       
         }
-        public void populatePageADetails(XmlNodeList DetailList, Table table, JObject jo) {            
+        public void populatePageADetails(XmlNodeList DetailList, Table table, JObject jo, string id) {            
             foreach (XmlNode node in DetailList) {                
                 Dictionary<String, String> cols = new Dictionary<string, string>();
                 foreach (XmlNode row in node) {
@@ -88,7 +86,7 @@ namespace ReportGenerator_v1.System {
                 }
                 this.addTableRow(table, cols, jo);                
             }
-            this.populateTableTotals(DetailList, table,jo);
+            this.populateTableTotals(DetailList, table,jo, id);
         }
         public void replaceTextWithNewTable(string text, int rows, int cols) {
             this.wordProcessor.Document.BeginUpdate();
@@ -154,18 +152,19 @@ namespace ReportGenerator_v1.System {
                 
             }            
         }        
-
-        private void populateTableTotals(XmlNodeList DetailList, Table table, JObject jo) {
+        private void populateTableTotals(XmlNodeList DetailList, Table table, JObject jo, string id) {
             int rowcount = table.Rows.Count() - 1;
             var totals = jo.GetValue("total");
             //table.Rows.InsertAfter(rowcount);
 
+            
+            
             int index = -1;
             for (int i = 0; i < totals.Count(); i++) {
                 for (int j=0;j< jo.GetValue("cols").Count(); j++) {                
                     if (totals[i]["col"].ToString() == jo.GetValue("cols")[j].ToString()) {
-                        
-                        this.wordProcessor.Document.InsertSingleLineText(table[rowcount, j].Range.Start, "3");
+                        var value = this.datasource.GetValueByID("PageA."+ totals[0]["field"].ToString().Trim(), id);
+                        this.wordProcessor.Document.InsertSingleLineText(table[rowcount, j].Range.Start, value);
                     }
                 }
             }
@@ -201,7 +200,6 @@ namespace ReportGenerator_v1.System {
             }
 
         }
-
         private void replaceTextWithTemplate(Comment comment, string file) {
             string documentTemplate = Path.Combine(ConfigurationManager.AppSettings["templates"] + file + ".docx");
 
@@ -220,7 +218,6 @@ namespace ReportGenerator_v1.System {
             }
             this.wordProcessor.Document.Delete(comment.Range);
         }
-
         private void replaceTextWithTemplate(Comment comment, string file, string id) {
             string documentTemplate = Path.Combine(ConfigurationManager.AppSettings["templates"] + file + ".docx");
 
@@ -241,22 +238,17 @@ namespace ReportGenerator_v1.System {
             }
             
         }
-
-
         public void parseField(JObject jo, Comment comment, string id = "") {
             Console.WriteLine(jo + " is field");
             this.replaceRangeWithNewText(comment.Range, datasource.GetValue(jo.GetValue("name").ToString()).ToString());
         }
-
         public void parseList(JObject jo, Comment comment, string id = "") {
             Console.WriteLine(jo + " is List");
         }
-
         public void parseTemplate(JObject jo, Comment comment, string id = "") {
             Console.WriteLine(jo + " is template");
             this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString());
         }        
-
         public void parseImage(JObject jo, Comment comment, string id = "") {
             Console.WriteLine(jo + " is image");
             XmlNodeList DetailList = ((Xml)datasource).getList("PageA[ns:ID='" + id + "']");
@@ -264,17 +256,15 @@ namespace ReportGenerator_v1.System {
             //this.replaceTextWithImage(comment.Range, jo.GetValue("name").ToString(), id);
             this.replaceTextWithImage(comment.Range, DetailList[0]["Image"].InnerText, id);            
         }      
-
         public void parseTable(JObject jo, Comment comment, string id = "") {            
             string data = jo.GetValue("cols").ToString().Replace("[", " ").Replace("]", " ").Replace(Environment.NewLine, "");            
             TableCell tableCell = this.wordProcessor.Document.Tables.GetTableCell(comment.Range.Start);
 
             if(tableCell != null) {
                 XmlNodeList DetailList = ((Xml)datasource).getList("PageADetails[ns:PageADetailID='" + id + "']");
-                this.populatePageADetails(DetailList, tableCell.Table, jo);                              
+                this.populatePageADetails(DetailList, tableCell.Table, jo, id);                              
             }
         }
-
         public void parseTemplateRecursively(JObject jo, Comment comment, string id="") {
 
             string recursiveElement = jo.GetValue("recursion").ToString();

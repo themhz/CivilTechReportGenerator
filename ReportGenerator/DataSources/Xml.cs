@@ -30,12 +30,12 @@ namespace ReportGenerator_v1.DataSources {
             }
         }
 
-        public object GetValueByID(string field, int index = 0, string id="") {
+        //Function to get any field by id. You need to specify parentnode.childnode in the field parameter, and the primary key ID
+        public String GetValueByID(string field, string id="") {
 
-            //XmlNodeList DetailList = ((Xml)datasource).getList("PageA[ns:ID='" + id + "']");
-            var element = this.getList("PageA[ns:ID='" + id + "']");
-
-            return null;
+            string[] fields = field.Split('.');            
+            var element = this.getList(fields[0] + "[ns:ID='" + id + "']");
+            return element[0][fields[1]].InnerText;
         }
 
         private Dictionary<String, DataColumn> getDictionary() {
