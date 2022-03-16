@@ -16,9 +16,11 @@ namespace ReportGenerator_v1 {
             var Container = BuildContainer();
             using (var scope = Container.BeginLifetimeScope()) {
                 var app = scope.Resolve<App>();
-                
+
                 //var reportType = scope.Resolve<ExceedDocX>();
-                var reportType = scope.Resolve<DevExpressDocX>();
+                //var reportType = scope.Resolve<DevExpressDocX>();
+                var reportType = scope.Resolve<DevExpressDocX002>();
+                
 
                 app.start(reportType);
             }
