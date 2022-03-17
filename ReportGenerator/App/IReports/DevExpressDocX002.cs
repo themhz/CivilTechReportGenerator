@@ -81,16 +81,23 @@ namespace ReportGenerator_v1.System {
 
         private void scanDocument(List<Comment> comments, Comment lastComment) {
 
+
+            this.wordProcessor.Document.AppendText("newTable");
+            var newTableRange = this.getTextRange("newTable");
+
+
+            #region OldCode
+
             //DocumentRange lastCommentRange = lastComment.Range;
 
             //foreach(Comment comment in comments) {
             //    //TableCell tableCell = this.wordProcessor.Document.Tables.GetTableCell(comment.Range.Start);
             //    wordProcessor.Document.InsertDocumentContent(lastComment.Range.End, comment.Range, InsertOptions.KeepSourceFormatting);
             //}
-            TableCell tableCell = this.wordProcessor.Document.Tables.GetTableCell(lastComment.Range.End);
-            
-            
-            this.SplitTable(this.wordProcessor.Document, tableCell.Table, tableCell.Row.Index);
+            //TableCell tableCell = this.wordProcessor.Document.Tables.GetTableCell(lastComment.Range.End);
+
+
+            //this.SplitTable(this.wordProcessor.Document, tableCell.Table, tableCell.Row.Index);
 
             //wordProcessor.Document.InsertDocumentContent(tableCell.Table.Range.End, tableCell.Row.Range, InsertOptions.KeepSourceFormatting);            
 
@@ -110,29 +117,19 @@ namespace ReportGenerator_v1.System {
             //}
 
             //return fields;
-        }
 
-        public void SplitTable(Document document, Table table, int rowIndex) {
-            Paragraph newParagraph = document.Paragraphs.Insert(table.Range.End);
-            // copy original table  
-            string tableContent = document.GetRtfText(table.Range);
-            DocumentRange newTableRange = document.InsertRtfText(newParagraph.Range.End, tableContent);
+            #endregion
+        }
+        public DocumentRange getTextRange(string search) {
             try {
-                Table newTable = document.Tables.Get(newTableRange)[0];
-                // remove rows in original table  
-                int rowsCount = table.Rows.Count;
-                for (int i = rowIndex; i < rowsCount; i++) {
-                    table.Rows.RemoveAt(table.Rows.Count - 1);
-                }
-                // remove rows in new table  
-                for (int i = 0; i < rowIndex; i++) {
-                    newTable.Rows.RemoveAt(0);
-                }
-            } catch(Exception ex) {
-
+                Regex myRegEx = new Regex(search);
+                return this.wordProcessor.Document.FindAll(myRegEx).First();
+            } catch (Exception ex) {
+                return null;
             }
-            
+
         }
+
         public void delete() {
             throw new NotImplementedException();
         }
