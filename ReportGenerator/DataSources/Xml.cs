@@ -7,12 +7,13 @@ using System.Collections.Generic;
 using System.Xml;
 using System.Data;
 using System.Linq;
+using System.Configuration;
 
 namespace ReportGenerator_v1.DataSources {
     public class Xml : IDataSource {
         private DataSet _dataSet;
         private Dictionary<String, DataColumn> binder;
-        private String xmlPath = "C:\\Users\\themis\\source\\repos\\CivilTechReportGenerator\\ReportGenerator\\DataSources\\files\\testReport.xml";
+        private String xmlPath = ConfigurationManager.AppSettings["xmlPath"]+ "testReport.xml";
 
         public Xml() {
             this.binder = getDictionary();

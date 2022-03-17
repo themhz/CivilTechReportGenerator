@@ -1,4 +1,5 @@
 ﻿using ReportGenerator;
+using System.Configuration;
 
 namespace ReportGenerator_v1.System {
     class ReportGenerator {
@@ -9,10 +10,12 @@ namespace ReportGenerator_v1.System {
         }
 
         public void CreateDocX(IReport reportType) {
-            string reportPath = "C:\\Users\\themis\\source\\repos\\CivilTechReportGenerator\\ReportGenerator\\DataSources\\files\\";
+            string reportPath = ConfigurationManager.AppSettings["reportPath"];
             this.DocXReport = reportType;
-            this.DocXReport.template = reportPath + "report_template2.docx";
-            this.DocXReport.generatedfile = reportPath+ "report_template_generated2.docx";
+            //this.DocXReport.template = reportPath + "report_template2.docx";
+            //this.DocXReport.generatedfile = reportPath+ "report_template_generated2.docx";
+            this.DocXReport.template = reportPath + "sampleDocument2.docx";
+            this.DocXReport.generatedfile = reportPath + "report_template_generated2.docx";
             this.DocXReport = this.DocXReport.create();
         }
 
