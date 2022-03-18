@@ -79,7 +79,7 @@ namespace ReportGenerator {
             this.tableItem.wordProcessor = wordProcessor;
 
             this.documentHandler.loadTemplate(this.template);
-            this.tableItem.copyRow(1, 0, 1);           
+            this.tableItem.copyRow(1, 0, 1);
             this.documentHandler.saveDocument(this.generatedfile);
 
         }

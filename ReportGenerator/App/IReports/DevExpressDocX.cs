@@ -148,6 +148,7 @@ namespace ReportGenerator_v1.System {
             if(colvalues != null) {
                 for(int i = 0; i < colvalues.Count(); i++) {
                     this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, i].Range.Start, cols[colvalues[i].ToString()].ToString());
+
                 }
                 
             }            
