@@ -177,28 +177,36 @@ namespace ReportGenerator_v1.System {
         }
         //Routed to different elements depending on the type
         private void parseFieldTypes(string field, Comment comment, string id="") {
-            JObject jo = JObject.Parse(field);                        
-            switch (jo.GetValue("type").ToString()) {
-                case "field":
-                    this.parseField(jo, comment, id);
-                    break;
-                case "image":
-                    this.parseImage(jo, comment, id);
-                    break;
-                case "list":
-                    this.parseList(jo, comment, id);
-                    break;
-                case "template":
-                    if (jo.ContainsKey("recursion")) {
-                        this.parseTemplateRecursively(jo, comment, id);
-                    } else {
-                        this.parseTemplate(jo, comment, id);
-                    }
-                    break;
-                case "table":
-                    this.parseTable(jo, comment, id);
-                    break;
+            try {
+                JObject jo = JObject.Parse(field);
+                switch (jo.GetValue("type").ToString()) {
+                    case "field":
+                        this.parseField(jo, comment, id);
+                        break;
+                    case "image":
+                        this.parseImage(jo, comment, id);
+                        break;
+                    case "list":
+                        this.parseList(jo, comment, id);
+                        break;
+                    case "template":
+                        if (jo.ContainsKey("recursion")) {
+                            this.parseTemplateRecursively(jo, comment, id);
+                        } else {
+                            this.parseTemplate(jo, comment, id);
+                        }
+                        break;
+                    case "table":
+                        this.parseTable(jo, comment, id);
+                        break;
+                    case "complexTable":
+                        this.parseComplexTable(jo, comment, id);
+                        break;
+                }
+            } catch(Exception ex) {
+
             }
+            
 
         }
         private void replaceTextWithTemplate(Comment comment, string file) {
@@ -220,7 +228,7 @@ namespace ReportGenerator_v1.System {
             this.wordProcessor.Document.Delete(comment.Range);
         }
         private void replaceTextWithTemplate(Comment comment, string file, string id) {
-            string documentTemplate = Path.Combine(ConfigurationManager.AppSettings["templates"] + file + ".docx");
+            string documentTemplate = Path.Combine(ConfigurationManager.AppSettings["templates"] + file);
 
             using (RichEditDocumentServer subWordPrecessor = new RichEditDocumentServer()) {
                 subWordPrecessor.LoadDocumentTemplate(documentTemplate);
@@ -265,6 +273,39 @@ namespace ReportGenerator_v1.System {
                 XmlNodeList DetailList = ((Xml)datasource).getList("PageADetails[ns:PageADetailID='" + id + "']");
                 this.populatePageADetails(DetailList, tableCell.Table, jo, id);                              
             }
+        }
+        public void parseComplexTable(JObject jo, Comment comment, string id = "") {
+            //this.wordProcessor.Document.AppendText("newTable");
+            //var newTableRange = this.getTextRange("newTable");
+
+
+            //TableCell tableCell = null;
+            //Table table;
+
+            //int headerCount = 2;
+            //int rowCount = 2;
+            //int footerCount = 2;
+
+            //// Copy header
+            //tableCell = this.wordProcessor.Document.Tables.GetTableCell(comments[0].Range.Start);
+            //table = tableCell.Table;
+            //var headerRange = getRowsRange(table, 0, headerCount);
+            //wordProcessor.Document.InsertDocumentContent(newTableRange.End, headerRange, InsertOptions.KeepSourceFormatting);
+
+            //// Do row repetition
+            //DocumentPosition lastPos = newTableRange.End;
+            //for (int i = 0; i < 4; i++) {
+            //    var bodyRange = getRowsRange(table, headerCount, rowCount);
+            //    lastPos = wordProcessor.Document.InsertDocumentContent(lastPos, bodyRange, InsertOptions.KeepSourceFormatting).End;
+            //}
+
+            //// Copy footer
+            //var footerRange = getRowsRange(table, headerCount + rowCount, footerCount);
+            //wordProcessor.Document.InsertDocumentContent(lastPos, footerRange, InsertOptions.KeepSourceFormatting);
+
+
+            //this.delete(this.getTextRange("newTable"));
+            //this.delete(this.wordProcessor.Document.Tables[0].Range);
         }
         public void parseTemplateRecursively(JObject jo, Comment comment, string id="") {
 

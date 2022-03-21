@@ -134,7 +134,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="DataSources\files\report_template2.docx" />
-    <None Include="DataSources\files\sampleDocument2.docx" />
+    <None Include="DataSources\files\templates\sampleDocument2.docx" />
     <None Include="DataSources\files\templates\template_part3.docx" />
     <None Include="DataSources\files\templates\template_part2.docx" />
     <None Include="DataSources\files\templates\template_part1.docx" />
