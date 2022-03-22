@@ -19,7 +19,7 @@ namespace ReportGenerator_v1.System {
 
     class DevExpressDocX : IReport {
 
-        public RichEditDocumentServer wordProcessor { set; get; }
+        public RichEditDocumentServer mainWordProcessor { set; get; }
         public RichEditDocumentServer tempWordProcessor { set; get; }
         public IDataSource datasource { set; get; }
         public String template { set; get; }
@@ -27,12 +27,12 @@ namespace ReportGenerator_v1.System {
         private DocumentRange sourceRange { set; get; }
         private DocumentRange targetRange { set; get; }
         public DevExpressDocX(RichEditDocumentServer _wordProcessor, IDataSource _datasource) {
-            this.wordProcessor = _wordProcessor;
+            this.mainWordProcessor = _wordProcessor;
             this.datasource = _datasource;
         }
         public IReport create() {
             Console.WriteLine("creating file report");
-            using (this.wordProcessor) {
+            using (this.mainWordProcessor) {
                 this.load();
                 this.parse();
                 this.save();
@@ -42,13 +42,13 @@ namespace ReportGenerator_v1.System {
             return this;
         }
         public void load() {
-            this.wordProcessor.Document.BeginUpdate();
-            this.wordProcessor.LoadDocument(this.template);
+            this.mainWordProcessor.Document.BeginUpdate();
+            this.mainWordProcessor.LoadDocument(this.template);
         }
         public void save() {
-            this.wordProcessor.Document.EndUpdate();
+            this.mainWordProcessor.Document.EndUpdate();
             Console.WriteLine("Saving file report");
-            this.wordProcessor.SaveDocument(this.generatedfile, DocumentFormat.OpenXml);
+            this.mainWordProcessor.SaveDocument(this.generatedfile, DocumentFormat.OpenXml);
             Console.WriteLine("Report save in :" + this.template);
         }
         public void openfile() {
@@ -58,125 +58,21 @@ namespace ReportGenerator_v1.System {
         //However some commans are implemented.. more to come..
         public void parse() {
             //Collect all comments and loop through them in order to parse each one of them individually and create the document elemtnts
-            CommentCollection comments = this.wordProcessor.Document.Comments;
+            CommentCollection comments = this.mainWordProcessor.Document.Comments;
             foreach (Comment comment in comments.ToList()) {
                 //this block of code is used to get the comments and save them in a string variable
                 //all the block is needed according to devexpress
-                SubDocument doc = comment.BeginUpdate();
-                String field = doc.GetText(doc.Range).Replace("”", "\"").Replace("{{", "{").Replace("}}", "}");
-                comment.EndUpdate(doc);
-                
+                string commentText = this.getCommentText(comment);                
                 //After collecting the individual comment witch is in json format, it will be passed to the internal function parseFieldTypes in order to 
                 //parse and create the fields
-                this.parseFieldTypes(field, comment);
-
+                this.parseCommentTypes(commentText, comment);
                 //then move to the next comment..
-
             }
             Regex r = new Regex("{PBR}");
-            wordProcessor.Document.ReplaceAll(r, DevExpress.Office.Characters.PageBreak.ToString());
-            
-            //Console.ReadLine();       
-        }
-        public void populatePageADetails(XmlNodeList DetailList, Table table, JObject jo, string id) {            
-            foreach (XmlNode node in DetailList) {                
-                Dictionary<String, String> cols = new Dictionary<string, string>();
-                foreach (XmlNode row in node) {
-                    cols.Add(row.Name, row.InnerText);
-                }
-                this.addTableRow(table, cols, jo);                
-            }
-            this.populateTableTotals(DetailList, table,jo, id);
-        }
-        public void replaceTextWithNewTable(string text, int rows, int cols) {
-            this.wordProcessor.Document.BeginUpdate();
-            this.targetRange = this.getTextRange(text);
-            this.wordProcessor.Document.Tables.Create(this.targetRange.Start, rows, cols);
-            this.delete();
-        }
-        public void replaceRangeWithNewText(DocumentRange sourceRange, string targetText) {
-            this.wordProcessor.Document.BeginUpdate();
-            this.targetRange = sourceRange;
-            if (this.targetRange != null)
-                this.wordProcessor.Document.Replace(targetRange, targetText);
-        }
-        public void replaceTextWithNewText(string sourceText, string targetText) {
-            this.wordProcessor.Document.BeginUpdate();
-            this.targetRange = this.getTextRange(sourceText);
-            if (this.targetRange != null)
-                this.wordProcessor.Document.Replace(targetRange, targetText);
-        }
-        public void replaceTextWithImage(DocumentRange sourceRange, string targetText, string id) {
-            this.wordProcessor.Document.BeginUpdate();
-            this.wordProcessor.Document.Unit = DevExpress.Office.DocumentUnit.Inch;
-            this.targetRange = sourceRange;
-            if (this.targetRange != null) {
-                
-                byte[] bytes = Convert.FromBase64String(this.datasource.GetValue(targetText).ToString());
-                bytes = ImageResizer.resize(bytes, 700, 700);
-                using (MemoryStream ms = new MemoryStream(bytes)) {
-                    DocumentImageSource image = DocumentImageSource.FromStream(ms);
-                    this.wordProcessor.Document.Images.Insert(this.targetRange.Start, image);
-                }
-                this.delete();
-            }
-            //this.wordProcessor.Document.Replace(targetRange, targetText);
-        }        
-        //Get the table on the document based on the index
-        public Table getTable(int position) {
-            return this.wordProcessor.Document.Tables[position];
-        }
-        public Paragraph getParagraph(int position) {
-            return this.wordProcessor.Document.Paragraphs[position];
-        }
-        public DocumentRange getTextRange(string search) {
-            try {
-                Regex myRegEx = new Regex(search);
-                return this.wordProcessor.Document.FindAll(myRegEx).First();
-            } catch (Exception ex) {
-                return null;
-            }
-
-        }
-        public void delete() {
-            this.wordProcessor.Document.Delete(this.targetRange);
-        }                
-        private void addTableRow(Table targetTable, Dictionary<string, string> cols, JObject jo) {
-            int rowcount = targetTable.Rows.Count() - 1;
-            targetTable.Rows.InsertAfter(rowcount);
-            var colvalues = jo.GetValue("cols");
-            if(colvalues != null) {
-                for(int i = 0; i < colvalues.Count(); i++) {
-                    this.wordProcessor.Document.InsertSingleLineText(targetTable[rowcount, i].Range.Start, cols[colvalues[i].ToString()].ToString());
-
-                }
-                
-            }            
-        }        
-        private void populateTableTotals(XmlNodeList DetailList, Table table, JObject jo, string id) {
-            int rowcount = table.Rows.Count() - 1;
-            var totals = jo.GetValue("total");
-            //table.Rows.InsertAfter(rowcount);
-
-            
-            
-            int index = -1;
-            for (int i = 0; i < totals.Count(); i++) {
-                for (int j=0;j< jo.GetValue("cols").Count(); j++) {                
-                    if (totals[i]["col"].ToString() == jo.GetValue("cols")[j].ToString()) {
-                        var value = this.datasource.GetValueByID("PageA."+ totals[0]["field"].ToString().Trim(), id);
-                        this.wordProcessor.Document.InsertSingleLineText(table[rowcount, j].Range.Start, value);
-                    }
-                }
-            }
-
-            //for (int i = 0; i < totals.Count(); i++) {
-            //    this.wordProcessor.Document.InsertSingleLineText(table[rowcount, Int32.Parse(totals[i].ToString())].Range.Start, "3");
-            //}
-
+            mainWordProcessor.Document.ReplaceAll(r, DevExpress.Office.Characters.PageBreak.ToString());                        
         }
         //Routed to different elements depending on the type
-        private void parseFieldTypes(string field, Comment comment, string id="") {
+        private void parseCommentTypes(string field, Comment comment, string id = "", string foreignKey = "") {
             try {
                 JObject jo = JObject.Parse(field);
                 switch (jo.GetValue("type").ToString()) {
@@ -190,62 +86,133 @@ namespace ReportGenerator_v1.System {
                         this.parseList(jo, comment, id);
                         break;
                     case "template":
-                        if (jo.ContainsKey("recursion")) {
-                            this.parseTemplateRecursively(jo, comment, id);
-                        } else {
-                            this.parseTemplate(jo, comment, id);
-                        }
+                        this.parseTemplate(jo, comment, id);
                         break;
                     case "table":
                         this.parseTable(jo, comment, id);
                         break;
                     case "complexTable":
-                        this.parseComplexTable(jo, comment, id);
+                        this.parseComplexTable(jo, comment, id, foreignKey);
                         break;
                 }
-            } catch(Exception ex) {
+            } catch (Exception ex) {
 
             }
-            
+
 
         }
-        private void replaceTextWithTemplate(Comment comment, string file) {
-            string documentTemplate = Path.Combine(ConfigurationManager.AppSettings["templates"] + file + ".docx");
-
-            using (RichEditDocumentServer subWordPrecessor = new RichEditDocumentServer()) {
-                subWordPrecessor.LoadDocumentTemplate(documentTemplate);
-
-                this.tempWordProcessor = this.wordProcessor;
-                this.wordProcessor = subWordPrecessor;
-                foreach (Comment c in subWordPrecessor.Document.Comments.ToList()) {
-                    SubDocument doc = c.BeginUpdate();
-                    string field = doc.GetText(doc.Range).Replace("”", "\"").Replace("“", "\"");
-                    this.parseFieldTypes(field, c);
+        public void populateTable(XmlNodeList DetailList, Table table, JObject jo, string id) {            
+            foreach (XmlNode node in DetailList) {                
+                Dictionary<String, String> cols = new Dictionary<string, string>();
+                foreach (XmlNode row in node) {
+                    cols.Add(row.Name, row.InnerText);
                 }
-                this.wordProcessor = this.tempWordProcessor;
-                this.wordProcessor.Document.InsertDocumentContent(comment.Range.End, subWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
+                this.addTableRow(table, cols, jo);                
             }
-            this.wordProcessor.Document.Delete(comment.Range);
+            this.populateTableTotals(DetailList, table,jo, id);
         }
-        private void replaceTextWithTemplate(Comment comment, string file, string id) {
+        public void replaceTextWithNewTable(string text, int rows, int cols) {
+            this.mainWordProcessor.Document.BeginUpdate();
+            this.targetRange = this.getTextRange(text);
+            this.mainWordProcessor.Document.Tables.Create(this.targetRange.Start, rows, cols);
+            this.delete();
+        }
+        public void replaceRangeWithNewText(DocumentRange sourceRange, string targetText) {
+            this.mainWordProcessor.Document.BeginUpdate();
+            this.targetRange = sourceRange;
+            if (this.targetRange != null)
+                this.mainWordProcessor.Document.Replace(targetRange, targetText);
+        }
+        public void replaceTextWithNewText(string sourceText, string targetText) {
+            this.mainWordProcessor.Document.BeginUpdate();
+            this.targetRange = this.getTextRange(sourceText);
+            if (this.targetRange != null)
+                this.mainWordProcessor.Document.Replace(targetRange, targetText);
+        }
+        public void replaceTextWithImage(DocumentRange sourceRange, string targetText, string id) {
+            this.mainWordProcessor.Document.BeginUpdate();
+            this.mainWordProcessor.Document.Unit = DevExpress.Office.DocumentUnit.Inch;
+            this.targetRange = sourceRange;
+            if (this.targetRange != null) {
+                
+                byte[] bytes = Convert.FromBase64String(this.datasource.GetValue(targetText).ToString());
+                bytes = ImageResizer.resize(bytes, 700, 700);
+                using (MemoryStream ms = new MemoryStream(bytes)) {
+                    DocumentImageSource image = DocumentImageSource.FromStream(ms);
+                    this.mainWordProcessor.Document.Images.Insert(this.targetRange.Start, image);
+                }
+                this.delete();
+            }
+            //this.wordProcessor.Document.Replace(targetRange, targetText);
+        }        
+        //Get the table on the document based on the index
+        public Table getTable(int position) {
+            return this.mainWordProcessor.Document.Tables[position];
+        }
+        public Paragraph getParagraph(int position) {
+            return this.mainWordProcessor.Document.Paragraphs[position];
+        }
+        public DocumentRange getTextRange(string search) {
+            try {
+                Regex myRegEx = new Regex(search);
+                return this.mainWordProcessor.Document.FindAll(myRegEx).First();
+            } catch (Exception ex) {
+                return null;
+            }
+        }
+        public void delete() {
+            this.mainWordProcessor.Document.Delete(this.targetRange);
+        }                
+        private void addTableRow(Table targetTable, Dictionary<string, string> cols, JObject jo) {
+            int rowcount = targetTable.Rows.Count() - 1;
+            targetTable.Rows.InsertAfter(rowcount);
+            var colvalues = jo.GetValue("cols");
+            if(colvalues != null) {
+                for(int i = 0; i < colvalues.Count(); i++) {
+                    this.mainWordProcessor.Document.InsertSingleLineText(targetTable[rowcount, i].Range.Start, cols[colvalues[i].ToString()].ToString());
+
+                }
+                
+            }            
+        }        
+        private void populateTableTotals(XmlNodeList DetailList, Table table, JObject jo, string id) {
+            int rowcount = table.Rows.Count() - 1;
+            var totals = jo.GetValue("total");                     
+            
+            int index = -1;
+            for (int i = 0; i < totals.Count(); i++) {
+                for (int j=0;j< jo.GetValue("cols").Count(); j++) {                
+                    if (totals[i]["col"].ToString() == jo.GetValue("cols")[j].ToString()) {
+                        var value = this.datasource.GetValueByID("PageA."+ totals[0]["field"].ToString().Trim(), id);
+                        this.mainWordProcessor.Document.InsertSingleLineText(table[rowcount, j].Range.Start, value);
+                    }
+                }
+            }         
+        }
+        private void replaceTextWithTemplate(Comment comment, string file, string id, string foreightKey="") {
             string documentTemplate = Path.Combine(ConfigurationManager.AppSettings["templates"] + file);
 
-            using (RichEditDocumentServer subWordPrecessor = new RichEditDocumentServer()) {
-                subWordPrecessor.LoadDocumentTemplate(documentTemplate);
+            //create child wordprocessor
+            using (RichEditDocumentServer childWordPrecessor = new RichEditDocumentServer()) {
+                //load document to child wordprocessor
+                childWordPrecessor.LoadDocumentTemplate(documentTemplate);
+                //swap the objects main wordprocessor in order to be accessed globaly
+                this.tempWordProcessor = this.mainWordProcessor;
+                this.mainWordProcessor = childWordPrecessor;
 
-                this.tempWordProcessor = this.wordProcessor;
-                this.wordProcessor = subWordPrecessor;
-                foreach (Comment c in subWordPrecessor.Document.Comments.ToList()) {
+                //loop through child processor comments
+                foreach (Comment c in childWordPrecessor.Document.Comments.ToList()) {
                     SubDocument doc = c.BeginUpdate();
                     String field = doc.GetText(doc.Range).Replace("”", "\"").Replace("“", "\"");
-
-                    if(field!="")
-                        this.parseFieldTypes(field, c, id);
+                    if (field != "") {
+                        this.parseCommentTypes(field, c, id, foreightKey);
+                    }
                 }
-                this.wordProcessor = this.tempWordProcessor;
-                this.wordProcessor.Document.InsertDocumentContent(comment.Range.End, subWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
-            }
-            
+
+                //get the main wordprocessor back
+                this.mainWordProcessor = this.tempWordProcessor;
+                this.mainWordProcessor.Document.InsertDocumentContent(comment.Range.End, childWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
+            }            
         }
         public void parseField(JObject jo, Comment comment, string id = "") {
             Console.WriteLine(jo + " is field");
@@ -255,66 +222,85 @@ namespace ReportGenerator_v1.System {
             Console.WriteLine(jo + " is List");
         }
         public void parseTemplate(JObject jo, Comment comment, string id = "") {
+
             Console.WriteLine(jo + " is template");
-            this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString());
+            if (jo.ContainsKey("loopTable")) {
+                this.loopTable(jo, comment, id);
+            } else {                
+                this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id);
+            }
+            
         }        
         public void parseImage(JObject jo, Comment comment, string id = "") {
             Console.WriteLine(jo + " is image");
-            XmlNodeList DetailList = ((Xml)datasource).getList("PageA[ns:ID='" + id + "']");
+            //XmlNodeList DetailList = ((Xml)datasource).getList("PageA[ns:ID='" + id + "']");
+            XmlNodeList DetailList = ((Xml)datasource).getList("PageA","ID", id);
 
             //this.replaceTextWithImage(comment.Range, jo.GetValue("name").ToString(), id);
             this.replaceTextWithImage(comment.Range, DetailList[0]["Image"].InnerText, id);            
         }      
         public void parseTable(JObject jo, Comment comment, string id = "") {            
             string data = jo.GetValue("cols").ToString().Replace("[", " ").Replace("]", " ").Replace(Environment.NewLine, "");            
-            TableCell tableCell = this.wordProcessor.Document.Tables.GetTableCell(comment.Range.Start);
+            TableCell tableCell = this.mainWordProcessor.Document.Tables.GetTableCell(comment.Range.Start);
 
             if(tableCell != null) {
-                XmlNodeList DetailList = ((Xml)datasource).getList("PageADetails[ns:PageADetailID='" + id + "']");
-                this.populatePageADetails(DetailList, tableCell.Table, jo, id);                              
+                //XmlNodeList DetailList = ((Xml)datasource).getList("PageADetails[ns:PageADetailID='" + id + "']");
+                XmlNodeList DetailList = ((Xml)datasource).getList("PageADetails","PageADetailID", id);
+                this.populateTable(DetailList, tableCell.Table, jo, id);                              
             }
         }
-        public void parseComplexTable(JObject jo, Comment comment, string id = "") {
-            //this.wordProcessor.Document.AppendText("newTable");
-            //var newTableRange = this.getTextRange("newTable");
+        public void parseComplexTable(JObject jo, Comment comment, string id = "", string foreignKey = "") {
+            this.mainWordProcessor.Document.AppendText("newTable");
+            var newTableRange = this.getTextRange("newTable");
+            TableCell tableCell = null;
+            Table table;
+            int headerCount = Int32.Parse(jo.GetValue("headerCount").ToString());
+            int rowCount = Int32.Parse(jo.GetValue("rowCount").ToString());
+            int footerCount = Int32.Parse(jo.GetValue("footerCount").ToString());
 
+            // Copy header
+            tableCell = this.mainWordProcessor.Document.Tables.GetTableCell(comment.Range.Start);
+            table = tableCell.Table;
+            var headerRange = getRowsRange(table, 0, headerCount);
+            mainWordProcessor.Document.InsertDocumentContent(newTableRange.End, headerRange, InsertOptions.KeepSourceFormatting);
 
-            //TableCell tableCell = null;
-            //Table table;
+            // Do row repetition
+            DocumentPosition lastPos = newTableRange.End;
+            for (int i = 0; i < 4; i++) {
+                var bodyRange = getRowsRange(table, headerCount, rowCount);
+                lastPos = mainWordProcessor.Document.InsertDocumentContent(lastPos, bodyRange, InsertOptions.KeepSourceFormatting).End;
+            }
 
-            //int headerCount = 2;
-            //int rowCount = 2;
-            //int footerCount = 2;
-
-            //// Copy header
-            //tableCell = this.wordProcessor.Document.Tables.GetTableCell(comments[0].Range.Start);
-            //table = tableCell.Table;
-            //var headerRange = getRowsRange(table, 0, headerCount);
-            //wordProcessor.Document.InsertDocumentContent(newTableRange.End, headerRange, InsertOptions.KeepSourceFormatting);
-
-            //// Do row repetition
-            //DocumentPosition lastPos = newTableRange.End;
-            //for (int i = 0; i < 4; i++) {
-            //    var bodyRange = getRowsRange(table, headerCount, rowCount);
-            //    lastPos = wordProcessor.Document.InsertDocumentContent(lastPos, bodyRange, InsertOptions.KeepSourceFormatting).End;
-            //}
-
-            //// Copy footer
-            //var footerRange = getRowsRange(table, headerCount + rowCount, footerCount);
-            //wordProcessor.Document.InsertDocumentContent(lastPos, footerRange, InsertOptions.KeepSourceFormatting);
+            // Copy footer
+            var footerRange = getRowsRange(table, headerCount + rowCount, footerCount);
+            mainWordProcessor.Document.InsertDocumentContent(lastPos, footerRange, InsertOptions.KeepSourceFormatting);
 
 
             //this.delete(this.getTextRange("newTable"));
             //this.delete(this.wordProcessor.Document.Tables[0].Range);
         }
-        public void parseTemplateRecursively(JObject jo, Comment comment, string id="") {
+        protected DocumentRange getRowsRange(Table table, int rowIndex, int rowCount) {
+            DocumentPosition start = table.Rows[rowIndex].Range.Start;
+            DocumentPosition end = table.Rows[rowIndex + rowCount - 1].Range.End;
+            int length = end.ToInt() - start.ToInt();
 
-            string recursiveElement = jo.GetValue("recursion").ToString();
-            XmlNodeList PageAList = ((Xml)datasource).getList(recursiveElement);
-            foreach (XmlNode page in PageAList) {                
-                this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), page["ID"].InnerText);
+            return this.mainWordProcessor.Document.CreateRange(start, length);
+        }
+        public void loopTable(JObject jo, Comment comment, string id="", string foreignKey="") {
+
+            string loopTable = jo.GetValue("loopTable").ToString();
+            XmlNodeList tables = ((Xml)datasource).getList(jo.GetValue("loopTable").ToString(), jo.GetValue("foreignKey").ToString(), id);
+            foreach (XmlNode table in tables) {                
+                this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), table[jo.GetValue("id").ToString()].InnerText, table[jo.GetValue("foreignKey").ToString()].InnerText);
             }
-            this.wordProcessor.Document.Delete(comment.Range);
+            this.mainWordProcessor.Document.Delete(comment.Range);
+        }
+        public string getCommentText(Comment comment) {
+            SubDocument doc = comment.BeginUpdate();
+            string commentText = doc.GetText(doc.Range).Replace("”", "\"").Replace("{{", "{").Replace("}}", "}");
+            comment.EndUpdate(doc);
+
+            return commentText;
         }
     }
 }
