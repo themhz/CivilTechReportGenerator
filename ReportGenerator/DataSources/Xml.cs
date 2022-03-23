@@ -61,8 +61,13 @@ namespace ReportGenerator_v1.DataSources {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(this.xmlPath);
             var nsmgr = new XmlNamespaceManager(xmlDoc.NameTable);
-
-            string selector = $"{node}[ns:{field}='" + value + "']";
+            string selector = node;
+            if (value == "") {
+                selector += $"[ns:{field}]";
+            } else {
+                selector += $"[ns:{field}='" + value + "']";
+            }
+            
             nsmgr.AddNamespace("ns", "http://www.civilteam.gr/dsBuildingHeatInsulation.xsd");
             XmlNodeList nodeList = xmlDoc.DocumentElement.SelectNodes($"//ns:dsBuildingHeatInsulation//ns:{selector}", nsmgr);
 
