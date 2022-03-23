@@ -207,12 +207,17 @@ namespace ReportGenerator_v1.System {
             
             foreach (XmlNode node in nodes) {
                 
-                var bodyRange = getRowsRange(table, headerCount, rowCount);
-                foreach(String field in jo.GetValue("fields")) {
+                var bodyRange = getRowsRange(table, headerCount, rowCount);                
+                
+                lastPos = mainWordProcessor.Document.InsertDocumentContent(lastPos, bodyRange, InsertOptions.KeepSourceFormatting).End;
+                
+                foreach (String field in jo.GetValue("fields")) {
                     this.replaceTextWithNewText(field, node[field].InnerText);
                 }
+                //fix the bug that doesnt replace all ID
                 
-                lastPos = mainWordProcessor.Document.InsertDocumentContent(lastPos, bodyRange, InsertOptions.KeepSourceFormatting).End;                
+                //mainWordProcessor.Document.UpdateAllFields();
+                
             }
                 
          
