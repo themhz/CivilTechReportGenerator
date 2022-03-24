@@ -194,36 +194,32 @@ namespace ReportGenerator_v1.System {
             int rowCount = Int32.Parse(jo.GetValue("rowCount").ToString());
             int footerCount = Int32.Parse(jo.GetValue("footerCount").ToString());
 
-            // Copy header
+            //Get table 
             tableCell = this.mainWordProcessor.Document.Tables.GetTableCell(comment.Range.Start);
             table = tableCell.Table;
+
+            // Copy header
             var headerRange = getRowsRange(table, 0, headerCount);
             mainWordProcessor.Document.InsertDocumentContent(newTableRange.End, headerRange, InsertOptions.KeepSourceFormatting);
 
             // Do row repetition
             DocumentPosition lastPos = newTableRange.End;
-
             XmlNodeList nodes = ((Xml)this.datasource).getList(jo.GetValue("loopTable").ToString(), jo.GetValue("foreignKey").ToString(), id);
             
             foreach (XmlNode node in nodes) {
-                
-                var bodyRange = getRowsRange(table, headerCount, rowCount);                
-                
+               
+                var bodyRange = getRowsRange(table, headerCount, rowCount);               
                 lastPos = mainWordProcessor.Document.InsertDocumentContent(lastPos, bodyRange, InsertOptions.KeepSourceFormatting).End;
-                
+
                 foreach (String field in jo.GetValue("fields")) {
-                    this.replaceTextWithNewText(field, node[field].InnerText);
+                    this.replaceTextWithNewTextLast(field, node[field].InnerText);
                 }
-                //fix the bug that doesnt replace all ID
-                
-                //mainWordProcessor.Document.UpdateAllFields();
-                
             }
-                
-         
+
 
             // Copy footer
-            var footerRange = getRowsRange(table, headerCount + rowCount, footerCount);
+            DocumentRange footerRange = getRowsRange(table, headerCount + rowCount, footerCount);
+           
             mainWordProcessor.Document.InsertDocumentContent(lastPos, footerRange, InsertOptions.KeepSourceFormatting);
 
             this.mainWordProcessor.Document.Delete(comment.Range);
@@ -234,25 +230,32 @@ namespace ReportGenerator_v1.System {
 
 
         public void replaceTextWithNewTable(string text, int rows, int cols) {
-            this.mainWordProcessor.Document.BeginUpdate();
+            //this.mainWordProcessor.Document.BeginUpdate();
             this.targetRange = this.getTextRange(text);
             this.mainWordProcessor.Document.Tables.Create(this.targetRange.Start, rows, cols);
             this.delete();
         }
         public void replaceRangeWithNewText(DocumentRange sourceRange, string targetText) {
-            this.mainWordProcessor.Document.BeginUpdate();
+            //this.mainWordProcessor.Document.BeginUpdate();
             this.targetRange = sourceRange;
             if (this.targetRange != null)
                 this.mainWordProcessor.Document.Replace(targetRange, targetText);
         }
         public void replaceTextWithNewText(string sourceText, string targetText) {
-            this.mainWordProcessor.Document.BeginUpdate();
+            //this.mainWordProcessor.Document.BeginUpdate();
             this.targetRange = this.getTextRange(sourceText);
             if (this.targetRange != null)
                 this.mainWordProcessor.Document.Replace(targetRange, targetText);
         }
+        public void replaceTextWithNewTextLast(string sourceText, string targetText) {
+            //this.mainWordProcessor.Document.BeginUpdate();
+            this.targetRange = this.getTextRangeLast(sourceText);
+            if (this.targetRange != null)
+                this.mainWordProcessor.Document.Replace(targetRange, targetText);
+        }
+
         public void replaceTextWithImage(DocumentRange sourceRange, string targetText, string id) {
-            this.mainWordProcessor.Document.BeginUpdate();
+            //this.mainWordProcessor.Document.BeginUpdate();
             this.mainWordProcessor.Document.Unit = DevExpress.Office.DocumentUnit.Inch;
             this.targetRange = sourceRange;
             if (this.targetRange != null) {
@@ -285,6 +288,7 @@ namespace ReportGenerator_v1.System {
                     if (field != "") {
                         this.parseCommentTypes(field, c, id, foreightKey);
                     }
+                    doc.EndUpdate();
                 }
 
                 //get the main wordprocessor back
@@ -301,6 +305,7 @@ namespace ReportGenerator_v1.System {
 
             return this.mainWordProcessor.Document.CreateRange(start, length);
         }
+
         public Table getTable(int position) {
             return this.mainWordProcessor.Document.Tables[position];
         }
@@ -315,11 +320,20 @@ namespace ReportGenerator_v1.System {
                 return null;
             }
         }
+
+        public DocumentRange getTextRangeLast(string search) {
+            try {
+                Regex myRegEx = new Regex(search);
+                return this.mainWordProcessor.Document.FindAll(myRegEx).Last();
+            } catch (Exception ex) {
+                return null;
+            }
+        }
         public string getCommentText(Comment comment) {
             SubDocument doc = comment.BeginUpdate();
-            string commentText = doc.GetText(doc.Range).Replace("”", "\"").Replace("{{", "{").Replace("}}", "}");
+            string commentText = doc.GetText(doc.Range).Replace("”", "\"").Replace("{{", "{").Replace("}}", "}");            
             comment.EndUpdate(doc);
-
+            
             return commentText;
         }
     }
