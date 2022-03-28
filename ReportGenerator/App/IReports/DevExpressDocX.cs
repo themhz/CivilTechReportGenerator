@@ -305,7 +305,6 @@ namespace ReportGenerator_v1.System {
 
             return this.mainWordProcessor.Document.CreateRange(start, length);
         }
-
         public Table getTable(int position) {
             return this.mainWordProcessor.Document.Tables[position];
         }
@@ -320,7 +319,6 @@ namespace ReportGenerator_v1.System {
                 return null;
             }
         }
-
         public DocumentRange getTextRangeLast(string search) {
             try {
                 Regex myRegEx = new Regex(search);
