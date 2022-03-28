@@ -32,8 +32,14 @@ namespace ReportGenerator_v1.System {
             this.mainWordProcessor = _wordProcessor;
             this.datasource = _datasource;
         }
+        /// <summary>
+        /// Creats the document, it loads the master template, parses, saves and finaly opens it
+        /// </summary>
+        /// <returns>
+        /// and returns the document itself
+        /// </returns>
         public IReport create() {
-            Console.WriteLine("creating file report");
+            Console.WriteLine("creating document "+ this.generatedfile.ToString());
             using (this.mainWordProcessor) {
                 this.load();
                 this.parse();
@@ -43,19 +49,34 @@ namespace ReportGenerator_v1.System {
             Console.WriteLine("file report created");
             return this;
         }
+        /// <summary>
+        /// Loads the document and begins the update
+        /// </summary>
         public void load() {
             this.mainWordProcessor.Document.BeginUpdate();
             this.mainWordProcessor.LoadDocument(this.template);
         }
+        /// <summary>
+        /// Saves the document to the folder specified in the App.config, and the path is in the this.generatedfile
+        /// </summary>        
         public void save() {
             this.mainWordProcessor.Document.EndUpdate();
             Console.WriteLine("Saving file report");
             this.mainWordProcessor.SaveDocument(this.generatedfile, DocumentFormat.OpenXml);
             Console.WriteLine("Report save in :" + this.template);
         }
+        /// <summary>
+        /// Opens the file with the word application 
+        /// </summary>
         public void openfile() {
             Process.Start(new ProcessStartInfo(this.generatedfile) { UseShellExecute = true });
         }                                    
+        /// <summary>
+        /// Adds a row to the target table that is specified
+        /// </summary>
+        /// <param name="targetTable">The target table that the row will be added</param>
+        /// <param name="cols">You need to specify a dictionary with the column name and values</param>
+        /// <param name="jo">the json object with the actually values of the row</param>
         private void addTableRow(Table targetTable, Dictionary<string, string> cols, JObject jo) {
             int rowcount = targetTable.Rows.Count() - 1;
             targetTable.Rows.InsertAfter(rowcount);
@@ -63,11 +84,16 @@ namespace ReportGenerator_v1.System {
             if(colvalues != null) {
                 for(int i = 0; i < colvalues.Count(); i++) {
                     this.mainWordProcessor.Document.InsertSingleLineText(targetTable[rowcount, i].Range.Start, cols[colvalues[i].ToString()].ToString());
-
-                }
-                
+                }                
             }            
-        }        
+        }
+        /// <summary>
+        /// populates the totals of the table. It is the final row of a normal table
+        /// </summary>
+        /// <param name="DetailList">the xml node list object that is created by testReport.xml</param>
+        /// <param name="table">The table object</param>
+        /// <param name="jo">the json object</param>
+        /// <param name="id">and the primary key of the table</param>
         private void populateTableTotals(XmlNodeList DetailList, Table table, JObject jo, string id) {
             int rowcount = table.Rows.Count() - 1;
             var totals = jo.GetValue("total");                     
@@ -82,6 +108,13 @@ namespace ReportGenerator_v1.System {
                 }
             }         
         }        
+        /// <summary>
+        /// Loops through the xml datasource on a specific table or node and parses it by executing the replaceTextWithTemplate function
+        /// </summary>
+        /// <param name="jo">the json object</param>
+        /// <param name="comment">the comment that was parsed</param>
+        /// <param name="id">the id of the table to be looped</param>
+        /// <param name="foreignKey">the foreign key name</param>
         public void loopTable(JObject jo, Comment comment, string id = "", string foreignKey = "") {
 
             XmlNodeList tables = ((Xml)datasource).getList(jo.GetValue("loopTable").ToString(), jo.GetValue("foreignKey").ToString(), id);
@@ -89,7 +122,14 @@ namespace ReportGenerator_v1.System {
                 this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), table[jo.GetValue("id").ToString()].InnerText, table[jo.GetValue("foreignKey").ToString()].InnerText);
             }
             this.mainWordProcessor.Document.Delete(comment.Range);
-        }        
+        }
+        /// <summary>
+        /// populates the simple table by adding rows to it. It reads the xmlNode
+        /// </summary>
+        /// <param name="DetailList">the xml node list object that is created by testReport.xml</param>
+        /// <param name="table">The table object</param>
+        /// <param name="jo">the json object</param>
+        /// <param name="id">and the primary key of the table</param>
         public void populateTable(XmlNodeList DetailList, Table table, JObject jo, string id) {
             foreach (XmlNode node in DetailList) {
                 Dictionary<String, String> cols = new Dictionary<string, string>();
@@ -100,46 +140,55 @@ namespace ReportGenerator_v1.System {
             }
             this.populateTableTotals(DetailList, table, jo, id);
         }
+        /// <summary>
+        /// Deletes the object specified within the current object range
+        /// </summary>
         public void delete() {
             this.mainWordProcessor.Document.Delete(this.targetRange);
         }
-
+        /// <summary>
+        /// Parses all the comments of a document. Basically everything starts here
+        /// </summary>
         public void parse() {
             //Collect all comments and loop through them in order to parse each one of them individually and create the document elemtnts
             CommentCollection comments = this.mainWordProcessor.Document.Comments;
             foreach (Comment comment in comments.ToList()) {
-                //this block of code is used to get the comments and save them in a string variable
-                //all the block is needed according to devexpress
-                string commentText = this.getCommentText(comment);
+                                
                 //After collecting the individual comment witch is in json format, it will be passed to the internal function parseFieldTypes in order to 
                 //parse and create the fields
-                this.parseCommentTypes(commentText, comment);
+                this.parseCommentTypes(comment);
                 //then move to the next comment..
             }
             Regex r = new Regex("{PBR}");
             mainWordProcessor.Document.ReplaceAll(r, DevExpress.Office.Characters.PageBreak.ToString());
-        }        
-        private void parseCommentTypes(string field, Comment comment, string id = "", string foreignKey = "") {
+        }
+        ///<summary>
+        ///This function is used to check the type of parsing that will be used        
+        ///</summary>
+        ///<param name="json">the json string to be parsed as jobject and get the parse type</param>
+        ///<param name="comment">the comment object that is passsed</param>
+        private void parseCommentTypes(Comment comment, string id = "", string foreignKey = "") {
+            string json = this.getCommentText(comment);
             try {
-                JObject jo = JObject.Parse(field);
-                switch (jo.GetValue("type").ToString()) {
+                JObject jsonObject = JObject.Parse(json);
+                switch (jsonObject.GetValue("type").ToString()) {
                     case "field":
-                        this.parseField(jo, comment, id);
+                        this.parseField(jsonObject, comment, id);
                         break;
                     case "image":
-                        this.parseImage(jo, comment, id);
+                        this.parseImage(jsonObject, comment, id);
                         break;
                     case "list":
-                        this.parseList(jo, comment, id);
+                        this.parseList(jsonObject, comment, id);
                         break;
                     case "template":
-                        this.parseTemplate(jo, comment, id);
+                        this.parseTemplate(jsonObject, comment, id);
                         break;
                     case "table":
-                        this.parseTable(jo, comment, id);
+                        this.parseTable(jsonObject, comment, id);
                         break;
                     case "complexTable":
-                        this.parseComplexTable(jo, comment, id, foreignKey);
+                        this.parseComplexTable(jsonObject, comment, id, foreignKey);
                         break;
                 }
             } catch (Exception ex) {
@@ -147,7 +196,13 @@ namespace ReportGenerator_v1.System {
             }
 
 
-        }       
+        }
+        /// <summary>
+        /// replaces the targeted range that the comment points to with the text that relates to the name
+        /// </summary>
+        ///<param name="json">the json string to be parsed as jobject and get the parse type</param>
+        ///<param name="comment">the comment object that is passsed</param>
+        /// <param name="id"></param>
         public void parseField(JObject jo, Comment comment, string id = "") {
             Console.WriteLine(jo + " is field");
             this.replaceRangeWithNewText(comment.Range, datasource.GetValue(jo.GetValue("name").ToString()).ToString());
@@ -286,7 +341,7 @@ namespace ReportGenerator_v1.System {
                     SubDocument doc = c.BeginUpdate();
                     String field = doc.GetText(doc.Range).Replace("”", "\"").Replace("“", "\"");
                     if (field != "") {
-                        this.parseCommentTypes(field, c, id, foreightKey);
+                        this.parseCommentTypes(c, id, foreightKey);
                     }
                     doc.EndUpdate();
                 }
