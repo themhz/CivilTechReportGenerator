@@ -220,7 +220,6 @@ namespace ReportGenerator_v1.System {
                 this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id);
             }            
         }        
-
         /// <summary>
         /// Gets the image and prints in the document. Notice that the image is in binary format not an actual jpg and its embedid in the xml
         /// </summary>
@@ -232,7 +231,6 @@ namespace ReportGenerator_v1.System {
             XmlNodeList DetailList = ((Xml)datasource).getList("PageA","ID", id);            
             this.replaceTextWithImage(comment.Range, DetailList[0]["Image"].InnerText, id);            
         }      
-
         /// <summary>
         /// Parses the table comment and populates the table in the document
         /// </summary>
@@ -250,7 +248,6 @@ namespace ReportGenerator_v1.System {
                 this.populateTable(DetailList, tableCell.Table, jo, id);
             }
         }
-
         /// <summary>
         /// parses a compex table where you can expand n rows a time, keeping header and footer in place
         /// </summary>
