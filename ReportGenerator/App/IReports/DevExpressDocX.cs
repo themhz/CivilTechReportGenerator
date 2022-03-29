@@ -183,10 +183,7 @@ namespace ReportGenerator_v1.System {
                         break;
                     case "table":
                         this.parseTable(jsonObject, comment, id);
-                        break;
-                    case "complexTable":
-                        this.parseComplexTable(jsonObject, comment, id);
-                        break;
+                        break;                   
                 }
             } catch (Exception ex) {
 
@@ -238,14 +235,18 @@ namespace ReportGenerator_v1.System {
         /// <param name="comment">the comment object</param>
         /// <param name="id">the id</param>
         public void parseTable(JObject jo, Comment comment, string id = "") {
-            //string data = jo.GetValue("cols").ToString().Replace("[", " ").Replace("]", " ").Replace(Environment.NewLine, "");
-            string loopTable = jo.GetValue("table").ToString();
-            string foreignKey = jo.GetValue("foreignKey").ToString();
-            TableCell tableCell = this.mainWordProcessor.Document.Tables.GetTableCell(comment.Range.Start);
 
-            if(tableCell != null) {                
-                XmlNodeList DetailList = ((Xml)datasource).getList(loopTable, foreignKey, id);
-                this.populateTable(DetailList, tableCell.Table, jo, id);
+            if (jo.ContainsKey("rowCount") && Int32.Parse(jo.GetValue("rowCount").ToString()) >1) {
+                parseComplexTable(jo, comment, id);
+            } else {
+                string loopTable = jo.GetValue("table").ToString();
+                string foreignKey = jo.GetValue("foreignKey").ToString();
+                TableCell tableCell = this.mainWordProcessor.Document.Tables.GetTableCell(comment.Range.Start);
+
+                if (tableCell != null) {
+                    XmlNodeList DetailList = ((Xml)datasource).getList(loopTable, foreignKey, id);
+                    this.populateTable(DetailList, tableCell.Table, jo, id);
+                }
             }
         }
         /// <summary>
