@@ -177,10 +177,7 @@ namespace ReportGenerator_v1.System {
                         break;
                     case "image":
                         this.parseImage(jsonObject, comment, id);
-                        break;
-                    case "list":
-                        this.parseList(jsonObject, comment, id);
-                        break;
+                        break;                   
                     case "template":
                         this.parseTemplate(jsonObject, comment, id);
                         break;
@@ -188,7 +185,7 @@ namespace ReportGenerator_v1.System {
                         this.parseTable(jsonObject, comment, id);
                         break;
                     case "complexTable":
-                        this.parseComplexTable(jsonObject, comment, id, foreignKey);
+                        this.parseComplexTable(jsonObject, comment, id);
                         break;
                 }
             } catch (Exception ex) {
@@ -206,39 +203,61 @@ namespace ReportGenerator_v1.System {
         public void parseField(JObject jo, Comment comment, string id = "") {
             Console.WriteLine(jo + " is field");
             this.replaceRangeWithNewText(comment.Range, datasource.GetValue(jo.GetValue("name").ToString()).ToString());
-        }
-        public void parseList(JObject jo, Comment comment, string id = "") {
-            Console.WriteLine(jo + " is List");
-        }
+        }      
+        /// <summary>
+        /// Parses the template in the comment
+        /// Finds the looptable attribute in the json comment and loops so it prints the table as many times as it is found in the xml
+        /// else it replaces with a template
+        /// </summary>
+        /// <param name="jo">the json object</param>
+        /// <param name="comment">the comment object</param>
+        /// <param name="id">the id as primary key</param>
         public void parseTemplate(JObject jo, Comment comment, string id = "") {
-
             Console.WriteLine(jo + " is template");
             if (jo.ContainsKey("loopTable")) {
                 this.loopTable(jo, comment, id);
             } else {                
                 this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id);
-            }
-            
+            }            
         }        
-        public void parseImage(JObject jo, Comment comment, string id = "") {
-            Console.WriteLine(jo + " is image");
-            //XmlNodeList DetailList = ((Xml)datasource).getList("PageA[ns:ID='" + id + "']");
-            XmlNodeList DetailList = ((Xml)datasource).getList("PageA","ID", id);
 
-            //this.replaceTextWithImage(comment.Range, jo.GetValue("name").ToString(), id);
+        /// <summary>
+        /// Gets the image and prints in the document. Notice that the image is in binary format not an actual jpg and its embedid in the xml
+        /// </summary>
+        /// <param name="jo">the json object</param>
+        /// <param name="comment">the comment object</param>
+        /// <param name="id">the id as primary key</param>
+        public void parseImage(JObject jo, Comment comment, string id = "") {
+            Console.WriteLine(jo + " is image");            
+            XmlNodeList DetailList = ((Xml)datasource).getList("PageA","ID", id);            
             this.replaceTextWithImage(comment.Range, DetailList[0]["Image"].InnerText, id);            
         }      
-        public void parseTable(JObject jo, Comment comment, string id = "") {            
-            string data = jo.GetValue("cols").ToString().Replace("[", " ").Replace("]", " ").Replace(Environment.NewLine, "");            
+
+        /// <summary>
+        /// Parses the table comment and populates the table in the document
+        /// </summary>
+        /// <param name="jo">the json object</param>
+        /// <param name="comment">the comment object</param>
+        /// <param name="id">the id</param>
+        public void parseTable(JObject jo, Comment comment, string id = "") {
+            //string data = jo.GetValue("cols").ToString().Replace("[", " ").Replace("]", " ").Replace(Environment.NewLine, "");
+            string loopTable = jo.GetValue("loopTable").ToString();
+            string foreignKey = jo.GetValue("foreignKey").ToString();
             TableCell tableCell = this.mainWordProcessor.Document.Tables.GetTableCell(comment.Range.Start);
 
-            if(tableCell != null) {
-                //XmlNodeList DetailList = ((Xml)datasource).getList("PageADetails[ns:PageADetailID='" + id + "']");
-                XmlNodeList DetailList = ((Xml)datasource).getList("PageADetails","PageADetailID", id);
-                this.populateTable(DetailList, tableCell.Table, jo, id);                              
+            if(tableCell != null) {                
+                XmlNodeList DetailList = ((Xml)datasource).getList(loopTable, foreignKey, id);
+                this.populateTable(DetailList, tableCell.Table, jo, id);
             }
         }
-        public void parseComplexTable(JObject jo, Comment comment, string id = "", string foreignKey = "") {
+
+        /// <summary>
+        /// parses a compex table where you can expand n rows a time, keeping header and footer in place
+        /// </summary>
+        /// <param name="jo">json object</param>
+        /// <param name="comment">comment object</param>
+        /// <param name="id">the primary key of the table</param>        
+        public void parseComplexTable(JObject jo, Comment comment, string id = "") {
             
             this.mainWordProcessor.Document.AppendText("newTable");
             var newTableRange = this.getTextRange("newTable");
@@ -308,7 +327,6 @@ namespace ReportGenerator_v1.System {
             if (this.targetRange != null)
                 this.mainWordProcessor.Document.Replace(targetRange, targetText);
         }
-
         public void replaceTextWithImage(DocumentRange sourceRange, string targetText, string id) {
             //this.mainWordProcessor.Document.BeginUpdate();
             this.mainWordProcessor.Document.Unit = DevExpress.Office.DocumentUnit.Inch;
@@ -352,7 +370,14 @@ namespace ReportGenerator_v1.System {
             }
         }
 
-        
+
+        /// <summary>
+        /// Gets the row range
+        /// </summary>
+        /// <param name="table">the table object</param>
+        /// <param name="rowIndex">the rowIndex that we will get the range</param>
+        /// <param name="rowCount">how many rows</param>
+        /// <returns></returns>
         protected DocumentRange getRowsRange(Table table, int rowIndex, int rowCount) {
             DocumentPosition start = table.Rows[rowIndex].Range.Start;
             DocumentPosition end = table.Rows[rowIndex + rowCount - 1].Range.End;
@@ -360,12 +385,27 @@ namespace ReportGenerator_v1.System {
 
             return this.mainWordProcessor.Document.CreateRange(start, length);
         }
+        /// <summary>
+        /// get the table of the document by the index
+        /// </summary>
+        /// <param name="position">the index position</param>
+        /// <returns></returns>
         public Table getTable(int position) {
             return this.mainWordProcessor.Document.Tables[position];
         }
+        /// <summary>
+        /// gets the paragraph by index
+        /// </summary>
+        /// <param name="position">the index the document</param>
+        /// <returns></returns>
         public Paragraph getParagraph(int position) {
             return this.mainWordProcessor.Document.Paragraphs[position];
         }
+        /// <summary>
+        /// Searches for a text in a document and gets its range. The search happens from top to bottom
+        /// </summary>
+        /// <param name="search">the text to search</param>
+        /// <returns></returns>
         public DocumentRange getTextRange(string search) {
             try {
                 Regex myRegEx = new Regex(search);
@@ -374,6 +414,11 @@ namespace ReportGenerator_v1.System {
                 return null;
             }
         }
+        /// <summary>
+        /// Searches for a text in a document and gets its range. The search happens from bottom to top
+        /// </summary>
+        /// <param name="search">the text to search</param>
+        /// <returns></returns>
         public DocumentRange getTextRangeLast(string search) {
             try {
                 Regex myRegEx = new Regex(search);
@@ -382,6 +427,11 @@ namespace ReportGenerator_v1.System {
                 return null;
             }
         }
+        /// <summary>
+        /// gets comment text
+        /// </summary>
+        /// <param name="comment">the comment object</param>
+        /// <returns></returns>
         public string getCommentText(Comment comment) {
             SubDocument doc = comment.BeginUpdate();
             string commentText = doc.GetText(doc.Range).Replace("”", "\"").Replace("{{", "{").Replace("}}", "}");            
