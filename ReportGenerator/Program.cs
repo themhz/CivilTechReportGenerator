@@ -38,13 +38,7 @@ namespace ReportGenerator_v1 {
             builder.RegisterType<TableData>().As<TableData>();
             builder.RegisterType<DevExpressDocX>().As<IReport>();
             builder.RegisterType<Xml>().As<IDataSource>();
-            
-            
-
-
-
-
-
+                 
             return builder.Build();
         }
     }

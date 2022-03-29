@@ -117,7 +117,7 @@ namespace ReportGenerator_v1.System {
         /// <param name="foreignKey">the foreign key name</param>
         public void loopTable(JObject jo, Comment comment, string id = "", string foreignKey = "") {
 
-            XmlNodeList tables = ((Xml)datasource).getList(jo.GetValue("loopTable").ToString(), jo.GetValue("foreignKey").ToString(), id);
+            XmlNodeList tables = ((Xml)datasource).getList(jo.GetValue("table").ToString(), jo.GetValue("foreignKey").ToString(), id);
             foreach (XmlNode table in tables) {
                 this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), table[jo.GetValue("id").ToString()].InnerText, table[jo.GetValue("foreignKey").ToString()].InnerText);
             }
@@ -153,7 +153,7 @@ namespace ReportGenerator_v1.System {
             //Collect all comments and loop through them in order to parse each one of them individually and create the document elemtnts
             CommentCollection comments = this.mainWordProcessor.Document.Comments;
             foreach (Comment comment in comments.ToList()) {
-                                
+            
                 //After collecting the individual comment witch is in json format, it will be passed to the internal function parseFieldTypes in order to 
                 //parse and create the fields
                 this.parseCommentTypes(comment);
@@ -214,7 +214,7 @@ namespace ReportGenerator_v1.System {
         /// <param name="id">the id as primary key</param>
         public void parseTemplate(JObject jo, Comment comment, string id = "") {
             Console.WriteLine(jo + " is template");
-            if (jo.ContainsKey("loopTable")) {
+            if (jo.ContainsKey("table")) {
                 this.loopTable(jo, comment, id);
             } else {                
                 this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id);
@@ -239,7 +239,7 @@ namespace ReportGenerator_v1.System {
         /// <param name="id">the id</param>
         public void parseTable(JObject jo, Comment comment, string id = "") {
             //string data = jo.GetValue("cols").ToString().Replace("[", " ").Replace("]", " ").Replace(Environment.NewLine, "");
-            string loopTable = jo.GetValue("loopTable").ToString();
+            string loopTable = jo.GetValue("table").ToString();
             string foreignKey = jo.GetValue("foreignKey").ToString();
             TableCell tableCell = this.mainWordProcessor.Document.Tables.GetTableCell(comment.Range.Start);
 
@@ -275,7 +275,7 @@ namespace ReportGenerator_v1.System {
 
             // Do row repetition
             DocumentPosition lastPos = newTableRange.End;
-            XmlNodeList nodes = ((Xml)this.datasource).getList(jo.GetValue("loopTable").ToString(), jo.GetValue("foreignKey").ToString(), id);
+            XmlNodeList nodes = ((Xml)this.datasource).getList(jo.GetValue("table").ToString(), jo.GetValue("foreignKey").ToString(), id);
             
             foreach (XmlNode node in nodes) {
                
