@@ -257,8 +257,8 @@ namespace ReportGenerator_v1.System {
         /// <param name="id">the primary key of the table</param>        
         public void parseComplexTable(JObject jo, Comment comment, string id = "") {
             
-            this.mainWordProcessor.Document.AppendText("newTable");
-            var newTableRange = this.getTextRange("newTable");
+            this.mainWordProcessor.Document.AppendText("{{newTable}}");
+            var newTableRange = this.getTextRange("{{newTable}}");
             TableCell tableCell = null;
             Table table;
 
@@ -280,15 +280,18 @@ namespace ReportGenerator_v1.System {
             
             foreach (XmlNode node in nodes) {
                
-                var bodyRange = getRowsRange(table, headerCount, rowCount);               
+                var bodyRange = getRowsRange(table, headerCount, rowCount);                
                 lastPos = mainWordProcessor.Document.InsertDocumentContent(lastPos, bodyRange, InsertOptions.KeepSourceFormatting).End;
-
+                
                 foreach (String field in jo.GetValue("fields")) {
-                    this.replaceTextWithNewTextLast(field, node[field].InnerText);
+                    this.replaceAllTextWithText(field, node[field].InnerText, bodyRange);
+                    //this.replaceTextWithNewTextLast(field, node[field].InnerText);
                 }
+
+                
             }
 
-
+            
             // Copy footer
             DocumentRange footerRange = getRowsRange(table, headerCount + rowCount, footerCount);
            
@@ -296,8 +299,9 @@ namespace ReportGenerator_v1.System {
 
             this.mainWordProcessor.Document.Delete(comment.Range);
             this.mainWordProcessor.Document.Delete(table.Range);
+            this.replaceTextWithNewText("{{newTable}}","");
 
-            
+
         }
 
 
@@ -418,12 +422,40 @@ namespace ReportGenerator_v1.System {
         /// <param name="search">the text to search</param>
         /// <returns></returns>
         public DocumentRange getTextRangeLast(string search) {
-            try {
+            try {                
                 Regex myRegEx = new Regex(search);
                 return this.mainWordProcessor.Document.FindAll(myRegEx).Last();
             } catch (Exception ex) {
                 return null;
             }
+        }
+
+        public void replaceAllTextWithText(string search, string text, DocumentRange range = null) {
+            
+            Regex r = new Regex("{{name:\"" + search + "\".*?}}");
+            DocumentRange[] result = null;
+
+            if (range != null) {                
+                result = this.mainWordProcessor.Document.FindAll(r, range);
+            } else {                
+                result = this.mainWordProcessor.Document.FindAll(r);
+            }
+            
+            Dictionary<String, JObject> fields = new Dictionary<String, JObject>();
+            for (int i = 0; i < result.Length; i++) {
+                if(range.Contains(result[i].Start) && range.Contains(result[i].End)) {
+                    //String field = this.mainWordProcessor.Document.GetText(result[i]).Replace("”", "\"").Replace("{{", "{").Replace("}}", "}");
+                    String field = this.mainWordProcessor.Document.GetText(result[i]).Replace("”", "\"");
+                    //this.replaceTextWithNewTextLast("{{name:\""+field+ "\".*?}}", text);
+                    string json = field.Replace("{{", "{").Replace("}}", "}");
+
+                    text = this.formatText(text);
+                    this.replaceTextWithNewTextLast(field, text);
+                }
+                                
+            }
+
+            
         }
         /// <summary>
         /// gets comment text
@@ -436,6 +468,12 @@ namespace ReportGenerator_v1.System {
             comment.EndUpdate(doc);
             
             return commentText;
+        }
+
+        public string formatText(string text) {
+
+
+            return text;
         }
     }
 }

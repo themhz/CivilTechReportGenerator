@@ -45,8 +45,9 @@ namespace ReportGenerator_v1.DataSources {
 
             _dataSet = new DataSet();
             _dataSet.ReadXmlSchema(this.xmlPath);
-            _dataSet.ReadXml(this.xmlPath, XmlReadMode.ReadSchema);            
+            _dataSet.ReadXml(this.xmlPath, XmlReadMode.ReadSchema);
 
+           
             foreach (DataTable table in _dataSet.Tables) {
                 foreach (DataColumn column in table.Columns) {
                     dictionary.Add(table.TableName + "." + column.ColumnName, column);
@@ -84,6 +85,19 @@ namespace ReportGenerator_v1.DataSources {
             return null;
         }
 
+
+        // TODO Need to do some work
+        public object GetValueWithLinq() {
+            DataTable PageA = _dataSet.Tables["PageADetails"];
+            IEnumerable<DataRow> query =
+            from pageA in PageA.AsEnumerable()
+            select pageA;
+            foreach (DataRow p in query) {
+                Console.WriteLine(p.Field<string>("ID"));
+            }
+
+            return null;
+        }
 
     }
 }
