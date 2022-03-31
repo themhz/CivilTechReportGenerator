@@ -135,8 +135,9 @@
     <None Include="App.config" />
     <None Include="DataSources\files\old\template_part1.docx" />
     <None Include="DataSources\files\report_template2.docx" />
+    <None Include="DataSources\files\templates\complexTable2.docx" />
     <None Include="DataSources\files\templates\complexTable.docx" />
-    <None Include="DataSources\files\templates\template_part3.docx" />
+    <None Include="DataSources\files\templates\template_part4.docx" />
     <None Include="DataSources\files\templates\template_part2.docx" />
     <None Include="DataSources\files\templates\template_part1.docx" />
     <None Include="DataSources\files\temp\report_template.docx" />

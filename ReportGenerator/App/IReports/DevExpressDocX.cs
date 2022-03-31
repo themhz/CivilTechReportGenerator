@@ -136,7 +136,7 @@ namespace ReportGenerator_v1.System {
                 foreach (XmlNode row in node) {
                     cols.Add(row.Name, row.InnerText);
                 }
-                this.addTableRow(table, cols, jo);
+                 this.addTableRow(table, cols, jo);
             }
             this.populateTableTotals(DetailList, table, jo, id);
         }
@@ -236,7 +236,7 @@ namespace ReportGenerator_v1.System {
         /// <param name="id">the id</param>
         public void parseTable(JObject jo, Comment comment, string id = "") {
 
-            if (jo.ContainsKey("rowCount") && Int32.Parse(jo.GetValue("rowCount").ToString()) >1) {
+            if (jo.ContainsKey("rowCount")) {
                 parseComplexTable(jo, comment, id);
             } else {
                 string loopTable = jo.GetValue("table").ToString();
