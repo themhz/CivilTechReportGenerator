@@ -87,7 +87,7 @@ namespace ReportGenerator_v1.DataSources {
 
 
         // TODO Need to do some work
-        public object GetValueWithLinq() {
+        public object GetValueByLinq() {
             DataTable PageA = _dataSet.Tables["PageADetails"];
             IEnumerable<DataRow> query =
             from pageA in PageA.AsEnumerable()

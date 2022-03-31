@@ -286,9 +286,7 @@ namespace ReportGenerator_v1.System {
                 foreach (String field in jo.GetValue("fields")) {
                     this.replaceAllTextWithText(field, node[field].InnerText, bodyRange);
                     //this.replaceTextWithNewTextLast(field, node[field].InnerText);
-                }
-
-                
+                }                
             }
 
             
@@ -300,7 +298,6 @@ namespace ReportGenerator_v1.System {
             this.mainWordProcessor.Document.Delete(comment.Range);
             this.mainWordProcessor.Document.Delete(table.Range);
             this.replaceTextWithNewText("{{newTable}}","");
-
 
         }
 
