@@ -23,7 +23,6 @@ namespace ReportGenerator_v1 {
                 
 
                 app.start(reportType);
-                //hi
             }
         }
 
