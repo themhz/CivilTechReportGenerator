@@ -23,7 +23,6 @@ namespace ReportGenerator_v1 {
                 
                 //ssdsada
                 app.start(reportType);
-                //hi
             }
         }
 
