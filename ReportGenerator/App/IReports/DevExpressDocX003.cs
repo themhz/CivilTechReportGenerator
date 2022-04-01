@@ -305,18 +305,29 @@ namespace ReportGenerator_v1.System {
 
                     //Appears ok
                     parentWordProcessor.Document.InsertDocumentContent(this.getTextRange("{{Test}}", parentWordProcessor).Start, childWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
-                    //Appears ok
-                    parentWordProcessor.Document.InsertDocumentContent(this.getTextRange("{{Test}}", parentWordProcessor).Start, childWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
-                    //Doesnt Appears
-                    parentWordProcessor.Document.InsertDocumentContent(this.getTextRange("{{Test}}", parentWordProcessor).Start, childWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
-                    parentWordProcessor.Document.InsertDocumentContent(this.getTextRange("{{Test}}", parentWordProcessor).Start, childWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
-                    parentWordProcessor.Document.InsertDocumentContent(this.getTextRange("{{Test}}", parentWordProcessor).Start, childWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
-
                     parentWordProcessor.Document.EndUpdate();
-                    parentWordProcessor.SaveDocument(this.generatedfile, DocumentFormat.OpenXml);
+                    //Appears ok
+                    parentWordProcessor.Document.BeginUpdate();
+                    parentWordProcessor.Document.InsertDocumentContent(this.getTextRange("{{Test}}", parentWordProcessor).Start, childWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
+                    parentWordProcessor.Document.EndUpdate();
+                    //Doesnt Appears
+                    parentWordProcessor.Document.BeginUpdate();
+                    parentWordProcessor.Document.InsertDocumentContent(this.getTextRange("{{Test}}", parentWordProcessor).Start, childWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
+                    parentWordProcessor.Document.EndUpdate();
 
-                    this.openfile();
+                    parentWordProcessor.Document.BeginUpdate();
+                    parentWordProcessor.Document.InsertDocumentContent(this.getTextRange("{{Test}}", parentWordProcessor).Start, childWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
+                    parentWordProcessor.Document.EndUpdate();
+
+                    parentWordProcessor.Document.BeginUpdate();
+                    parentWordProcessor.Document.InsertDocumentContent(this.getTextRange("{{Test}}", parentWordProcessor).Start, childWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
+                    parentWordProcessor.Document.EndUpdate();
+
                 }
+
+                parentWordProcessor.Document.EndUpdate();
+                parentWordProcessor.SaveDocument(this.generatedfile, DocumentFormat.OpenXml);
+                this.openfile();
             }
         }
     }
