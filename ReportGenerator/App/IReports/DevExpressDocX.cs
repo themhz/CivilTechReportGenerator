@@ -26,8 +26,7 @@ namespace ReportGenerator_v1.System {
         public String generatedfile { set; get; }
         private DocumentRange sourceRange { set; get; }
         private DocumentRange targetRange { set; get; }
-
-
+        
         public DevExpressDocX(RichEditDocumentServer _wordProcessor, IDataSource _datasource) {
             this.mainWordProcessor = _wordProcessor;
             this.datasource = _datasource;
@@ -108,21 +107,7 @@ namespace ReportGenerator_v1.System {
                 }
             }         
         }        
-        /// <summary>
-        /// Loops through the xml datasource on a specific table or node and parses it by executing the replaceTextWithTemplate function
-        /// </summary>
-        /// <param name="jo">the json object</param>
-        /// <param name="comment">the comment that was parsed</param>
-        /// <param name="id">the id of the table to be looped</param>
-        /// <param name="foreignKey">the foreign key name</param>
-        public void loopTable(JObject jo, Comment comment, string id = "", string foreignKey = "") {
-
-            XmlNodeList tables = ((Xml)datasource).getList(jo.GetValue("table").ToString(), jo.GetValue("foreignKey").ToString(), id);
-            foreach (XmlNode table in tables) {
-                this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), table[jo.GetValue("id").ToString()].InnerText, table[jo.GetValue("foreignKey").ToString()].InnerText);
-            }
-            this.mainWordProcessor.Document.Delete(comment.Range);
-        }
+       
         /// <summary>
         /// populates the simple table by adding rows to it. It reads the xmlNode
         /// </summary>
@@ -159,8 +144,7 @@ namespace ReportGenerator_v1.System {
                 this.parseCommentTypes(comment);
                 //then move to the next comment..
             }
-            Regex r = new Regex("{PBR}");
-            mainWordProcessor.Document.ReplaceAll(r, DevExpress.Office.Characters.PageBreak.ToString());
+            this.createPageBreak();
         }
         ///<summary>
         ///This function is used to check the type of parsing that will be used        
@@ -211,12 +195,20 @@ namespace ReportGenerator_v1.System {
         /// <param name="id">the id as primary key</param>
         public void parseTemplate(JObject jo, Comment comment, string id = "") {
             Console.WriteLine(jo + " is template");
+            //Repeate for each table
             if (jo.ContainsKey("table")) {
-                this.loopTable(jo, comment, id);
-            } else {                
+                //Φέρνει μια λίστα από πίνακες και για κάθε πίνακα φέρνει το κλειδί 
+                XmlNodeList tables = ((Xml)datasource).getList(jo.GetValue("table").ToString(), jo.GetValue("foreignKey").ToString(), id);
+                foreach (XmlNode table in tables) {
+                    this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), table[jo.GetValue("id").ToString()].InnerText, table[jo.GetValue("foreignKey").ToString()].InnerText);
+                }
+            } else {
                 this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id);
             }            
-        }        
+        }
+
+
+
         /// <summary>
         /// Gets the image and prints in the document. Notice that the image is in binary format not an actual jpg and its embedid in the xml
         /// </summary>
@@ -466,11 +458,15 @@ namespace ReportGenerator_v1.System {
             
             return commentText;
         }
-
         public string formatText(string text) {
 
 
             return text;
+        }
+
+        public void createPageBreak() {
+            Regex r = new Regex("{PBR}");
+            mainWordProcessor.Document.ReplaceAll(r, DevExpress.Office.Characters.PageBreak.ToString());
         }
     }
 }

@@ -111,6 +111,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App\IReports\DevExpressDocX003.cs" />
     <Compile Include="App\IReports\DevExpressDocX002.cs" />
     <Compile Include="DataSources\Interfaces\IDataSource.cs" />
     <Compile Include="DataSources\Xml.cs" />

@@ -18,8 +18,8 @@ namespace ReportGenerator_v1 {
                 var app = scope.Resolve<App>();
 
                 //var reportType = scope.Resolve<ExceedDocX>();
-                var reportType = scope.Resolve<DevExpressDocX>();
-                //var reportType = scope.Resolve<DevExpressDocX002>();                          
+                //var reportType = scope.Resolve<DevExpressDocX>();
+                var reportType = scope.Resolve<DevExpressDocX003>();                          
                 app.start(reportType);
             }
         }

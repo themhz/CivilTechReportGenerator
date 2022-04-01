@@ -14,7 +14,8 @@ namespace ReportGenerator_v1.System {
             this.DocXReport = reportType;
             this.DocXReport.template = reportPath + "report_template2.docx";                        
             this.DocXReport.generatedfile = reportPath + "report_template_generated2.docx";
-            this.DocXReport = this.DocXReport.create();
+            //this.DocXReport = this.DocXReport.create();
+            ((DevExpressDocX003)this.DocXReport).test();
         }
     }
 }
