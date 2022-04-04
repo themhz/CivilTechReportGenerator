@@ -301,7 +301,7 @@ namespace ReportGenerator_v1.System {
                     //load document to child wordprocessor
                     childWordPrecessor.LoadDocumentTemplate(documentTemplate);
 
-                    
+                    childWordPrecessor.Document.BeginUpdate();
 
                     //Appears ok
                     parentWordProcessor.Document.InsertDocumentContent(this.getTextRange("{{Test}}", parentWordProcessor).Start, childWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
@@ -321,8 +321,9 @@ namespace ReportGenerator_v1.System {
 
                     parentWordProcessor.Document.BeginUpdate();
                     parentWordProcessor.Document.InsertDocumentContent(this.getTextRange("{{Test}}", parentWordProcessor).Start, childWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
-                    parentWordProcessor.Document.EndUpdate();
 
+
+                    childWordPrecessor.Document.EndUpdate();
                 }
 
                 parentWordProcessor.Document.EndUpdate();
