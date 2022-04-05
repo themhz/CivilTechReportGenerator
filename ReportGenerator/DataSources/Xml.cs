@@ -88,12 +88,37 @@ namespace ReportGenerator_v1.DataSources {
 
         // TODO Need to do some work
         public object GetValueByLinq() {
-            DataTable PageA = _dataSet.Tables["PageADetails"];
-            IEnumerable<DataRow> query =
-            from pageA in PageA.AsEnumerable()
-            select pageA;
-            foreach (DataRow p in query) {
-                Console.WriteLine(p.Field<string>("ID"));
+
+            //Inner join
+            DataTable PageA = _dataSet.Tables["PageA"];
+            DataTable PageADetails = _dataSet.Tables["PageADetails"];
+
+            var JoinResult = (from pageA in PageA.AsEnumerable()
+                              join pageADetails in PageADetails.AsEnumerable()
+                              on pageA.Field<string>("ID") equals pageADetails.Field<string>("PageADetailID")
+                              select new {
+                                  id = pageA.Field<string>("ID"),
+                                  pageAName = pageA.Field<string>("Name"),
+                                  pageATypeName = pageA.Field<string>("TypeName"),
+                                  pageADetailsName = pageADetails.Field<string>("Name")
+                              }).ToList();
+
+
+            //Select where
+            //DataTable SelectedTable = _dataSet.Tables["PageADetails"];            
+            //IEnumerable<DataRow> filter = SelectedTable.AsEnumerable().
+            //           Where(
+            //               x => x.Field<string>("PageADetailID") == "77ff0e87-ea58-4e71-9fcb-78294125b76a"
+            //           );
+
+            //Select all 
+            //SelectedTable = _dataSet.Tables["PageBLevelFaceElements"];
+            //query = from table in SelectedTable.AsEnumerable() select table;
+
+            Console.WriteLine("Start");
+            foreach (var p in JoinResult) {
+                //Console.WriteLine(((DataRow)p).Field<string>("ID"));
+                Console.WriteLine(p.id + " | " + p.pageAName + " | " + p.pageATypeName + " | " + p.pageADetailsName);
             }
 
             return null;

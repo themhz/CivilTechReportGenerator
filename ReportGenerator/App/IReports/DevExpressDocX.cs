@@ -216,6 +216,7 @@ namespace ReportGenerator_v1.System {
         /// <param name="comment">the comment object</param>
         /// <param name="id">the id as primary key</param>
         public void parseImage(JObject jo, Comment comment, string id = "") {
+            var test = ((Xml)datasource).GetValueByLinq();
             Console.WriteLine(jo + " is image");            
             XmlNodeList DetailList = ((Xml)datasource).getList("PageA","ID", id);            
             this.replaceTextWithImage(comment.Range, DetailList[0]["Image"].InnerText, id);            
