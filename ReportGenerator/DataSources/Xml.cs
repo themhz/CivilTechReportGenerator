@@ -88,7 +88,7 @@ namespace ReportGenerator_v1.DataSources {
 
         // TODO Need to do some work
         public object GetValueByLinq() {
-        //https://www.c-sharpcorner.com/blogs/inner-join-and-outer-join-in-datatable-using-linq
+            //https://www.c-sharpcorner.com/blogs/inner-join-and-outer-join-in-datatable-using-linq
             //Inner join
             DataTable PageA = _dataSet.Tables["PageA"];
             DataTable PageADetails = _dataSet.Tables["PageADetails"];

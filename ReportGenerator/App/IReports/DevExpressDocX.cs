@@ -14,6 +14,7 @@ using System.Diagnostics;
 using Newtonsoft.Json.Linq;
 using System.Configuration;
 using System.Text.Json.Nodes;
+using DevExpress.Office;
 
 namespace ReportGenerator_v1.System {
 
@@ -26,6 +27,7 @@ namespace ReportGenerator_v1.System {
         public String generatedfile { set; get; }
         private DocumentRange sourceRange { set; get; }
         private DocumentRange targetRange { set; get; }
+        private CommentCollection comments { set; get; }
         
         public DevExpressDocX(RichEditDocumentServer _wordProcessor, IDataSource _datasource) {
             this.mainWordProcessor = _wordProcessor;
@@ -135,23 +137,22 @@ namespace ReportGenerator_v1.System {
         /// Parses all the comments of a document. Basically everything starts here
         /// </summary>
         public void parse() {
-            //Collect all comments and loop through them in order to parse each one of them individually and create the document elemtnts
+            //Collect all comments and loop through them in order to parse each one of them individually and create the document elemtnts            
+
             CommentCollection comments = this.mainWordProcessor.Document.Comments;
-            foreach (Comment comment in comments.ToList()) {
-            
-                //After collecting the individual comment witch is in json format, it will be passed to the internal function parseFieldTypes in order to 
-                //parse and create the fields
-                this.parseCommentTypes(comment);
-                //then move to the next comment..
+            this.comments = comments;
+            while (comments.Count > 0) {
+                this.parseCommentTypes(comments[0]);
+                this.mainWordProcessor.Document.Comments.Remove(comments[0]);
             }
             this.createPageBreak();
-        }
+    }
         ///<summary>
         ///This function is used to check the type of parsing that will be used        
         ///</summary>
         ///<param name="json">the json string to be parsed as jobject and get the parse type</param>
         ///<param name="comment">the comment object that is passsed</param>
-        private void parseCommentTypes(Comment comment, string id = "", string foreignKey = "") {
+        private void parseCommentTypes(Comment comment, string id = "", string foreignKey = "", RichEditDocumentServer wp = null) {
             string json = this.getCommentText(comment);
             try {
                 JObject jsonObject = JObject.Parse(json);
@@ -166,7 +167,7 @@ namespace ReportGenerator_v1.System {
                         this.parseTemplate(jsonObject, comment, id);
                         break;
                     case "table":
-                        this.parseTable(jsonObject, comment, id);
+                        this.parseTable(jsonObject, comment, id, wp);
                         break;                   
                 }
             } catch (Exception ex) {
@@ -216,7 +217,7 @@ namespace ReportGenerator_v1.System {
         /// <param name="comment">the comment object</param>
         /// <param name="id">the id as primary key</param>
         public void parseImage(JObject jo, Comment comment, string id = "") {
-            var test = ((Xml)datasource).GetValueByLinq();
+            //var test = ((Xml)datasource).GetValueByLinq();
             Console.WriteLine(jo + " is image");            
             XmlNodeList DetailList = ((Xml)datasource).getList("PageA","ID", id);            
             this.replaceTextWithImage(comment.Range, DetailList[0]["Image"].InnerText, id);            
@@ -227,10 +228,10 @@ namespace ReportGenerator_v1.System {
         /// <param name="jo">the json object</param>
         /// <param name="comment">the comment object</param>
         /// <param name="id">the id</param>
-        public void parseTable(JObject jo, Comment comment, string id = "") {
+        public void parseTable(JObject jo, Comment comment, string id = "", RichEditDocumentServer wp = null) {
 
             if (jo.ContainsKey("rowCount")) {
-                parseComplexTable(jo, comment, id);
+                parseComplexTable(jo, comment, id, wp);
             } else {
                 string loopTable = jo.GetValue("table").ToString();
                 string foreignKey = jo.GetValue("foreignKey").ToString();
@@ -248,20 +249,28 @@ namespace ReportGenerator_v1.System {
         /// <param name="jo">json object</param>
         /// <param name="comment">comment object</param>
         /// <param name="id">the primary key of the table</param>        
-        public void parseComplexTable(JObject jo, Comment comment, string id = "") {
+        public void parseComplexTable(JObject jo, Comment comment, string id = "", RichEditDocumentServer wp = null) {
+
             
-            this.mainWordProcessor.Document.AppendText("{{newTable}}");
+            //Need to parse get the table range based on the comment that is pointing to it
+            //TableCell tableCell = null;
+            //Table table;
+            //get the table based on comment range
+            Table table = this.getTableByRange(comment.Range);
+           
+            //Insert LineBreak after the table to create space for the new table                       
+            this.mainWordProcessor.Document.InsertText(table.Range.End, Characters.LineBreak.ToString());
+            this.mainWordProcessor.Document.InsertText(table.Range.End, "{{newTable}}");
+
             var newTableRange = this.getTextRange("{{newTable}}");
-            TableCell tableCell = null;
-            Table table;
 
             int headerCount = Int32.Parse(jo.GetValue("headerCount").ToString());
             int rowCount = Int32.Parse(jo.GetValue("rowCount").ToString());
             int footerCount = Int32.Parse(jo.GetValue("footerCount").ToString());
 
-            //Get table 
-            tableCell = this.mainWordProcessor.Document.Tables.GetTableCell(comment.Range.Start);
-            table = tableCell.Table;
+            ////Get table 
+            //tableCell = this.mainWordProcessor.Document.Tables.GetTableCell(comment.Range.Start);
+            //table = tableCell.Table;
 
             // Copy header
             var headerRange = getRowsRange(table, 0, headerCount);
@@ -270,27 +279,29 @@ namespace ReportGenerator_v1.System {
             // Do row repetition
             DocumentPosition lastPos = newTableRange.End;
             XmlNodeList nodes = ((Xml)this.datasource).getList(jo.GetValue("table").ToString(), jo.GetValue("foreignKey").ToString(), id);
-            
+
             foreach (XmlNode node in nodes) {
-               
-                var bodyRange = getRowsRange(table, headerCount, rowCount);                
+
+                var bodyRange = getRowsRange(table, headerCount, rowCount);
                 lastPos = mainWordProcessor.Document.InsertDocumentContent(lastPos, bodyRange, InsertOptions.KeepSourceFormatting).End;
-                
+
                 foreach (String field in jo.GetValue("fields")) {
                     this.replaceAllTextWithText(field, node[field].InnerText, bodyRange);
                     //this.replaceTextWithNewTextLast(field, node[field].InnerText);
-                }                
+                }
             }
 
-            
+
             // Copy footer
             DocumentRange footerRange = getRowsRange(table, headerCount + rowCount, footerCount);
-           
+            
             mainWordProcessor.Document.InsertDocumentContent(lastPos, footerRange, InsertOptions.KeepSourceFormatting);
 
             this.mainWordProcessor.Document.Delete(comment.Range);
-            this.mainWordProcessor.Document.Delete(table.Range);
-            this.replaceTextWithNewText("{{newTable}}","");
+            
+            this.mainWordProcessor.Document.ReplaceAll("{{newTable}}", " ", SearchOptions.None,this.mainWordProcessor.Document.Range);
+            //this.replaceTextWithNewText("{{newTable}}",  " ");
+            
 
         }
 
@@ -335,7 +346,7 @@ namespace ReportGenerator_v1.System {
             }
             //this.wordProcessor.Document.Replace(targetRange, targetText);
         }
-        private void replaceTextWithTemplate(Comment comment, string file, string id, string foreightKey = "") {
+        private void replaceTextWithTemplate(Comment comment, string file, string id, string foreightKey = "", RichEditDocumentServer wp = null) {
             string documentTemplate = Path.Combine(ConfigurationManager.AppSettings["templates"] + file);
 
             //create child wordprocessor
@@ -346,14 +357,16 @@ namespace ReportGenerator_v1.System {
                 this.tempWordProcessor = this.mainWordProcessor;
                 this.mainWordProcessor = childWordPrecessor;
 
-                //loop through child processor comments
-                foreach (Comment c in childWordPrecessor.Document.Comments.ToList()) {
-                    SubDocument doc = c.BeginUpdate();
+                //loop through child processor comments            
+                while(childWordPrecessor.Document.Comments.Count() > 0) {
+                    SubDocument doc = childWordPrecessor.Document.Comments[0].BeginUpdate();
                     String field = doc.GetText(doc.Range).Replace("”", "\"").Replace("“", "\"");
-                    if (field != "") {
-                        this.parseCommentTypes(c, id, foreightKey);
-                    }
                     doc.EndUpdate();
+                    if (field != "") {
+                        this.parseCommentTypes(childWordPrecessor.Document.Comments[0], id, foreightKey, childWordPrecessor);
+                    }                    
+
+                    childWordPrecessor.Document.Comments.Remove(childWordPrecessor.Document.Comments[0]);
                 }
 
                 //get the main wordprocessor back
@@ -382,9 +395,18 @@ namespace ReportGenerator_v1.System {
         /// </summary>
         /// <param name="position">the index position</param>
         /// <returns></returns>
-        public Table getTable(int position) {
+        public Table getTableByPosition(int position) {
             return this.mainWordProcessor.Document.Tables[position];
         }
+
+        public Table getTableByRange(DocumentRange range) {
+            TableCell tableCell = this.mainWordProcessor.Document.Tables.GetTableCell(range.Start);
+            Table table = tableCell.Row.Table;
+
+
+            return table;
+        }
+
         /// <summary>
         /// gets the paragraph by index
         /// </summary>
