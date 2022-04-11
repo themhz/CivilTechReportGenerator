@@ -1,0 +1,53 @@
+{	
+	"Tables":
+	[
+		{
+			"Table":"TableA",
+			Alias: "PgA"
+			"Fields":[
+				{"Name":"ID","Alias":"Aid0", "Format":"String"},		
+				{"Name":"Field1","Alias":"Aid1", "Format":"String"},
+				{"Name":"Field2","Alias":"Aid2", "Format":"String"},
+				{"Name":"Field3","Alias":"Aid3", "Format":"##.##0"}
+			]
+		},
+		{
+			"Table":"TableB",
+			"Fields":[
+				{"Name":"ID","Alias":"Aid3", "Format":"+{0:0.00} €"},
+				{"Name":"Field1","Alias":"Aid4", "Format":""},
+				{"Name":"Field2","Alias":"Aid5", "Format":""},
+				{"Name":"Field3","Alias":"Aid6", "Format":"##.##0"}
+			]
+		}		
+
+	]
+}
+
+{	
+	"Includes":
+	[
+		{
+			"File":"..... \file.docx",
+			Alias: "Section1"
+		},
+		{
+			"File":"..... \file2.docx",
+			Alias: "Section2"
+		}		
+
+	]
+}
+
+
+{	alias:"asdsadasdsa",
+	file:"tade.docx",
+	table: "PageADetails",
+	type: "table",
+	id: "ID",
+	foreignKey: "PageADetailID",
+	headerCount: 2,
+	rowCount: 1,
+	footerCount: 0,
+	fields:["Index","ID","PageADetailID","MaterialID","Name","Density","d","λ","dλ" ]
+}

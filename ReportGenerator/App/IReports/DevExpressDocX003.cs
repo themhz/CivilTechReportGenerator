@@ -60,8 +60,10 @@ namespace ReportGenerator_v1.System {
 
         public void parse() {                        
             List<Comment> lcomments = new List<Comment>();
-            foreach (Comment comment in getAllComments().ToList()) {
+            foreach (Comment comment in getAllComments().ToList()) {            
+                Console.WriteLine(comment.GetHashCode());
                 this.parseCommentTypes(comment);
+                //this.wordProcessor.Document.Comments.Remove(comment);
             }
             this.createPageBreak();
         }
@@ -219,24 +221,25 @@ namespace ReportGenerator_v1.System {
         public void parseTemplate(JObject jo, Comment comment, string id = "", RichEditDocumentServer wp = null) {
             Console.WriteLine(jo + " is template");
             //Repeate for each table
-            //if (jo.ContainsKey("table")) {
-            //    //Φέρνει μια λίστα από πίνακες και για κάθε πίνακα φέρνει το κλειδί 
-            //    XmlNodeList tables = ((Xml)datasource).getList(jo.GetValue("table").ToString(), jo.GetValue("foreignKey").ToString(), id);
-            //    foreach (XmlNode table in tables) {
-            //        this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), table[jo.GetValue("id").ToString()].InnerText, table[jo.GetValue("foreignKey").ToString()].InnerText);
-            //    }
-            //} else {
-            //    this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id);
-            //}
+            if (jo.ContainsKey("table")) {
+                //Φέρνει μια λίστα από πίνακες και για κάθε πίνακα φέρνει το κλειδί 
+                XmlNodeList tables = ((Xml)datasource).getList(jo.GetValue("table").ToString(), jo.GetValue("foreignKey").ToString(), id);
+                foreach (XmlNode table in tables) {
+                    this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), table[jo.GetValue("id").ToString()].InnerText, table[jo.GetValue("foreignKey").ToString()].InnerText);
+                }
+            } else {
+                this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id);
+            }
+            
 
-            this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id + 1);
-            this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id + 2);
-            this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id + 3);
-            this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id + 4);
-            this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id + 5);
-            this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id + 6);
-            this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id + 7);
-            this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id + 8);
+            //this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id + 1);
+            //this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id + 2);
+            //this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id + 3);
+            //this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id + 4);
+            //this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id + 5);
+            //this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id + 6);
+            //this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id + 7);
+            //this.replaceTextWithTemplate(comment, jo.GetValue("name").ToString(), id + 8);
         }
 
         private int countering = 0;
@@ -250,18 +253,18 @@ namespace ReportGenerator_v1.System {
                     childWordPrecessor.LoadDocumentTemplate(documentTemplate);
 
                 //loop through child processor comments
-                //foreach (Comment c in childWordPrecessor.Document.Comments) {
-                //    SubDocument doc = c.BeginUpdate();
-                //    //String field = doc.GetText(doc.Range).Replace("”", "\"").Replace("“", "\"");
-                //    //if (field != "") {
-                //        //this.parseCommentTypes(c, id, childWordPrecessor);
-                //    //}
-                //    doc.EndUpdate();
-                //}
+                foreach (Comment c in childWordPrecessor.Document.Comments) {
+                    SubDocument doc = c.BeginUpdate();
+                    String field = doc.GetText(doc.Range).Replace("”", "\"").Replace("“", "\"");
+                    if (field != "") {
+                        this.parseCommentTypes(c, id, childWordPrecessor);
+                    }
+                    doc.EndUpdate();
+                }
                 //get the main wordprocessor back
 
-                    
-                    this.wordProcessor.Document.InsertDocumentContent(this.getTextRange("{{Test}}").Start, childWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
+
+                this.wordProcessor.Document.InsertDocumentContent(this.getTextRange("{{Test}}").Start, childWordPrecessor.Document.Range, InsertOptions.KeepSourceFormatting);
                     
                     //this.replaceTextWithNewText("Διατομή", id);
                 }

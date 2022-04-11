@@ -46,6 +46,7 @@ namespace ReportGenerator_v1.System {
                 this.parse();
                 this.save();
                 this.openfile();
+                
             }
             Console.WriteLine("file report created");
             return this;
@@ -143,7 +144,7 @@ namespace ReportGenerator_v1.System {
             this.comments = comments;
             while (comments.Count > 0) {
                 this.parseCommentTypes(comments[0]);
-                this.mainWordProcessor.Document.Comments.Remove(comments[0]);
+                //this.mainWordProcessor.Document.Comments.Remove(comments[0]);
             }
             this.createPageBreak();
     }
@@ -167,13 +168,12 @@ namespace ReportGenerator_v1.System {
                         this.parseTemplate(jsonObject, comment, id);
                         break;
                     case "table":
-                        this.parseTable(jsonObject, comment, id, wp);
+                        //this.parseTable(jsonObject, comment, id, wp);
                         break;                   
                 }
             } catch (Exception ex) {
 
             }
-
 
         }
         /// <summary>
@@ -291,14 +291,10 @@ namespace ReportGenerator_v1.System {
                 }
             }
 
-
             // Copy footer
-            DocumentRange footerRange = getRowsRange(table, headerCount + rowCount, footerCount);
-            
+            DocumentRange footerRange = getRowsRange(table, headerCount + rowCount, footerCount);            
             mainWordProcessor.Document.InsertDocumentContent(lastPos, footerRange, InsertOptions.KeepSourceFormatting);
-
-            this.mainWordProcessor.Document.Delete(comment.Range);
-            
+            this.mainWordProcessor.Document.Delete(comment.Range);            
             this.mainWordProcessor.Document.ReplaceAll("{{newTable}}", " ", SearchOptions.None,this.mainWordProcessor.Document.Range);
             //this.replaceTextWithNewText("{{newTable}}",  " ");
             
@@ -358,16 +354,19 @@ namespace ReportGenerator_v1.System {
                 this.mainWordProcessor = childWordPrecessor;
 
                 //loop through child processor comments            
-                while(childWordPrecessor.Document.Comments.Count() > 0) {
+                //while(childWordPrecessor.Document.Comments.Count() > 0) {
+                foreach(Comment childcomment in childWordPrecessor.Document.Comments) {
                     SubDocument doc = childWordPrecessor.Document.Comments[0].BeginUpdate();
                     String field = doc.GetText(doc.Range).Replace("”", "\"").Replace("“", "\"");
                     doc.EndUpdate();
                     if (field != "") {
                         this.parseCommentTypes(childWordPrecessor.Document.Comments[0], id, foreightKey, childWordPrecessor);
-                    }                    
-
-                    childWordPrecessor.Document.Comments.Remove(childWordPrecessor.Document.Comments[0]);
+                    }
+                    //this.tempWordProcessor.Document.Comments.Remove(childWordPrecessor.Document.Comments[0]);
+                    //doc.Delete(childWordPrecessor.Document.Comments[0].Range);
                 }
+                    
+            
 
                 //get the main wordprocessor back
                 this.mainWordProcessor = this.tempWordProcessor;
