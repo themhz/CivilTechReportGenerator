@@ -135,6 +135,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="DataSources\files\old\template_part1.docx" />
+    <None Include="DataSources\files\Replace Algorithm.docx" />
     <None Include="DataSources\files\report_template2.docx" />
     <None Include="DataSources\files\templates\complexTable2.docx" />
     <None Include="DataSources\files\templates\complexTable.docx" />
@@ -162,6 +163,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DataSources\files\anotation.txt" />
     <Content Include="DataSources\files\old\oldfunctions.txt" />
     <Content Include="DataSources\files\testReport.xml" />
   </ItemGroup>

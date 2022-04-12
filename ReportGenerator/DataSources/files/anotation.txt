@@ -40,7 +40,8 @@
 }
 
 
-{	alias:"asdsadasdsa",
+{	
+	alias:"asdsadasdsa",
 	file:"tade.docx",
 	table: "PageADetails",
 	type: "table",
