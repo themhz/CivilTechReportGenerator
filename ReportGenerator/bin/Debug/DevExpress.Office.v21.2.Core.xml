@@ -20,6 +20,35 @@
       </summary>
       <value>true if the document export is Azure-compatible; otherwise false.</value>
     </member>
+    <member name="T:DevExpress.Office.BeforeEncodingDetectionEventArgs">
+      <summary>
+        <para>Provides data for the BeforeEncoding event.</para>
+      </summary>
+    </member>
+    <member name="M:DevExpress.Office.BeforeEncodingDetectionEventArgs.#ctor(System.IO.Stream)">
+      <summary>
+        <para>Initializes a new instance of the <see cref="T:DevExpress.Office.BeforeEncodingDetectionEventArgs"/> class with specified settings.</para>
+      </summary>
+      <param name="stream">A stream with document data.</param>
+    </member>
+    <member name="P:DevExpress.Office.BeforeEncodingDetectionEventArgs.Encoding">
+      <summary>
+        <para>Gets or sets the document encoding.</para>
+      </summary>
+      <value>An enumeration value that indicates the document encoding type.</value>
+    </member>
+    <member name="P:DevExpress.Office.BeforeEncodingDetectionEventArgs.Handled">
+      <summary>
+        <para>Gets or sets whether the event is handled.</para>
+      </summary>
+      <value>true to handle the event; otherwise, false.</value>
+    </member>
+    <member name="P:DevExpress.Office.BeforeEncodingDetectionEventArgs.Stream">
+      <summary>
+        <para>Obtains a stream with document data.</para>
+      </summary>
+      <value>A stream with document data.</value>
+    </member>
     <member name="T:DevExpress.Office.DocumentLayoutUnit">
       <summary>
         <para>Lists measurement units used for the document layout.</para>

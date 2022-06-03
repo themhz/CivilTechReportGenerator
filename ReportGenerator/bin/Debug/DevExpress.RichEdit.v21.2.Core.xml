@@ -6372,7 +6372,7 @@
       <summary>
         <para>Specifies an application used to modify the document.</para>
       </summary>
-      <value>The application name. The default is “DevExpress Office File API/<span class="macro" data-macro-template="xx.x.x">21.2.5</span>.0”.</value>
+      <value>The application name. The default is “DevExpress Office File API/<span class="macro" data-macro-template="xx.x.x">21.2.7</span>.0”.</value>
     </member>
     <member name="P:DevExpress.XtraRichEdit.API.Native.DocumentProperties.AppVersion">
       <summary>
@@ -7213,6 +7213,11 @@
       </summary>
       <param name="password">A password to encrypt the document.</param>
       <param name="type">The encryption type.</param>
+    </member>
+    <member name="M:DevExpress.XtraRichEdit.API.Native.EncryptionSettings.Dispose">
+      <summary>
+        <para>Disposes of the EncryptionSettings object.</para>
+      </summary>
     </member>
     <member name="P:DevExpress.XtraRichEdit.API.Native.EncryptionSettings.Password">
       <summary>
@@ -11397,7 +11402,7 @@
       <summary>
         <para>Gets the name of the application used to modify the document.</para>
       </summary>
-      <value>The application’s name. The default is “DevExpress Office File API/<span class="macro" data-macro-template="xx.x.x">21.2.5</span>.0”.</value>
+      <value>The application’s name. The default is “DevExpress Office File API/<span class="macro" data-macro-template="xx.x.x">21.2.7</span>.0”.</value>
     </member>
     <member name="P:DevExpress.XtraRichEdit.API.Native.ReadOnlyDocumentBuiltInProperties.AppVersion">
       <summary>
@@ -19113,7 +19118,7 @@
     </member>
     <member name="T:DevExpress.XtraRichEdit.BookmarkOptions">
       <summary>
-        <para>Represents settings which define the appearance of bookmarks in the document.</para>
+        <para>Contains settings used to define the bookmark appearance and behavior in the Rich Text Editor.</para>
       </summary>
     </member>
     <member name="M:DevExpress.XtraRichEdit.BookmarkOptions.#ctor">
@@ -23227,6 +23232,10 @@
       </summary>
       <value>An XtraRichEditStringId enumeration value, identifying the resource string.</value>
     </member>
+    <member name="P:DevExpress.XtraRichEdit.Commands.InsertTableElementMenuCommand.Id">
+      <summary />
+      <value></value>
+    </member>
     <member name="P:DevExpress.XtraRichEdit.Commands.InsertTableElementMenuCommand.MenuCaptionStringId">
       <summary>
         <para>Gets a string resource identifier of a menu caption corresponding to <see cref="T:DevExpress.XtraRichEdit.Commands.InsertTableElementMenuCommand"/>.</para>
@@ -25950,6 +25959,10 @@
         <para><see cref="T:DevExpress.XtraRichEdit.Commands.InsertTableColumnToTheRightCommand"/> ID.</para>
       </summary>
       <value>A command ID.</value>
+    </member>
+    <member name="F:DevExpress.XtraRichEdit.Commands.RichEditCommandId.InsertTableElement">
+      <summary />
+      <value></value>
     </member>
     <member name="F:DevExpress.XtraRichEdit.Commands.RichEditCommandId.InsertTableInner">
       <summary>
@@ -36191,7 +36204,7 @@
     </member>
     <member name="T:DevExpress.XtraRichEdit.HyperlinkOptions">
       <summary>
-        <para>Represents settings which define the appearance and behavior of hyperlinks in the document.</para>
+        <para>Contains settings used to define the hyperlink appearance in the Rich Text Editor.</para>
       </summary>
     </member>
     <member name="M:DevExpress.XtraRichEdit.HyperlinkOptions.#ctor">
@@ -36400,9 +36413,9 @@
     </member>
     <member name="P:DevExpress.XtraRichEdit.Import.HtmlDocumentImporterOptions.AutoDetectEncoding">
       <summary>
-        <para>Gets or sets whether the auto-detection of the charset of the html file is enabled.</para>
+        <para>Gets or sets whether to enable the auto-detection of the loaded text encoding.</para>
       </summary>
-      <value>true to enable the auto-detect option; otherwise, false.</value>
+      <value>true to enable the automatic encoding detection; otherwise, false.</value>
     </member>
     <member name="M:DevExpress.XtraRichEdit.Import.HtmlDocumentImporterOptions.CopyFrom(DevExpress.Office.Import.IImporterOptions)">
       <summary>
@@ -36414,7 +36427,7 @@
       <summary>
         <para>Gets or sets the encoding used to interpret characters in the document.</para>
       </summary>
-      <value>A <see cref="T:System.Text.Encoding"/> object providing the conversion between certain encoding and Unicode.</value>
+      <value>An object that contains character encoding parameters.</value>
     </member>
     <member name="P:DevExpress.XtraRichEdit.Import.HtmlDocumentImporterOptions.FontScalingDpiValue">
       <summary>
@@ -36524,9 +36537,9 @@
     </member>
     <member name="P:DevExpress.XtraRichEdit.Import.PlainTextDocumentImporterOptions.AutoDetectEncoding">
       <summary>
-        <para>Gets or sets whether the auto-detection of the loaded text encoding is enabled.</para>
+        <para>Gets or sets whether to enable the auto-detection of the loaded text encoding.</para>
       </summary>
-      <value>true to switch the encoding autodetection on; otherwise, false.</value>
+      <value>true to enable the automatic encoding detection; otherwise, false.</value>
     </member>
     <member name="M:DevExpress.XtraRichEdit.Import.PlainTextDocumentImporterOptions.CopyFrom(DevExpress.Office.Import.IImporterOptions)">
       <summary>
@@ -36538,7 +36551,7 @@
       <summary>
         <para>Gets or sets the encoding used to interpret characters in the document.</para>
       </summary>
-      <value>A <see cref="T:System.Text.Encoding"/> object providing the conversion between certain encoding and Unicode.</value>
+      <value>An object that contains character encoding parameters.</value>
     </member>
     <member name="P:DevExpress.XtraRichEdit.Import.PlainTextDocumentImporterOptions.UpdateField">
       <summary>
@@ -37336,7 +37349,9 @@
       </summary>
     </member>
     <member name="E:DevExpress.XtraRichEdit.IRichEditDocumentServer.BeforeEncodingDetection">
-      <summary />
+      <summary>
+        <para>Occurs before detecting encoding of the loaded plain text or HTML content.</para>
+      </summary>
     </member>
     <member name="E:DevExpress.XtraRichEdit.IRichEditDocumentServer.BeforeExport">
       <summary>
@@ -38281,15 +38296,15 @@
     </member>
     <member name="P:DevExpress.XtraRichEdit.PrintingOptions.EnableCommentBackgroundOnPrint">
       <summary>
-        <para>Gets or sets whether to print the background of the document’s margin containing comment balloons.</para>
+        <para>Gets or sets whether to print the background of the document’s margin with comment balloons.</para>
       </summary>
-      <value>True, to print the background of the document’s margin; otherwise, false.</value>
+      <value>true, to print the background of the document’s margin; otherwise, false.</value>
     </member>
     <member name="P:DevExpress.XtraRichEdit.PrintingOptions.EnableCommentFillOnPrint">
       <summary>
         <para>Gets or sets whether to print the background color of the comment balloons.</para>
       </summary>
-      <value>True, to print the comment balloon background; otherwise, false.</value>
+      <value>true, to print the comment balloon background; otherwise, false.</value>
     </member>
     <member name="P:DevExpress.XtraRichEdit.PrintingOptions.EnablePageBackgroundOnPrint">
       <summary>
@@ -39216,7 +39231,9 @@
       </summary>
     </member>
     <member name="E:DevExpress.XtraRichEdit.RichEditDocumentServer.BeforeEncodingDetection">
-      <summary />
+      <summary>
+        <para>Occurs before detection of the loaded plain text or HTML encoding.</para>
+      </summary>
     </member>
     <member name="E:DevExpress.XtraRichEdit.RichEditDocumentServer.BeforeExport">
       <summary>

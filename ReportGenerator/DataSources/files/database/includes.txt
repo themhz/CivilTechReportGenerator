@@ -1,0 +1,24 @@
+{
+	"Includes":
+	[
+		{
+			"file":	"PageA.docx",
+			"alias": "PageAtemplate",
+		},
+		{
+			"file":	"PageADetails.docx",
+			"alias": "PageADetailstemplate",			
+			"table": "PageA"
+		},
+		{
+			"file":	"Slabs.docx",
+			"alias": "Slabs",
+		},
+		{
+			"file":	"rptAnnex4.docx",
+			"alias": "rptAnnex4",
+			"table": "PageBLevelFaces",
+		},		
+		
+	]
+}

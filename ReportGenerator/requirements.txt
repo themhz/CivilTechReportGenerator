@@ -1,0 +1,17 @@
+﻿Loads the docx
+	Read All Comments
+	Read All Tokens
+	Parse Comments	
+	Parse Tokens	
+Loop
+
+
+1. Read all comments, Tokens
+	The application reads a docx file and then it reads all the comments and all the tokens placed with in
+	This is nessesary because we will use them in order to parse them. Parsing is explained later.
+	For now we just load them from a document.docx
+	Notice that tokens have two types. One type is {somealias} or this {!somealias}
+
+
+
+

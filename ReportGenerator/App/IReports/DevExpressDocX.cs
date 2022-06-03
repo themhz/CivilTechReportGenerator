@@ -143,8 +143,7 @@ namespace ReportGenerator_v1.System {
             CommentCollection comments = this.mainWordProcessor.Document.Comments;
             this.comments = comments;
             while (comments.Count > 0) {
-                this.parseCommentTypes(comments[0]);
-                //this.mainWordProcessor.Document.Comments.Remove(comments[0]);
+                this.parseCommentTypes(comments[0]);                
             }
             this.createPageBreak();
     }
@@ -295,9 +294,7 @@ namespace ReportGenerator_v1.System {
             DocumentRange footerRange = getRowsRange(table, headerCount + rowCount, footerCount);            
             mainWordProcessor.Document.InsertDocumentContent(lastPos, footerRange, InsertOptions.KeepSourceFormatting);
             this.mainWordProcessor.Document.Delete(comment.Range);            
-            this.mainWordProcessor.Document.ReplaceAll("{{newTable}}", " ", SearchOptions.None,this.mainWordProcessor.Document.Range);
-            //this.replaceTextWithNewText("{{newTable}}",  " ");
-            
+            this.mainWordProcessor.Document.ReplaceAll("{{newTable}}", " ", SearchOptions.None,this.mainWordProcessor.Document.Range);                       
 
         }
 
@@ -463,7 +460,6 @@ namespace ReportGenerator_v1.System {
                     text = this.formatText(text);
                     this.replaceTextWithNewTextLast(field, text);
                 }
-                                
             }
 
             

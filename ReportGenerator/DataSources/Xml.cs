@@ -8,12 +8,13 @@ using System.Xml;
 using System.Data;
 using System.Linq;
 using System.Configuration;
+using FastMember;
 
 namespace ReportGenerator_v1.DataSources {
     public class Xml : IDataSource {
         private DataSet _dataSet;
         private Dictionary<String, DataColumn> binder;
-        private String xmlPath = ConfigurationManager.AppSettings["xmlPath"]+ "testReport.xml";
+        private String xmlPath = ConfigurationManager.AppSettings["xmlPath"]+ "dataEnergyBuilding.xml";
 
         public Xml() {
             this.binder = getDictionary();
@@ -87,7 +88,7 @@ namespace ReportGenerator_v1.DataSources {
 
 
         // TODO Need to do some work
-        public object GetValueByLinq() {
+        public DataTable GetValueByLinq() {
             //https://www.c-sharpcorner.com/blogs/inner-join-and-outer-join-in-datatable-using-linq
             //Inner join
             DataTable PageA = _dataSet.Tables["PageA"];
@@ -104,6 +105,13 @@ namespace ReportGenerator_v1.DataSources {
                               }).ToList();
 
 
+            DataTable table = new DataTable();
+            using (var reader = ObjectReader.Create(JoinResult))
+            {
+                table.Load(reader);
+            }
+
+
             //Select where
             //DataTable SelectedTable = _dataSet.Tables["PageADetails"];            
             //IEnumerable<DataRow> filter = SelectedTable.AsEnumerable().
@@ -115,13 +123,13 @@ namespace ReportGenerator_v1.DataSources {
             //SelectedTable = _dataSet.Tables["PageBLevelFaceElements"];
             //query = from table in SelectedTable.AsEnumerable() select table;
 
-            Console.WriteLine("Start");
-            foreach (var p in JoinResult) {
-                //Console.WriteLine(((DataRow)p).Field<string>("ID"));
-                Console.WriteLine(p.id + " | " + p.pageAName + " | " + p.pageATypeName + " | " + p.pageADetailsName);
-            }
+            //Console.WriteLine("Start");
+            //foreach (var p in JoinResult) {
+            //    //Console.WriteLine(((DataRow)p).Field<string>("ID"));
+            //    Console.WriteLine(p.id + " | " + p.pageAName + " | " + p.pageATypeName + " | " + p.pageADetailsName);
+            //}
 
-            return null;
+            return table;
         }
 
     }

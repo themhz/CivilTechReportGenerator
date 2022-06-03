@@ -1039,6 +1039,9 @@
         <para>The expression element is an operator.</para>
       </summary>
     </member>
+    <member name="F:DevExpress.Data.Controls.ExpressionEditor.ExpressionElementKind.Parenthesis">
+      <summary />
+    </member>
     <member name="T:DevExpress.Data.Controls.ExpressionEditor.FunctionInfo">
       <summary>
         <para>Provides information about a function listed in the Expression Editor.</para>
@@ -10190,12 +10193,12 @@
     </member>
     <member name="F:DevExpress.Utils.DefaultBoolean.False">
       <summary>
-        <para>Corresponds to a Boolean value of false.</para>
+        <para>false. DefaultBoolean.False has a constant value of 1, while the standard false value corresponds to a value of 0. In Visual Basic, do not use implicit conversion of Boolean values to DefaultBoolean, and vice versa, as the conversion may produce incorrect results.</para>
       </summary>
     </member>
     <member name="F:DevExpress.Utils.DefaultBoolean.True">
       <summary>
-        <para>Corresponds to a Boolean value of true.</para>
+        <para>true. DefaultBoolean.True has a constant value of 0, while the standard true value corresponds to a value of 1. In Visual Basic, do not use implicit conversion of Boolean values to DefaultBoolean, and vice versa, as the conversion may produce incorrect results.</para>
       </summary>
     </member>
     <member name="T:DevExpress.Utils.DXCollection`1">
