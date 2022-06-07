@@ -116,6 +116,11 @@
   <ItemGroup>
     <Compile Include="App\IReports\DevExpressDocX003.cs" />
     <Compile Include="App\IReports\DevExpressDocX002.cs" />
+    <Compile Include="DataSources\files\database\dsBuildingHeatInsulation1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsBuildingHeatInsulation.xsd</DependentUpon>
+    </Compile>
     <Compile Include="DataSources\Interfaces\IDataSource.cs" />
     <Compile Include="DataSources\Xml.cs" />
     <Compile Include="Helpers\ImageResizer.cs" />
@@ -137,16 +142,22 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="DataSources\files\old\template_part1.docx" />
-    <None Include="DataSources\files\Replace Algorithm.docx" />
-    <None Include="DataSources\files\report_template2.docx" />
-    <None Include="DataSources\files\templates\complexTable2.docx" />
-    <None Include="DataSources\files\templates\complexTable.docx" />
-    <None Include="DataSources\files\templates\template_part4.docx" />
-    <None Include="DataSources\files\templates\template_part2.docx" />
-    <None Include="DataSources\files\templates\template_part1.docx" />
-    <None Include="DataSources\files\temp\report_template.docx" />
-    <None Include="DataSources\files\old\report_template_ver1.docx" />
+    <None Include="DataSources\files\database\dsBuildingHeatInsulation.xsc">
+      <DependentUpon>dsBuildingHeatInsulation.xsd</DependentUpon>
+    </None>
+    <None Include="DataSources\files\database\dsBuildingHeatInsulation.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsBuildingHeatInsulation1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="DataSources\files\database\dsBuildingHeatInsulation.xss">
+      <DependentUpon>dsBuildingHeatInsulation.xsd</DependentUpon>
+    </None>
+    <None Include="DataSources\files\templates\Main.docx" />
+    <None Include="DataSources\files\templates\PageADetails.docx" />
+    <None Include="DataSources\files\templates\rptAnnex4.docx" />
+    <None Include="DataSources\files\templates\rptAnnex4A.docx" />
+    <None Include="DataSources\files\templates\Slabs.docx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -166,10 +177,12 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DataSources\files\anotation.txt" />
-    <Content Include="DataSources\files\old\oldfunctions.txt" />
-    <Content Include="DataSources\files\testReport.xml" />
+    <Content Include="DataSources\files\database\dataEnergyBuilding.xml" />
+    <Content Include="DataSources\files\database\includes.txt" />
+    <Content Include="DataSources\files\database\fields.txt" />
+    <Content Include="requirements.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Text.Json.6.0.0\build\System.Text.Json.targets" Condition="Exists('..\packages\System.Text.Json.6.0.0\build\System.Text.Json.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

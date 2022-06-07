@@ -12,6 +12,11 @@ Loop
 	For now we just load them from a document.docx
 	Notice that tokens have two types. One type is {somealias} or this {!somealias}
 
+	{somealias} must be a name located withing the database->fields.txt file which is a json file. It is an alias that corresponds to 
+	a current field of a table. 
+
+	{!somealias} must also be decllared with in databe->fields.txt file but will be parsed and use as a table field within a table
+
 
 
 

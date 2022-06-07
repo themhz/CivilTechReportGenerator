@@ -46,7 +46,6 @@ namespace ReportGenerator_v1.System {
                 this.parse();
                 this.save();
                 this.openfile();
-                
             }
             Console.WriteLine("file report created");
             return this;
@@ -143,10 +142,10 @@ namespace ReportGenerator_v1.System {
             CommentCollection comments = this.mainWordProcessor.Document.Comments;
             this.comments = comments;
             while (comments.Count > 0) {
-                this.parseCommentTypes(comments[0]);                
+                this.parseCommentTypes(comments[0]);
             }
             this.createPageBreak();
-    }
+        }
         ///<summary>
         ///This function is used to check the type of parsing that will be used        
         ///</summary>
