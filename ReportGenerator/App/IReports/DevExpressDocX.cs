@@ -24,9 +24,13 @@ namespace ReportGenerator_v1.System {
         public RichEditDocumentServer tempWordProcessor { set; get; }
         public IDataSource datasource { set; get; }
         public String template { set; get; }
-        public String generatedfile { set; get; }
+        public String generatedFile { set; get; }
+        public String fieldsFile { set; get; }
+        public JObject joFieldsFile { set; get; }
+        public String includesFile { set; get; }
+        public JObject joIncludesFile { set; get; }
         private DocumentRange sourceRange { set; get; }
-        private DocumentRange targetRange { set; get; }
+        private DocumentRange targetRange { set; get; }        
         private CommentCollection comments { set; get; }
         
         public DevExpressDocX(RichEditDocumentServer _wordProcessor, IDataSource _datasource) {
@@ -40,10 +44,12 @@ namespace ReportGenerator_v1.System {
         /// and returns the document itself
         /// </returns>
         public IReport create() {
-            Console.WriteLine("creating document "+ this.generatedfile.ToString());
+            Console.WriteLine("creating document "+ this.generatedFile.ToString());
             using (this.mainWordProcessor) {
-                this.load();
-                this.parse();
+                this.loadWordDocument();
+                this.loadFieldsFile();
+                this.loadIncludesFile();
+                this.start();
                 this.save();
                 this.openfile();
             }
@@ -52,10 +58,20 @@ namespace ReportGenerator_v1.System {
         }
         /// <summary>
         /// Loads the document and begins the update
-        /// </summary>
-        public void load() {
+        /// </summary>        
+        public void loadWordDocument()
+        {
             this.mainWordProcessor.Document.BeginUpdate();
             this.mainWordProcessor.LoadDocument(this.template);
+        }
+
+        public void loadFieldsFile()
+        {
+            this.joFieldsFile = JObject.Parse(File.ReadAllText(this.fieldsFile));
+        }
+        public void loadIncludesFile()
+        {
+            this.joIncludesFile = JObject.Parse(File.ReadAllText(this.includesFile));
         }
         /// <summary>
         /// Saves the document to the folder specified in the App.config, and the path is in the this.generatedfile
@@ -63,14 +79,14 @@ namespace ReportGenerator_v1.System {
         public void save() {
             this.mainWordProcessor.Document.EndUpdate();
             Console.WriteLine("Saving file report");
-            this.mainWordProcessor.SaveDocument(this.generatedfile, DocumentFormat.OpenXml);
+            this.mainWordProcessor.SaveDocument(this.generatedFile, DocumentFormat.OpenXml);
             Console.WriteLine("Report save in :" + this.template);
         }
         /// <summary>
         /// Opens the file with the word application 
         /// </summary>
         public void openfile() {
-            Process.Start(new ProcessStartInfo(this.generatedfile) { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo(this.generatedFile) { UseShellExecute = true });
         }                                    
         /// <summary>
         /// Adds a row to the target table that is specified
@@ -136,15 +152,14 @@ namespace ReportGenerator_v1.System {
         /// <summary>
         /// Parses all the comments of a document. Basically everything starts here
         /// </summary>
-        public void parse() {
-            //Collect all comments and loop through them in order to parse each one of them individually and create the document elemtnts            
+        public void start() {            
 
-            CommentCollection comments = this.mainWordProcessor.Document.Comments;
-            this.comments = comments;
-            while (comments.Count > 0) {
-                this.parseCommentTypes(comments[0]);
-            }
-            this.createPageBreak();
+            //CommentCollection comments = this.mainWordProcessor.Document.Comments;
+            //this.comments = comments;
+            //while (comments.Count > 0) {
+            //    this.parseCommentTypes(comments[0]);
+            //}
+            //this.createPageBreak();
         }
         ///<summary>
         ///This function is used to check the type of parsing that will be used        

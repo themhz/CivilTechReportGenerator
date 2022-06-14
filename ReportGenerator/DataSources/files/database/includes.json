@@ -7,8 +7,8 @@
 		},
 		{
 			"file":	"PageADetails.docx",
-			"alias": "PageADetailstemplate",			
-			"table": "PageA"
+			"alias": "PageADetailstemplate",
+			"table": "PageA",
 		},
 		{
 			"file":	"Slabs.docx",

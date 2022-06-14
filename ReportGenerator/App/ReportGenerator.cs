@@ -9,12 +9,13 @@ namespace ReportGenerator_v1.System {
             this.DocXReport = _docXReport;
         }
 
-        public void CreateDocX(IReport reportType) {
-            string reportPath = ConfigurationManager.AppSettings["reportPath"];
+        public void CreateDocX(IReport reportType) {            
             this.DocXReport = reportType;
-            this.DocXReport.template = reportPath + "Main.docx";                        
-            this.DocXReport.generatedfile = reportPath + "report_generated.docx";
-            this.DocXReport = this.DocXReport.create();            
+            this.DocXReport.template = ConfigurationManager.AppSettings["reportPath"] + "Main.docx";
+            this.DocXReport.generatedFile = ConfigurationManager.AppSettings["reportPath"] + "report_generated.docx";
+            this.DocXReport.fieldsFile = ConfigurationManager.AppSettings["fieldsPath"] + "fields.json";
+            this.DocXReport.includesFile = ConfigurationManager.AppSettings["includesPath"] + "includes.json";
+            this.DocXReport = this.DocXReport.create();
         }
     }
 }

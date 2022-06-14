@@ -5,6 +5,7 @@ C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\DevExpress.Data.v21.2.dll
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\DevExpress.Office.v21.2.Core.dll
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\DevExpress.RichEdit.v21.2.Core.dll
+C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\FastMember.dll
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\Microsoft.Extensions.DependencyModel.dll
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\Newtonsoft.Json.dll
@@ -60,9 +61,7 @@ C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\es\DevExpress.Pdf.v21.2.Core.resources.dll
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\ja\DevExpress.Pdf.v21.2.Core.resources.dll
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\ru\DevExpress.Pdf.v21.2.Core.resources.dll
-C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\obj\Debug\ReportGenerator.csproj.AssemblyReference.cache
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\obj\Debug\ReportGenerator.csproj.CoreCompileInputs.cache
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\obj\Debug\ReportGenerator.csproj.CopyComplete
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\obj\Debug\ReportGenerator.exe
 C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\obj\Debug\ReportGenerator.pdb
-C:\Users\themis\source\repos\CivilTechReportGenerator\ReportGenerator\bin\Debug\FastMember.dll

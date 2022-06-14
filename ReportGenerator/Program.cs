@@ -17,9 +17,9 @@ namespace ReportGenerator_v1 {
             using (var scope = Container.BeginLifetimeScope()) {
                 var app = scope.Resolve<App>();
 
-                //var reportType = scope.Resolve<ExceedDocX>();
+                //var reportType = scope.Resolve<DevExpressDocX003>();                
                 var reportType = scope.Resolve<DevExpressDocX>();
-                //var reportType = scope.Resolve<DevExpressDocX003>();
+
                 app.start(reportType);
             }
         }
@@ -28,15 +28,17 @@ namespace ReportGenerator_v1 {
         //https://autofac.readthedocs.io/en/latest/index.html
         private static IContainer BuildContainer() {
             var builder = new ContainerBuilder();
-            builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly()).AsSelf().AsImplementedInterfaces();
-            builder.RegisterType<RichEditDocumentServer>().As<RichEditDocumentServer>();
-            builder.RegisterType<ExceedDocX>().As<ExceedDocX>();
+            
+            builder.RegisterType<RichEditDocumentServer>().As<RichEditDocumentServer>();            
             builder.RegisterType<List<List<string>>>().As<List<List<string>>>();
             builder.RegisterType<List<TableData>>().As<List<TableData>>();
-            builder.RegisterType<TableData>().As<TableData>();
+            builder.RegisterType<TableData>().As<TableData>();            
+
             builder.RegisterType<DevExpressDocX>().As<IReport>();
             builder.RegisterType<Xml>().As<IDataSource>();
-                 
+
+            builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly()).AsSelf().AsImplementedInterfaces();
+
             return builder.Build();
         }
     }
