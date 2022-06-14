@@ -46,9 +46,9 @@ namespace ReportGenerator_v1.System {
         public IReport create() {
             Console.WriteLine("creating document "+ this.generatedFile.ToString());
             using (this.mainWordProcessor) {
-                this.loadWordDocument();
                 this.loadFieldsFile();
                 this.loadIncludesFile();
+                this.loadWordDocument();                
                 this.start();
                 this.save();
                 this.openfile();
@@ -154,6 +154,7 @@ namespace ReportGenerator_v1.System {
         /// </summary>
         public void start() {            
 
+            
             //CommentCollection comments = this.mainWordProcessor.Document.Comments;
             //this.comments = comments;
             //while (comments.Count > 0) {
